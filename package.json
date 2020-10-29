@@ -1,0 +1,46 @@
+{
+  "name": "dester",
+  "version": "0.0.1",
+  "description": "A simple js/ts builder that uses Rollup and Sucrase",
+  "author": "cftcview <cftcview@gmail.com>",
+  "homepage": "https://github.com/wareset/dester#readme",
+  "license": "MIT",
+  "bin": {
+    "dester": "./dester"
+  },
+  "files": [
+    "cli.js",
+    "dester",
+    "README.md"
+  ],
+  "scripts": {
+    "pkg:name": "cat package.json | grep '\"name\":' | cut -d '\"' -f4",
+    "pkg:version": "cat package.json | grep '\"version\":' | cut -d '\"' -f4",
+    "git:get:tag": "echo v$(npm run -s pkg:version)",
+    "git:set:tag": "t=$(npm run -s git:get:tag) && git tag -a $t -m $t",
+    "git:commit": "git add . && read -p 'Commit: ' c; c=${c:-v$(npm run -s pkg:version)} && n=$(npm run -s pkg:name) && git commit -m \"$n: $c\"",
+    "commit": "read -p 'Version [patch]: ' V; V=${V:-patch} && npm version --force --no-git-tag-version $V; echo $V && read -p 'Push? (y/N): ' G && read -p 'Publish? (y/N): ' P && npm run -s git:commit && case $G in Y|y) $(git push);; esac && case $P in Y|y) $(npm run -s git:set:tag && git push --tags && npm -s publish);; esac"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wareset/dester.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wareset/dester/issues"
+  },
+  "peerDependencies": {
+    "typescript": "4.x"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-sucrase": "^3.1.0",
+    "kleur": "^4.1.3",
+    "minimist": "^1.2.5",
+    "rollup": "2.32.1"
+  }
+}
