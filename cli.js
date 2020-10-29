@@ -118,6 +118,7 @@ const rollupPluginSucrase = require('@rollup/plugin-sucrase')({
       console.log('  dester [input] [output]');
       console.log('  -i, --input  -  Input folder. Default: "src"');
       console.log('  -o, --output  -  Output folder. Default: "dist"');
+      console.log('  -t, --types  -  Create declarations. Default: true');
       console.log('  -w, --watch  -  Watch files. Default: false');
       console.log('  --pkg  -  Path to package.json. Default: "auto"');
       console.log('  --tsc  -  Path to tsconfig.json. Default: "auto"');
@@ -136,41 +137,41 @@ const rollupPluginSucrase = require('@rollup/plugin-sucrase')({
   const DIR_OUTPUT = path.resolve(output);
   const DIR_TYPES = path.resolve(DIR_OUTPUT, '__types__');
 
-  // console.log(process);
-  const DIR_NODE_MODULES = require.main.paths[0];
-  const DIR_CACHE = path.resolve(DIR_NODE_MODULES, '.cache');
-  if (!fs.existsSync(DIR_CACHE)) fs.mkdirSync(DIR_CACHE);
-  const DIR_CACHE_DESTER = path.resolve(DIR_CACHE, 'dester');
-  if (!fs.existsSync(DIR_CACHE_DESTER)) fs.mkdirSync(DIR_CACHE_DESTER);
-  const FILE_TSCONFIG = path.resolve(
-    DIR_CACHE_DESTER,
-    hash(DIR_INPUT + DIR_OUTPUT) + '.json'
-  );
-
-  const OBJ_TSCONFIG = {
-    // Change this to match your project
-    include: [path.join(DIR_INPUT, '/**/*')],
-
-    compilerOptions: {
-      // Tells TypeScript to read JS files, as
-      // normally they are ignored as source files
-      allowJs: true,
-      // Generate d.ts files
-      declaration: true,
-      // This compiler run should
-      // only output d.ts files
-      emitDeclarationOnly: true,
-      // Types should go into this directory.
-      // Removing this would place the .d.ts files
-      // next to the .js files
-      outDir: DIR_TYPES
-    }
-  };
-
-  fs.writeFileSync(FILE_TSCONFIG, JSON.stringify(OBJ_TSCONFIG));
-  process.on('exit', () => fs.unlinkSync(FILE_TSCONFIG));
-
   const createTypesFn = () => {
+    // console.log(process);
+    const DIR_NODE_MODULES = require.main.paths[0];
+    const DIR_CACHE = path.resolve(DIR_NODE_MODULES, '.cache');
+    if (!fs.existsSync(DIR_CACHE)) fs.mkdirSync(DIR_CACHE);
+    const DIR_CACHE_DESTER = path.resolve(DIR_CACHE, 'dester');
+    if (!fs.existsSync(DIR_CACHE_DESTER)) fs.mkdirSync(DIR_CACHE_DESTER);
+    const FILE_TSCONFIG = path.resolve(
+      DIR_CACHE_DESTER,
+      hash(DIR_INPUT + DIR_OUTPUT) + '.json'
+    );
+
+    const OBJ_TSCONFIG = {
+      // Change this to match your project
+      include: [path.join(DIR_INPUT, '/**/*')],
+
+      compilerOptions: {
+        // Tells TypeScript to read JS files, as
+        // normally they are ignored as source files
+        allowJs: true,
+        // Generate d.ts files
+        declaration: true,
+        // This compiler run should
+        // only output d.ts files
+        emitDeclarationOnly: true,
+        // Types should go into this directory.
+        // Removing this would place the .d.ts files
+        // next to the .js files
+        outDir: DIR_TYPES
+      }
+    };
+
+    fs.writeFileSync(FILE_TSCONFIG, JSON.stringify(OBJ_TSCONFIG));
+    process.on('exit', () => fs.unlinkSync(FILE_TSCONFIG));
+
     let cliTS = 'tsc';
 
     // prettier-ignore
