@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 // prettier-ignore
-const hash = s => (s.replace(/\r/g, '').split('').reduce((a, b) =>
+const hash = (s) => (s.replace(/\r/g, '').split('').reduce((a, b) =>
   (a = (a << 5) - a + b.charCodeAt(0)), 0) >>> 0).toString(36);
 const startsWith = (s, text, pos = 0) => s.indexOf(text, pos) === pos;
 const resolveExternals = (key, v) => {
@@ -11,20 +11,33 @@ const resolveExternals = (key, v) => {
   return res;
 };
 
-const parseJSON = str => JSON.parse(str.replace(/^\s*\/\/.*/gm, ''));
+// const parseJSON = (str) => JSON.parse(str.replace(/^\s*\/\/.*/gm, ''));
+
+// const __jsonSpliter__ = split(null, /(\0)/, /\/\*/, /\*\//, true, true);
+// const jsonNormalize = (data) => {
+//   return __jsonSpliter__(
+//     data.replace(/(\/\*|\/\/)|(\*\/|$)/gm, (__, c, a) =>
+//       c ? `\0${c}` : `${a}\0`
+//     )
+//   )
+//     .filter((v) => v.trim() && v[0] !== '/')
+//     .join('')
+//     .replace(/\0/g, '');
+// };
 
 const kleur = require('kleur');
 const argv = require('minimist')(process.argv.slice(2), {
-  default: { tsc: true, pkg: true, types: true },
+  default: { tsc: true, pkg: true, types: true, sourcemap: false },
   string: ['input', 'output', 'pkg', 'tsc'],
-  boolean: ['help', 'version', 'watch', 'types'],
+  boolean: ['help', 'version', 'watch', 'types', 'sourcemap'],
   alias: {
     h: 'help',
     v: 'version',
     i: 'input',
     o: 'output',
     t: 'types',
-    w: 'watch'
+    w: 'watch',
+    s: 'sourcemap'
   }
   // '--': true,
   // stopEarly: true, /* populate _ with first non-option */
@@ -33,27 +46,42 @@ const argv = require('minimist')(process.argv.slice(2), {
 
 // console.log(argv);
 
-const EXTENSIONS = ['.mjs', '.cjs', '.js', '.jsx', '.ts', '.tsx'];
+const EXTENSIONS = ['.mjs', '.js', '.jsx', '.ts', '.tsx', '.json', '.node'];
 
-let input = argv.input || argv._[0] || 'src';
-let output =
+let argvInput = argv.input || argv._[0] || 'src';
+let argvOutput =
   argv.output ||
   argv._[1] ||
-  (argv._[0] && input !== argv._[0] ? argv._[0] : 'dist');
+  (argv._[0] && argvInput !== argv._[0] ? argv._[0] : 'dist');
+
+const argvSourcemap = !!argv.sourcemap;
+const argvWatch = !!argv.watch;
 
 const findExternalsFn = (input, output) => {
   const BUILD_KEYS = {};
 
   const createOutputFn = (output, name = '') => [
-    { file: path.resolve(output, name, 'index.mjs'), format: 'esm' },
-    { file: path.resolve(output, name, 'index.js'), format: 'cjs' }
+    {
+      file: path.resolve(output, name, 'index.mjs'),
+      format: 'esm',
+      exports: 'named',
+      // interop: 'esModule',
+      sourcemap: argvSourcemap
+    },
+    {
+      file: path.resolve(output, name, 'index.js'),
+      format: 'cjs',
+      exports: 'named',
+      // interop: 'esModule',
+      sourcemap: argvSourcemap
+    }
   ];
 
   const findBuilders = (input, output) => {
     const files = fs.readdirSync(input, { withFileTypes: true });
 
     let name, ext, key;
-    const isIndex = [...files].some(dirent => {
+    const isIndex = [...files].some((dirent) => {
       ({ name, ext } = path.parse(dirent.name));
       if (dirent.isFile() && name === 'index' && ~EXTENSIONS.indexOf(ext)) {
         BUILD_KEYS[output] = {
@@ -87,18 +115,9 @@ const findExternalsFn = (input, output) => {
   return BUILD_KEYS;
 };
 
-const rollup = require('rollup');
-const rollupPluginCommonjs = require('@rollup/plugin-commonjs')({
-  extensions: EXTENSIONS
-});
-const rollupPluginJson = require('@rollup/plugin-json')();
-const rollupPluginSucrase = require('@rollup/plugin-sucrase')({
-  transforms: ['typescript']
-});
-
 (() => {
   if (argv.version || argv.help) {
-    const red = v => kleur.red(v);
+    const red = (v) => kleur.red(v);
     console.log(
       kleur.cyan().bold(`
    ___       ${red('__')} _ ${red('_ _ _ /_,_')}  ${red('_______   ____')}
@@ -120,6 +139,7 @@ const rollupPluginSucrase = require('@rollup/plugin-sucrase')({
       console.log('  -o, --output  -  Output folder. Default: "dist"');
       console.log('  -t, --types  -  Create declarations. Default: true');
       console.log('  -w, --watch  -  Watch files. Default: false');
+      console.log('  -s, --sourcemap  -  Create SourceMap. Default: false');
       console.log('  --pkg  -  Path to package.json. Default: "auto"');
       console.log('  --tsc  -  Path to tsconfig.json. Default: "auto"');
 
@@ -133,8 +153,21 @@ const rollupPluginSucrase = require('@rollup/plugin-sucrase')({
     return;
   }
 
-  const DIR_INPUT = path.resolve(input);
-  const DIR_OUTPUT = path.resolve(output);
+  const rollup = require('rollup');
+  // const rollupPluginResolve = require('@rollup/plugin-node-resolve').default({
+  //   extensions: EXTENSIONS
+  // });
+  // const rollupPluginCommonjs = require('@rollup/plugin-commonjs')({
+  //   // transformMixedEsModules: 'ignore',
+  //   extensions: EXTENSIONS
+  // });
+  const rollupPluginJson = require('@rollup/plugin-json')();
+  const rollupPluginSucrase = require('@rollup/plugin-sucrase')({
+    transforms: ['typescript']
+  });
+
+  const DIR_INPUT = path.resolve(argvInput);
+  const DIR_OUTPUT = path.resolve(argvOutput);
   const DIR_TYPES = path.resolve(DIR_OUTPUT, '__types__');
 
   const createTypesFn = () => {
@@ -165,7 +198,17 @@ const rollupPluginSucrase = require('@rollup/plugin-sucrase')({
         // Types should go into this directory.
         // Removing this would place the .d.ts files
         // next to the .js files
-        outDir: DIR_TYPES
+        outDir: DIR_TYPES,
+        // declarationDir: DIR_TYPES,
+
+        experimentalDecorators: true,
+        emitDecoratorMetadata: true,
+
+        allowSyntheticDefaultImports: true,
+        esModuleInterop: true,
+        target: 'esnext',
+        moduleResolution: 'node',
+        module: 'esnext'
       }
     };
 
@@ -181,20 +224,24 @@ const rollupPluginSucrase = require('@rollup/plugin-sucrase')({
     // prettier-ignore
     try {
       const tsFork = require('child_process').spawn(cliTS,
-        ['--build', FILE_TSCONFIG, ...(argv.watch ? ['--watch'] : [])]
+        ['--build', FILE_TSCONFIG, ...(argvWatch ? ['--watch'] : [])]
         // { stdio: ['ignore', 'inherit', 'inherit'], shell: true }
       );
       const exit = () => tsFork && tsFork.kill(0);
       process.on('SIGTERM', exit), process.on('exit', exit);
-      tsFork.stdout.on('data', data => {
+      tsFork.stdout.on('data', (data) => {
         console.log([data.toString()]);
+      });
+      tsFork.on('error', (data) => {
+        argv.types = false;
+        console.log(kleur.red('"tsc" not found. Use "--no-types" parameter!'));
       });
     } catch (err) {/* */}
   };
   if (argv.tsc !== false && argv.types) createTypesFn();
 
-  input = path.resolve(input);
-  output = path.resolve(output);
+  argvInput = path.resolve(argvInput);
+  argvOutput = path.resolve(argvOutput);
 
   const findFileFn = (fileFromArgv, base) => {
     let file = fileFromArgv;
@@ -242,18 +289,21 @@ const rollupPluginSucrase = require('@rollup/plugin-sucrase')({
     // console.log(BUILD_KEYS);
 
     let pkg;
-    if (pkgFile) pkg = parseJSON(fs.readFileSync(pkgFile).toString());
+    if (pkgFile) pkg = JSON.parse(fs.readFileSync(pkgFile).toString());
 
     let rollupPluginTypescript;
     if (
       tscFile &&
-      Object.keys(BUILD_KEYS).some(v =>
+      Object.keys(BUILD_KEYS).some((v) =>
         startsWith(path.parse(BUILD_KEYS[v].input).ext, '.ts')
       )
     ) {
       rollupPluginTypescript = require('rollup-plugin-typescript2')({
         tsconfig: tscFile,
-        tsconfigOverride: { compilerOptions: { declaration: false } }
+        tsconfigOverride: {
+          compilerOptions: { declaration: false },
+          include: [DIR_INPUT]
+        }
       });
     }
 
@@ -264,20 +314,28 @@ const rollupPluginSucrase = require('@rollup/plugin-sucrase')({
     );
 
     const ROLLS = [];
+    let writeKeys = {};
     for (const key of Object.keys(BUILD_KEYS)) {
       const { input, output } = BUILD_KEYS[key];
-      const plugins = [];
+      const plugins = [
+        rollupPluginJson
+        // rollupPluginResolve,
+        // rollupPluginCommonjs
+      ];
       const isTs = startsWith(path.parse(input).ext, '.ts');
-      if (isTs && rollupPluginTypescript) plugins.push(rollupPluginTypescript);
-      plugins.push(rollupPluginSucrase, rollupPluginCommonjs, rollupPluginJson);
+      if (isTs) plugins.unshift(rollupPluginTypescript || rollupPluginSucrase);
 
       const filePackage = path.resolve(key, 'package.json');
 
       plugins.push({
-        writeBundle() {
+        writeBundle({ format }, data) {
+          // console.log('format: ' + format, Object.keys(data));
+          if (key in writeKeys) return;
+          writeKeys[key] = true;
+
           let __package__ = {};
           if (fs.existsSync(filePackage)) {
-            __package__ = parseJSON(fs.readFileSync(filePackage).toString());
+            __package__ = JSON.parse(fs.readFileSync(filePackage).toString());
           }
           (__package__.main = './index'), (__package__.module = './index.mjs');
 
@@ -290,10 +348,26 @@ const rollupPluginSucrase = require('@rollup/plugin-sucrase')({
               )
             );
 
-            fs.writeFileSync(
-              path.resolve(key, 'index.d.ts'),
-              `export * from '${importPath}';`
-            );
+            const exports = data[Object.keys(data)[0]].exports;
+            console.log('exports: ', exports);
+
+            let text = '';
+            exports.forEach((v, k, a) => {
+              if (v === 'default') {
+                if (text) text += '\n';
+                text += `import __default__ from '${importPath}';\n`;
+                text += 'export { __default__ as default };\n';
+                if (k < a.length - 1) text += '\n';
+              } else text += `export { ${v} } from '${importPath}';\n`;
+            });
+
+            // let text = `export * from '${importPath}';\n`;
+            //             if (~exports.indexOf('default')) {
+            //               text += `import __default__ from '${importPath}';
+            // export { __default__ as default };\n`;
+            //             }
+
+            fs.writeFileSync(path.resolve(key, 'index.d.ts'), text);
           } else delete __package__.types;
 
           fs.writeFileSync(
@@ -307,8 +381,8 @@ const rollupPluginSucrase = require('@rollup/plugin-sucrase')({
         external: [
           ...external,
           ...Object.keys(BUILD_KEYS)
-            .filter(v => v !== key)
-            .map(v => resolveExternals(key, v))
+            .filter((v) => v !== key)
+            .map((v) => resolveExternals(key, v))
         ],
         input,
         plugins,
@@ -321,8 +395,8 @@ const rollupPluginSucrase = require('@rollup/plugin-sucrase')({
     watcher = rollup.watch(ROLLS);
     process.on('SIGTERM', watcher.close), process.on('exit', watcher.close);
 
-    watcher.on('event', event => {
-      // console.log(event, watcher);
+    watcher.on('event', (event) => {
+      console.log(event);
       // event.code can be one of:
       //   START        — the watcher is (re)starting
       //   BUNDLE_START — building an individual bundle
@@ -339,11 +413,20 @@ const rollupPluginSucrase = require('@rollup/plugin-sucrase')({
         console.log('--------------------------------------------------------');
       }
 
-      if (event.code === 'END' && !argv.watch) watcher.close();
+      if (event.code === 'END') {
+        writeKeys = {};
+        if (!argvWatch) watcher.close();
+      }
 
       if (event.code === 'ERROR') {
+        writeKeys = {};
+        const text = ' Dester ERROR: ' + event.error + ' ';
+        const bg = kleur.bgRed(
+          [...Array(text.length)].map((v) => ' ').join('')
+        );
+        console.error('\n' + bg + '\n' + kleur.bgRed(text) + '\n' + bg);
         console.error(event);
-        if (!argv.watch) watcher.close(), process.kill(0), process.exit(0);
+        if (!argvWatch) watcher.close(), process.kill(0), process.exit(0);
       }
     });
 
@@ -352,13 +435,13 @@ const rollupPluginSucrase = require('@rollup/plugin-sucrase')({
 
   watcher = buildRollupFn();
   let last;
-  const rebuildFn = force => (type, file) => {
+  const rebuildFn = (force) => (type, file) => {
     const l = type + file;
 
     if (last !== l) {
       last = l;
       console.log('\n');
-      console.log(kleur.red().inverse(' ' + type + ': ' + file + ' '));
+      console.log(kleur.green().inverse(' ' + type + ': ' + file + ' '));
     }
 
     if (type !== 'change' || force) {
@@ -366,9 +449,9 @@ const rollupPluginSucrase = require('@rollup/plugin-sucrase')({
       setTimeout(() => (watcher = buildRollupFn()), 1000);
     }
   };
-  if (argv.watch) {
+  if (argvWatch) {
     const chokidar = require('chokidar');
-    chokidar.watch(input).on('raw', rebuildFn());
+    chokidar.watch(argvInput).on('raw', rebuildFn());
     if (pkgFile) chokidar.watch(pkgFile).on('change', rebuildFn(true));
     if (tscFile) chokidar.watch(tscFile).on('change', rebuildFn(true));
   }
