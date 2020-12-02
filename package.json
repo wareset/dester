@@ -1,6 +1,6 @@
 {
   "name": "dester",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A simple CLI js/ts lib-builder that uses Rollup and TypeScript/Sucrase",
   "author": "cftcview <cftcview@gmail.com>",
   "homepage": "https://github.com/wareset/dester#readme",
