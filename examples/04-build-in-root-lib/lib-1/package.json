@@ -1,0 +1,11 @@
+{
+  "main": "index",
+  "module": "index.mjs",
+  "files": [
+    "../types",
+    "index.d.ts",
+    "index.js",
+    "index.mjs"
+  ],
+  "types": "index.d.ts"
+}

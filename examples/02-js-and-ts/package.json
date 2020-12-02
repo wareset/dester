@@ -1,0 +1,14 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "scripts": {
+    "dester": "dester ./src ./dist --tsc ./tsconfig.json",
+    "build": "rm -rf ./dist && npm run -s dester",
+    "dev": "npm run -s dester -- -w"
+  },
+  "devDependencies": {
+    "typescript": "4.x",
+    "dester": "0.x"
+  }
+}
