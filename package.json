@@ -1,7 +1,7 @@
 {
   "name": "dester",
   "version": "0.0.5",
-  "description": "A simple js/ts builder that uses Rollup and TypeScript/Sucrase",
+  "description": "A simple CLI js/ts lib-builder that uses Rollup and TypeScript/Sucrase",
   "author": "cftcview <cftcview@gmail.com>",
   "homepage": "https://github.com/wareset/dester#readme",
   "license": "MIT",

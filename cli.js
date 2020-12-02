@@ -2,30 +2,35 @@ const fs = require('fs');
 const path = require('path');
 
 const SEP = path.sep;
+const toPosix = (str) => str.split(SEP).join(path.posix.sep);
 
 // prettier-ignore
 const hash = (s) => (s.replace(/\r/g, '').split('').reduce((a, b) =>
   (a = (a << 5) - a + b.charCodeAt(0)), 0) >>> 0).toString(36);
-const startsWith = (s, text, pos = 0) => s.indexOf(text, pos) === pos;
+
+const startsWith = (str = '', v = '', pos = 0) =>
+  v.length && str.length >= v.length && str.indexOf(v, pos) === pos;
+
 const resolveExternals = (key, v) => {
   let res = v !== undefined ? path.relative(key, v) : key;
   if (!startsWith(res, SEP) && !startsWith(res, '..')) res = '.' + SEP + res;
+  if (res[res.length - 1] === SEP) res = res.slice(0, -1);
   return res;
 };
 
-// const parseJSON = (str) => JSON.parse(str.replace(/^\s*\/\/.*/gm, ''));
+const createCacheDir = () => {
+  const cacheDirArr = path
+    .resolve(require.main.paths[0] || path.resolve(), '.cache')
+    .split(SEP);
 
-// const __jsonSpliter__ = split(null, /(\0)/, /\/\*/, /\*\//, true, true);
-// const jsonNormalize = (data) => {
-//   return __jsonSpliter__(
-//     data.replace(/(\/\*|\/\/)|(\*\/|$)/gm, (__, c, a) =>
-//       c ? `\0${c}` : `${a}\0`
-//     )
-//   )
-//     .filter((v) => v.trim() && v[0] !== '/')
-//     .join('')
-//     .replace(/\0/g, '');
-// };
+  let dirCache = [cacheDirArr.shift(), cacheDirArr.shift()].join(SEP);
+  do {
+    dirCache = path.resolve(dirCache, cacheDirArr.shift());
+    if (!fs.existsSync(dirCache)) fs.mkdirSync(dirCache);
+  } while (cacheDirArr.length);
+
+  return dirCache;
+};
 
 const kleur = require('kleur');
 const argv = require('minimist')(process.argv.slice(2), {
@@ -36,8 +41,8 @@ const argv = require('minimist')(process.argv.slice(2), {
     sourcemap: false,
     silent: false
   },
-  string: ['input', 'output', 'pkg', 'tsc'],
-  boolean: ['help', 'version', 'watch', 'types', 'sourcemap', 'silent'],
+  string: ['input', 'output', 'pkg', 'tsc', 'types'],
+  boolean: ['help', 'version', 'watch', 'sourcemap', 'silent'],
   alias: {
     h: 'help',
     v: 'version',
@@ -47,9 +52,6 @@ const argv = require('minimist')(process.argv.slice(2), {
     w: 'watch',
     s: 'silent'
   }
-  // '--': true,
-  // stopEarly: true, /* populate _ with first non-option */
-  // unknown: function () { ... } /* invoked on unknown param */
 });
 
 // console.log(argv);
@@ -66,6 +68,12 @@ const argvSourcemap = !!argv.sourcemap;
 const argvWatch = !!argv.watch;
 const argvSilent = !!argv.silent;
 
+let argvTypes = argv.types;
+if (argvTypes === true || argvTypes === '') {
+  (argvTypes = '__types__'), (argv.types = true);
+} else if (startsWith(argvTypes, '.')) argvTypes = path.resolve(argvTypes);
+// else if (argvTypes) argvTypes = path.basename(argvTypes);
+
 const verbose = (...a) => {
   if (!argvSilent) console.log(...a);
 };
@@ -78,14 +86,12 @@ const findExternalsFn = (input, output) => {
       file: path.resolve(output, name, 'index.mjs'),
       format: 'esm',
       exports: 'named',
-      // interop: 'esModule',
       sourcemap: argvSourcemap
     },
     {
       file: path.resolve(output, name, 'index.js'),
       format: 'cjs',
       exports: 'named',
-      // interop: 'esModule',
       sourcemap: argvSourcemap
     }
   ];
@@ -146,22 +152,81 @@ const findExternalsFn = (input, output) => {
     console.log(description);
 
     if (argv.help) {
-      console.log('\nArguments:');
-      console.log('  dester [input] [output]');
-      console.log('  -i, --input  -  Input folder. Default: "src"');
-      console.log('  -o, --output  -  Output folder. Default: "dist"');
-      console.log('  -t, --types  -  Create declarations. Default: true');
-      console.log('  -w, --watch  -  Watch files. Default: false');
-      console.log('  -s, --silent  -  Do not display messages. Default: false');
-      console.log('  --sourcemap  -  Create SourceMap. Default: false');
-      console.log('  --pkg  -  Path to package.json. Default: "auto"');
-      console.log('  --tsc  -  Path to tsconfig.json. Default: "auto"');
+      console.log('\n--------------------------------------------------------');
 
-      console.log('\nExamples:');
+      console.log(kleur.red().bold().inverse('\nArguments:'));
+      console.log('  dester [input] [output]');
+      console.log(
+        '  -i, --input ' + kleur.blue(' -  Input folder. Default: "src"')
+      );
+      console.log(
+        '  -o, --output' + kleur.blue(' -  Output folder. Default: "dist"')
+      );
+      console.log(
+        '  -t, --types ' +
+          kleur.blue(' -  Folder for declarations. Default: "__types__"')
+      );
+      console.log(
+        '  -w, --watch ' +
+          kleur.blue(' -  Watch changes in files and configs. Default: false')
+      );
+      console.log(
+        '  -s, --silent' +
+          kleur.blue(' -  Do not display messages. Default: false')
+      );
+      console.log(
+        '  --sourcemap ' + kleur.blue(' -  Create SourceMap. Default: false')
+      );
+      console.log(
+        '  --pkg       ' +
+          kleur.blue(' -  Path to package.json. Default: "auto"')
+      );
+      console.log(
+        '  --tsc       ' +
+          kleur.blue(' -  Path to tsconfig.json. Default: "auto"')
+      );
+
+      console.log('\n--------------------------------------------------------');
+
+      console.log(kleur.red().bold().inverse('\nExamples:'));
+      console.log('  dester ./src');
       console.log('  dester ./src ./dist');
-      console.log('  dester ./src ./dist --pkg ./pakage.json');
-      console.log('  dester ./src ./dist --no-pkg');
+
+      console.log(kleur.bold().red('\nTypes:'));
+      console.log(kleur.blue('- Not create types:'));
+      console.log('  dester ./src ./dist --no-t');
+      console.log('  dester ./src ./dist --no-types');
+      console.log(kleur.blue('- Create types in "TYPES_FOLDER_NAME":'));
+      console.log('  dester ./src ./dist --types TYPES_FOLDER_NAME');
+      console.log('  dester ./src ./dist -t ./dist/TYPES_FOLDER_NAME');
+
+      console.log(kleur.bold().red('\nWatch:'));
+      console.log('  dester ./src ./dist -w');
       console.log('  dester ./src ./dist --watch');
+
+      console.log(kleur.bold().red('\nSilent mode:'));
+      console.log('  dester ./src ./dist -s');
+      console.log('  dester ./src ./dist --silent');
+
+      console.log(kleur.bold().red('\nCreate source maps:'));
+      console.log('  dester ./src ./dist --sourcemap');
+
+      console.log(kleur.bold().red('\nSet package.json:'));
+      console.log(kleur.blue('- Not find package.json:'));
+      console.log('  dester ./src ./dist --no-pkg');
+      console.log(kleur.blue('- Find package.json:'));
+      console.log('  dester ./src ./dist --pkg ./some-dir');
+      console.log('  dester ./src ./dist --pkg ./some-dir/package.json');
+      console.log('  dester ./src ./dist --pkg ./some-dir/custom-package.json');
+
+      console.log(kleur.bold().red('\nSet tsconfig.json:'));
+      console.log(kleur.blue('- Not find tsconfig.json:'));
+      console.log('  dester ./src ./dist --no-tsc');
+      console.log(kleur.blue('- Find tsconfig.json:'));
+      console.log('  dester ./src ./dist --tsc ./some-dir');
+      console.log('  dester ./src ./dist --tsc ./some-dir/tsconfig.json');
+
+      console.log('\n--------------------------------------------------------');
     }
 
     return;
@@ -182,13 +247,11 @@ const findExternalsFn = (input, output) => {
 
   const DIR_INPUT = path.resolve(argvInput);
   const DIR_OUTPUT = path.resolve(argvOutput);
-  const DIR_TYPES = path.resolve(DIR_OUTPUT, '__types__');
+  const DIR_TYPES = argvTypes ? path.resolve(DIR_OUTPUT, argvTypes) : null;
 
   const createTypesFn = () => {
     // console.log(process);
-    const DIR_NODE_MODULES = require.main.paths[0];
-    const DIR_CACHE = path.resolve(DIR_NODE_MODULES, '.cache');
-    if (!fs.existsSync(DIR_CACHE)) fs.mkdirSync(DIR_CACHE);
+    const DIR_CACHE = createCacheDir();
     const DIR_CACHE_DESTER = path.resolve(DIR_CACHE, 'dester');
     if (!fs.existsSync(DIR_CACHE_DESTER)) fs.mkdirSync(DIR_CACHE_DESTER);
     const FILE_TSCONFIG = path.resolve(
@@ -198,7 +261,7 @@ const findExternalsFn = (input, output) => {
 
     const OBJ_TSCONFIG = {
       // Change this to match your project
-      include: [path.join(DIR_INPUT, '/**/*')],
+      include: [toPosix(path.join(DIR_INPUT, '/**/*'))],
 
       compilerOptions: {
         // Tells TypeScript to read JS files, as
@@ -212,7 +275,7 @@ const findExternalsFn = (input, output) => {
         // Types should go into this directory.
         // Removing this would place the .d.ts files
         // next to the .js files
-        outDir: DIR_TYPES,
+        outDir: toPosix(DIR_TYPES),
         // declarationDir: DIR_TYPES,
 
         experimentalDecorators: true,
@@ -233,12 +296,18 @@ const findExternalsFn = (input, output) => {
 
     // prettier-ignore
     // eslint-disable-next-line block-spacing, brace-style
-    try { cliTS = require.resolve('.bin/tsc'); } catch (err) { /* */ }
+    try {
+      (() => {
+        const tsc = require.resolve('.bin/tsc');
+        if (fs.existsSync(tsc)) cliTS = tsc;
+      })();
+    } catch (err) { /* */ }
 
     // prettier-ignore
     try {
       const tsFork = require('child_process').spawn(cliTS,
-        ['--build', FILE_TSCONFIG, ...(argvWatch ? ['--watch'] : [])]
+        ['--build', FILE_TSCONFIG, ...(argvWatch ? ['--watch'] : [])],
+        { shell: true  }
         // { stdio: ['ignore', 'inherit', 'inherit'], shell: true }
       );
       const exit = () => tsFork && tsFork.kill(0);
@@ -252,7 +321,7 @@ const findExternalsFn = (input, output) => {
       });
     } catch (err) {/* */}
   };
-  if (argv.tsc !== false && argv.types) createTypesFn();
+  if (argv.types) createTypesFn();
 
   argvInput = path.resolve(argvInput);
   argvOutput = path.resolve(argvOutput);
@@ -293,6 +362,8 @@ const findExternalsFn = (input, output) => {
   verbose('');
   verbose(kleur.cyan().inverse(' FILE_PKG: \n    ' + pkgFile + ' '));
   verbose(kleur.cyan().inverse(' FILE_TSC: \n    ' + tscFile + ' '));
+  verbose('');
+  verbose(kleur.cyan().inverse(' DIR_TYPES: \n    ' + DIR_TYPES + ' '));
 
   let watcher;
   const buildRollupFn = () => {
@@ -300,7 +371,46 @@ const findExternalsFn = (input, output) => {
     if (watcher) return watcher;
 
     const BUILD_KEYS = findExternalsFn(DIR_INPUT, DIR_OUTPUT);
+    // console.log('DIR_OUTPUT', DIR_OUTPUT);
     // console.log('BUILD_KEYS', BUILD_KEYS);
+
+    const buildDefaultPackage = (key, props = {}) => {
+      const filePackage = path.resolve(key, 'package.json');
+
+      let __package__ = {};
+      if (fs.existsSync(filePackage)) {
+        __package__ = JSON.parse(fs.readFileSync(filePackage).toString());
+      }
+
+      const files = (__package__.files || []).filter((v) => {
+        return fs.existsSync(path.resolve(key, v));
+      });
+
+      if (argv.types) {
+        if (path.resolve(DIR_OUTPUT) === path.dirname(DIR_TYPES)) {
+          files.push(toPosix(path.join(resolveExternals(key, DIR_TYPES))));
+        }
+      }
+
+      const datafiles = Object.keys(BUILD_KEYS)
+        .map((v) => {
+          v = v.indexOf(key) === 0 ? v.slice(key.length + 1) : '';
+          return !v ? '' : v.split(SEP)[0];
+        })
+        .filter((v, k, a) => v && a.indexOf(v) === k);
+
+      __package__.files = [...files, ...datafiles].filter(
+        (v, k, a) => v && a.indexOf(v) === k
+      );
+      __package__.files.sort();
+
+      fs.writeFileSync(
+        filePackage,
+        JSON.stringify(__package__, null, '  ') + '\n'
+      );
+    };
+
+    if (!(DIR_OUTPUT in BUILD_KEYS)) buildDefaultPackage(DIR_OUTPUT);
 
     let pkg;
     if (pkgFile) pkg = JSON.parse(fs.readFileSync(pkgFile).toString());
@@ -347,11 +457,10 @@ const findExternalsFn = (input, output) => {
           if (key in writeKeys) return;
           writeKeys[key] = true;
 
-          const MAIN = './index';
-          const INDEX = './index.js';
-          const MODULE = './index.mjs';
-          const TYPES = './index.d.ts';
-          const __TYPES__ = './__types__';
+          const MAIN = 'index';
+          const INDEX = 'index.js';
+          const MODULE = 'index.mjs';
+          const TYPES = 'index.d.ts';
 
           let __package__ = {};
           if (fs.existsSync(filePackage)) {
@@ -359,18 +468,20 @@ const findExternalsFn = (input, output) => {
           }
           (__package__.main = MAIN), (__package__.module = MODULE);
 
-          const files = (__package__.files || ['edewd']).filter((v) => {
-            if ([INDEX, MODULE, TYPES, __TYPES__].indexOf(v) >= 0) return false;
+          const files = (__package__.files || []).filter((v) => {
+            if ([INDEX, MODULE, TYPES].indexOf(v) >= 0) return false;
             return fs.existsSync(path.resolve(key, v));
           });
           files.push(INDEX, MODULE);
 
-          if (argv.tsc !== false && argv.types) {
+          if (argv.types) {
             __package__.types = TYPES;
-            const importPath = resolveExternals(
-              path.join(
-                resolveExternals(key, DIR_TYPES),
-                resolveExternals(DIR_OUTPUT, key)
+            const importPath = toPosix(
+              resolveExternals(
+                path.join(
+                  resolveExternals(key, DIR_TYPES),
+                  resolveExternals(DIR_OUTPUT, key)
+                )
               )
             );
 
@@ -388,15 +499,9 @@ const findExternalsFn = (input, output) => {
             });
 
             files.push(TYPES);
-            if (path.resolve(DIR_OUTPUT) === path.resolve(key)) {
-              files.push(__TYPES__);
+            if (path.resolve(DIR_OUTPUT) === path.dirname(DIR_TYPES)) {
+              files.push(toPosix(path.join(resolveExternals(key, DIR_TYPES))));
             }
-
-            // let text = `export * from '${importPath}';\n`;
-            //             if (~exports.indexOf('default')) {
-            //               text += `import __default__ from '${importPath}';
-            // export { __default__ as default };\n`;
-            //             }
 
             fs.writeFileSync(path.resolve(key, 'index.d.ts'), text);
           } else delete __package__.types;
@@ -404,7 +509,7 @@ const findExternalsFn = (input, output) => {
           const datafiles = Object.keys(BUILD_KEYS)
             .map((v) => {
               v = v.indexOf(key) === 0 ? v.slice(key.length + 1) : '';
-              return !v ? '' : './' + v.split(SEP)[0];
+              return !v ? '' : v.split(SEP)[0];
             })
             .filter((v, k, a) => v && a.indexOf(v) === k);
 
@@ -415,7 +520,7 @@ const findExternalsFn = (input, output) => {
 
           fs.writeFileSync(
             filePackage,
-            JSON.stringify(__package__, null, '  ')
+            JSON.stringify(__package__, null, '  ') + '\n'
           );
         }
       });
@@ -425,7 +530,7 @@ const findExternalsFn = (input, output) => {
           ...external,
           ...Object.keys(BUILD_KEYS)
             .filter((v) => v !== key)
-            .map((v) => resolveExternals(key, v))
+            .map((v) => toPosix(resolveExternals(key, v)))
         ],
         input,
         plugins,
