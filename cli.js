@@ -408,7 +408,9 @@ const findExternalsFn = (input, output) => {
             })
             .filter((v, k, a) => v && a.indexOf(v) === k);
 
-          __package__.files = [...files, ...datafiles];
+          __package__.files = [...files, ...datafiles].filter(
+            (v, k, a) => v && a.indexOf(v) === k
+          );
           __package__.files.sort();
 
           fs.writeFileSync(
