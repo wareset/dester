@@ -1,13 +1,15 @@
 const fs = require('fs');
 const path = require('path');
 
+const SEP = path.sep;
+
 // prettier-ignore
 const hash = (s) => (s.replace(/\r/g, '').split('').reduce((a, b) =>
   (a = (a << 5) - a + b.charCodeAt(0)), 0) >>> 0).toString(36);
 const startsWith = (s, text, pos = 0) => s.indexOf(text, pos) === pos;
 const resolveExternals = (key, v) => {
   let res = v !== undefined ? path.relative(key, v) : key;
-  if (!startsWith(res, '/') && !startsWith(res, '..')) res = './' + res;
+  if (!startsWith(res, SEP) && !startsWith(res, '..')) res = '.' + SEP + res;
   return res;
 };
 
@@ -286,7 +288,7 @@ const findExternalsFn = (input, output) => {
     if (watcher) return watcher;
 
     const BUILD_KEYS = findExternalsFn(DIR_INPUT, DIR_OUTPUT);
-    // console.log(BUILD_KEYS);
+    // console.log('BUILD_KEYS', BUILD_KEYS);
 
     let pkg;
     if (pkgFile) pkg = JSON.parse(fs.readFileSync(pkgFile).toString());
@@ -333,14 +335,26 @@ const findExternalsFn = (input, output) => {
           if (key in writeKeys) return;
           writeKeys[key] = true;
 
+          const MAIN = './index';
+          const INDEX = './index.js';
+          const MODULE = './index.mjs';
+          const TYPES = './index.d.ts';
+          const __TYPES__ = './__types__';
+
           let __package__ = {};
           if (fs.existsSync(filePackage)) {
             __package__ = JSON.parse(fs.readFileSync(filePackage).toString());
           }
-          (__package__.main = './index'), (__package__.module = './index.mjs');
+          (__package__.main = MAIN), (__package__.module = MODULE);
+
+          const files = (__package__.files || ['edewd']).filter((v) => {
+            if ([INDEX, MODULE, TYPES, __TYPES__].indexOf(v) >= 0) return false;
+            return fs.existsSync(path.resolve(key, v));
+          });
+          files.push(INDEX, MODULE);
 
           if (argv.tsc !== false && argv.types) {
-            __package__.types = './index.d.ts';
+            __package__.types = TYPES;
             const importPath = resolveExternals(
               path.join(
                 resolveExternals(key, DIR_TYPES),
@@ -361,6 +375,11 @@ const findExternalsFn = (input, output) => {
               } else text += `export { ${v} } from '${importPath}';\n`;
             });
 
+            files.push(TYPES);
+            if (path.resolve(DIR_OUTPUT) === path.resolve(key)) {
+              files.push(__TYPES__);
+            }
+
             // let text = `export * from '${importPath}';\n`;
             //             if (~exports.indexOf('default')) {
             //               text += `import __default__ from '${importPath}';
@@ -369,6 +388,16 @@ const findExternalsFn = (input, output) => {
 
             fs.writeFileSync(path.resolve(key, 'index.d.ts'), text);
           } else delete __package__.types;
+
+          const datafiles = Object.keys(BUILD_KEYS)
+            .map((v) => {
+              v = v.indexOf(key) === 0 ? v.slice(key.length + 1) : '';
+              return !v ? '' : './' + v.split(SEP)[0];
+            })
+            .filter((v, k, a) => v && a.indexOf(v) === k);
+
+          __package__.files = [...files, ...datafiles];
+          __package__.files.sort();
 
           fs.writeFileSync(
             filePackage,

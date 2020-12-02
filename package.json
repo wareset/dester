@@ -1,7 +1,7 @@
 {
   "name": "dester",
   "version": "0.0.5",
-  "description": "WIP: A simple js/ts builder that uses Rollup and TypeScript/Sucrase",
+  "description": "A simple js/ts builder that uses Rollup and TypeScript/Sucrase",
   "author": "cftcview <cftcview@gmail.com>",
   "homepage": "https://github.com/wareset/dester#readme",
   "license": "MIT",
@@ -42,8 +42,8 @@
     "chokidar": "^3.4.3",
     "kleur": "^4.1.3",
     "minimist": "^1.2.5",
-    "rollup": "^2.33.2",
-    "rollup-plugin-typescript2": "^0.28.0"
+    "rollup": "^2.34.0",
+    "rollup-plugin-typescript2": "^0.29.0"
   },
   "devDependencies": {
     "typescript": "4.x"
