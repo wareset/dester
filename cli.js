@@ -29,9 +29,15 @@ const resolveExternals = (key, v) => {
 
 const kleur = require('kleur');
 const argv = require('minimist')(process.argv.slice(2), {
-  default: { tsc: true, pkg: true, types: true, sourcemap: false },
+  default: {
+    tsc: true,
+    pkg: true,
+    types: true,
+    sourcemap: false,
+    silent: false
+  },
   string: ['input', 'output', 'pkg', 'tsc'],
-  boolean: ['help', 'version', 'watch', 'types', 'sourcemap'],
+  boolean: ['help', 'version', 'watch', 'types', 'sourcemap', 'silent'],
   alias: {
     h: 'help',
     v: 'version',
@@ -39,7 +45,7 @@ const argv = require('minimist')(process.argv.slice(2), {
     o: 'output',
     t: 'types',
     w: 'watch',
-    s: 'sourcemap'
+    s: 'silent'
   }
   // '--': true,
   // stopEarly: true, /* populate _ with first non-option */
@@ -58,6 +64,11 @@ let argvOutput =
 
 const argvSourcemap = !!argv.sourcemap;
 const argvWatch = !!argv.watch;
+const argvSilent = !!argv.silent;
+
+const verbose = (...a) => {
+  if (!argvSilent) console.log(...a);
+};
 
 const findExternalsFn = (input, output) => {
   const BUILD_KEYS = {};
@@ -141,7 +152,8 @@ const findExternalsFn = (input, output) => {
       console.log('  -o, --output  -  Output folder. Default: "dist"');
       console.log('  -t, --types  -  Create declarations. Default: true');
       console.log('  -w, --watch  -  Watch files. Default: false');
-      console.log('  -s, --sourcemap  -  Create SourceMap. Default: false');
+      console.log('  -s, --silent  -  Do not display messages. Default: false');
+      console.log('  --sourcemap  -  Create SourceMap. Default: false');
       console.log('  --pkg  -  Path to package.json. Default: "auto"');
       console.log('  --tsc  -  Path to tsconfig.json. Default: "auto"');
 
@@ -232,11 +244,11 @@ const findExternalsFn = (input, output) => {
       const exit = () => tsFork && tsFork.kill(0);
       process.on('SIGTERM', exit), process.on('exit', exit);
       tsFork.stdout.on('data', (data) => {
-        console.log([data.toString()]);
+        verbose([data.toString()]);
       });
       tsFork.on('error', (data) => {
         argv.types = false;
-        console.log(kleur.red('"tsc" not found. Use "--no-types" parameter!'));
+        verbose(kleur.red('"tsc" not found. Use "--no-types" parameter!'));
       });
     } catch (err) {/* */}
   };
@@ -276,11 +288,11 @@ const findExternalsFn = (input, output) => {
   const pkgFile = findFileFn(argv.pkg, 'package.json');
   const tscFile = findFileFn(argv.tsc, 'tsconfig.json');
 
-  console.log(kleur.cyan().inverse(' DIR_INPUT: \n    ' + DIR_INPUT + ' '));
-  console.log(kleur.cyan().inverse(' DIR_OUTPUT: \n    ' + DIR_OUTPUT + ' '));
-  console.log('');
-  console.log(kleur.cyan().inverse(' FILE_PKG: \n    ' + pkgFile + ' '));
-  console.log(kleur.cyan().inverse(' FILE_TSC: \n    ' + tscFile + ' '));
+  verbose(kleur.cyan().inverse(' DIR_INPUT: \n    ' + DIR_INPUT + ' '));
+  verbose(kleur.cyan().inverse(' DIR_OUTPUT: \n    ' + DIR_OUTPUT + ' '));
+  verbose('');
+  verbose(kleur.cyan().inverse(' FILE_PKG: \n    ' + pkgFile + ' '));
+  verbose(kleur.cyan().inverse(' FILE_TSC: \n    ' + tscFile + ' '));
 
   let watcher;
   const buildRollupFn = () => {
@@ -363,7 +375,7 @@ const findExternalsFn = (input, output) => {
             );
 
             const exports = data[Object.keys(data)[0]].exports;
-            console.log('exports: ', exports);
+            verbose('exports: ', exports);
 
             let text = '';
             exports.forEach((v, k, a) => {
@@ -425,7 +437,7 @@ const findExternalsFn = (input, output) => {
     process.on('SIGTERM', watcher.close), process.on('exit', watcher.close);
 
     watcher.on('event', (event) => {
-      console.log(event);
+      verbose(event);
       // event.code can be one of:
       //   START        — the watcher is (re)starting
       //   BUNDLE_START — building an individual bundle
@@ -434,12 +446,12 @@ const findExternalsFn = (input, output) => {
       //   ERROR        — encountered an error while bundling
 
       if (event.code === 'BUNDLE_START') {
-        console.log('\n');
-        console.log(kleur.inverse(' ' + event.input + ' '));
+        verbose('\n');
+        verbose(kleur.inverse(' ' + event.input + ' '));
       }
 
       if (event.code === 'BUNDLE_END') {
-        console.log('--------------------------------------------------------');
+        verbose('--------------------------------------------------------');
       }
 
       if (event.code === 'END') {
@@ -469,8 +481,8 @@ const findExternalsFn = (input, output) => {
 
     if (last !== l) {
       last = l;
-      console.log('\n');
-      console.log(kleur.green().inverse(' ' + type + ': ' + file + ' '));
+      verbose('\n');
+      verbose(kleur.green().inverse(' ' + type + ': ' + file + ' '));
     }
 
     if (type !== 'change' || force) {
