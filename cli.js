@@ -262,6 +262,7 @@ const findExternalsFn = (input, output) => {
     const OBJ_TSCONFIG = {
       // Change this to match your project
       include: [toPosix(path.join(DIR_INPUT, '/**/*'))],
+      exclude: [toPosix(path.join(DIR_INPUT, '/**/_*'))],
 
       compilerOptions: {
         // Tells TypeScript to read JS files, as
