@@ -1,6 +1,6 @@
 # dester
 
-A simple CLI js/ts lib-builder that uses [Rollup](https://www.npmjs.com/package/rollup) and [TypeScript](https://www.npmjs.com/package/typescript)/[Sucrase](https://www.npmjs.com/package/sucrase)
+A simple CLI js/ts lib-builder that uses [Rollup](https://www.npmjs.com/package/rollup), [@babel/core](https://www.npmjs.com/package/@babel/core) and [TypeScript](https://www.npmjs.com/package/typescript)/[Sucrase](https://www.npmjs.com/package/sucrase)
 
 ```bash
    ___       __ _ _ _ _ /_,_  _______   ____
@@ -33,8 +33,12 @@ project-folder
 │   ├── index.ts      /* Used by `typescript` or `sucrase` */
 │   │
 │   ├── some-folder
+│   │   ├── _excluded-file.js
 │   │   ├── some-file-1.js
 │   │   └── some-file-2.js
+│   │
+│   ├── _excluded-folder
+│   │   ├── index.js
 │   │
 │   └── other-folder
 │       ├── other-file-1.js
@@ -55,6 +59,20 @@ project-folder
 ```bash
 cd ./project-folder
 dester ./src ./dist
+```
+
+or run use babel:
+
+```bash
+dester ./src ./dist --babel
+```
+
+##### `babel.config.json`:
+
+```json
+{
+  "plugins": [["@babel/plugin-proposal-class-properties"]]
+}
 ```
 
 #### result:
@@ -97,6 +115,7 @@ project-folder
 │
 ...
 │
+├── babel.config.json
 ├── package.json
 ├── README.md
 └── tsconfig.json
@@ -109,6 +128,7 @@ project-folder
 - The files `any-file-1.ts` and `any-file-2.ts` are missing in the folder because there is a file `index.ts` next to them. But directories always remain;
 - In a folder `some-folder` not a file `index.js`. Therefore, all files were created in separate folders;
 - The file `index.d.ts` and folder `__types__` will be created if you have the `typescript` (`tsc`) installed.
+- `_excluded-folder` and `_excluded-file.js` were ignored because they start with the `_`.
 
 #### Generated `dist/package.json` file structure:
 
@@ -173,13 +193,15 @@ Arguments:
   --sourcemap  -  Create SourceMap. Default: false
   --pkg        -  Path to package.json. Default: "auto"
   --tsc        -  Path to tsconfig.json. Default: "auto"
+  --babel      -  Path to babel.config.json. Default: false
 ```
+
 - If the path for `types` doesn't start with a `./` or `../`, they the will be created in the `dist` folder.
+
 ## Command examples
 
 ```bash
 Examples:
-  dester
   dester ./src
   dester ./src ./dist
 
@@ -187,6 +209,8 @@ Types:
 - Not create types:
   dester ./src ./dist --no-t
   dester ./src ./dist --no-types
+- Create types (DEFAULT):
+  dester ./src ./dist --types __types__
 - Create types in "TYPES_FOLDER_NAME":
   dester ./src ./dist --types TYPES_FOLDER_NAME
   dester ./src ./dist -t ./dist/TYPES_FOLDER_NAME
@@ -205,17 +229,36 @@ Create source maps:
 Set package.json:
 - Not find package.json:
   dester ./src ./dist --no-pkg
-- Find package.json:
+- Auto-find package.json (DEFAULT):
+  dester ./src ./dist --pkg
+  dester ./src ./dist --pkg auto
+- Find or auto-find package.json in dir:
   dester ./src ./dist --pkg ./some-dir
   dester ./src ./dist --pkg ./some-dir/package.json
   dester ./src ./dist --pkg ./some-dir/custom-package.json
 
 Set tsconfig.json:
+(need installed "typescript")
 - Not find tsconfig.json:
   dester ./src ./dist --no-tsc
-- Find tsconfig.json:
+- Auto-find tsconfig.json (DEFAULT):
+  dester ./src ./dist --tsc
+  dester ./src ./dist --tsc auto
+- Find or auto-find tsconfig.json in dir:
   dester ./src ./dist --tsc ./some-dir
   dester ./src ./dist --tsc ./some-dir/tsconfig.json
+
+Set babel.config.json (.babelrc.json):
+(need installed "@babel/core")
+- Not find babel.config.json (DEFAULT):
+  dester ./src ./dist --no-babel
+- Auto-find babel.config.json:
+  dester ./src ./dist --babel
+  dester ./src ./dist --babel auto
+- Find or auto-find babel.config.json in dir:
+  dester ./src ./dist --babel ./some-dir
+  dester ./src ./dist --babel ./some-dir/.babelrc.json
+  dester ./src ./dist --babel ./some-dir/babel.config.js
 ```
 
 ## Lisence

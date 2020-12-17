@@ -35,14 +35,16 @@ const createCacheDir = () => {
 const kleur = require('kleur');
 const argv = require('minimist')(process.argv.slice(2), {
   default: {
-    tsc: true,
-    pkg: true,
     types: true,
+    silent: false,
     sourcemap: false,
-    silent: false
+    pkg: true,
+    tsc: true,
+    babel: false,
+    cfg: true
   },
-  string: ['input', 'output', 'pkg', 'tsc', 'types'],
-  boolean: ['help', 'version', 'watch', 'sourcemap', 'silent'],
+  string: ['input', 'output', 'types', 'pkg', 'tsc', 'babel', 'cfg'],
+  boolean: ['help', 'version', 'watch', 'silent', 'sourcemap'],
   alias: {
     h: 'help',
     v: 'version',
@@ -56,7 +58,7 @@ const argv = require('minimist')(process.argv.slice(2), {
 
 // console.log(argv);
 
-const EXTENSIONS = ['.mjs', '.js', '.jsx', '.ts', '.tsx', '.json', '.node'];
+const EXTENSIONS = ['.ts', '.tsx', '.mjs', '.js', '.jsx', '.json', '.node'];
 
 let argvInput = argv.input || argv._[0] || 'src';
 let argvOutput =
@@ -185,6 +187,14 @@ const findExternalsFn = (input, output) => {
         '  --tsc       ' +
           kleur.blue(' -  Path to tsconfig.json. Default: "auto"')
       );
+      console.log(
+        '  --babel     ' +
+          kleur.blue(' -  Path to babel.config.json. Default: false')
+      );
+      // console.log(
+      //   '  --cfg       ' +
+      //     kleur.blue(' -  Path to dester.config.js. Default: "auto"')
+      // );
 
       console.log('\n--------------------------------------------------------');
 
@@ -196,6 +206,8 @@ const findExternalsFn = (input, output) => {
       console.log(kleur.blue('- Not create types:'));
       console.log('  dester ./src ./dist --no-t');
       console.log('  dester ./src ./dist --no-types');
+      console.log(kleur.blue('- Create types (DEFAULT):'));
+      console.log('  dester ./src ./dist --types __types__');
       console.log(kleur.blue('- Create types in "TYPES_FOLDER_NAME":'));
       console.log('  dester ./src ./dist --types TYPES_FOLDER_NAME');
       console.log('  dester ./src ./dist -t ./dist/TYPES_FOLDER_NAME');
@@ -214,17 +226,44 @@ const findExternalsFn = (input, output) => {
       console.log(kleur.bold().red('\nSet package.json:'));
       console.log(kleur.blue('- Not find package.json:'));
       console.log('  dester ./src ./dist --no-pkg');
-      console.log(kleur.blue('- Find package.json:'));
+      console.log(kleur.blue('- Auto-find package.json (DEFAULT):'));
+      console.log('  dester ./src ./dist --pkg');
+      console.log('  dester ./src ./dist --pkg auto');
+      console.log(kleur.blue('- Find or auto-find package.json in dir:'));
       console.log('  dester ./src ./dist --pkg ./some-dir');
       console.log('  dester ./src ./dist --pkg ./some-dir/package.json');
       console.log('  dester ./src ./dist --pkg ./some-dir/custom-package.json');
 
       console.log(kleur.bold().red('\nSet tsconfig.json:'));
+      console.log(kleur.inverse().red('(need installed "typescript")'));
       console.log(kleur.blue('- Not find tsconfig.json:'));
       console.log('  dester ./src ./dist --no-tsc');
-      console.log(kleur.blue('- Find tsconfig.json:'));
+      console.log(kleur.blue('- Auto-find tsconfig.json (DEFAULT):'));
+      console.log('  dester ./src ./dist --tsc');
+      console.log('  dester ./src ./dist --tsc auto');
+      console.log(kleur.blue('- Find or auto-find tsconfig.json in dir:'));
       console.log('  dester ./src ./dist --tsc ./some-dir');
       console.log('  dester ./src ./dist --tsc ./some-dir/tsconfig.json');
+
+      console.log(kleur.bold().red('\nSet babel.config.json (.babelrc.json):'));
+      console.log(kleur.inverse().red('(need installed "@babel/core")'));
+      console.log(kleur.blue('- Not find babel.config.json (DEFAULT):'));
+      console.log('  dester ./src ./dist --no-babel');
+      console.log(kleur.blue('- Auto-find babel.config.json:'));
+      console.log('  dester ./src ./dist --babel');
+      console.log('  dester ./src ./dist --babel auto');
+      console.log(kleur.blue('- Find or auto-find babel.config.json in dir:'));
+      console.log('  dester ./src ./dist --babel ./some-dir');
+      console.log('  dester ./src ./dist --babel ./some-dir/.babelrc.json');
+      console.log('  dester ./src ./dist --babel ./some-dir/babel.config.js');
+
+      // console.log(kleur.bold().red('\nSet dester.config.js:'));
+      // console.log(kleur.blue('- Not find dester.config.js:'));
+      // console.log('  dester ./src ./dist --no-cfg');
+      // console.log(kleur.blue('- Find dester.config.js:'));
+      // console.log('  dester ./src ./dist --cfg ./some-dir');
+      // console.log('  dester ./src ./dist --cfg ./some-dir/dester.config.js');
+      // console.log('  dester ./src ./dist --cfg ./some-dir/custom-config.js');
 
       console.log('\n--------------------------------------------------------');
     }
@@ -244,6 +283,20 @@ const findExternalsFn = (input, output) => {
   const rollupPluginSucrase = require('@rollup/plugin-sucrase')({
     transforms: ['typescript']
   });
+
+  let typescriptCore = 'tsc';
+  let babelCore, rollupPluginBabel;
+  try {
+    (() => {
+      babelCore = require.resolve('@babel/core');
+      if (fs.existsSync(babelCore)) {
+        rollupPluginBabel = require('@rollup/plugin-babel')
+          .getBabelOutputPlugin;
+      }
+    })();
+  } catch (err) {
+    /* */
+  }
 
   const DIR_INPUT = path.resolve(argvInput);
   const DIR_OUTPUT = path.resolve(argvOutput);
@@ -299,8 +352,8 @@ const findExternalsFn = (input, output) => {
     // eslint-disable-next-line block-spacing, brace-style
     try {
       (() => {
-        const tsc = require.resolve('.bin/tsc');
-        if (fs.existsSync(tsc)) cliTS = tsc;
+        typescriptCore = require.resolve('.bin/tsc');
+        if (fs.existsSync(typescriptCore)) cliTS = typescriptCore;
       })();
     } catch (err) { /* */ }
 
@@ -328,6 +381,12 @@ const findExternalsFn = (input, output) => {
   argvOutput = path.resolve(argvOutput);
 
   const findFileFn = (fileFromArgv, base) => {
+    if (Array.isArray(base)) {
+      let res;
+      base.some((v) => (res = findFileFn(fileFromArgv, v)));
+      return res || false;
+    }
+
     let file = fileFromArgv;
 
     // prettier-ignore
@@ -355,21 +414,40 @@ const findExternalsFn = (input, output) => {
     return file;
   };
 
-  const pkgFile = findFileFn(argv.pkg, 'package.json');
-  const tscFile = findFileFn(argv.tsc, 'tsconfig.json');
-
-  verbose(kleur.cyan().inverse(' DIR_INPUT: \n    ' + DIR_INPUT + ' '));
-  verbose(kleur.cyan().inverse(' DIR_OUTPUT: \n    ' + DIR_OUTPUT + ' '));
-  verbose('');
-  verbose(kleur.cyan().inverse(' FILE_PKG: \n    ' + pkgFile + ' '));
-  verbose(kleur.cyan().inverse(' FILE_TSC: \n    ' + tscFile + ' '));
-  verbose('');
-  verbose(kleur.cyan().inverse(' DIR_TYPES: \n    ' + DIR_TYPES + ' '));
-
   let watcher;
+  let pkgFile, tscFile, babelFile; // , cfgFile;
   const buildRollupFn = () => {
     // if (watcher) watcher.close(), watcher = null;
     if (watcher) return watcher;
+
+    pkgFile = findFileFn(argv.pkg, 'package.json');
+    tscFile = findFileFn(argv.tsc, 'tsconfig.json');
+    babelFile = findFileFn(argv.babel, [
+      '.babelrc.json',
+      '.babelrc.js',
+      'babel.config.json',
+      'babel.config.js'
+    ]);
+    // cfgFile = findFileFn(argv.cfg, 'dester.config.js');
+
+    verbose('\nInput/Output:');
+    verbose(kleur.cyan().inverse(' DIR_INPUT: \n    ' + DIR_INPUT + ' '));
+    verbose(kleur.cyan().inverse(' DIR_OUTPUT: \n    ' + DIR_OUTPUT + ' '));
+
+    verbose('\nTypescript');
+    verbose(kleur.cyan().inverse(' typescript: ' + typescriptCore + ' '));
+    verbose(kleur.cyan().inverse(' FILE_TSC: \n    ' + tscFile + ' '));
+    verbose(kleur.cyan().inverse(' DIR_TYPES: \n    ' + DIR_TYPES + ' '));
+
+    verbose('\nBabel:');
+    verbose(kleur.cyan().inverse(' @babel/core: ' + babelCore + ' '));
+    verbose(kleur.cyan().inverse(' FILE_BABEL: \n    ' + babelFile + ' '));
+
+    verbose('\nSettings:');
+    verbose(kleur.cyan().inverse(' FILE_PKG: \n    ' + pkgFile + ' '));
+    // verbose(kleur.cyan().inverse(' FILE_CFG: \n    ' + cfgFile + ' '));
+
+    verbose('');
 
     const BUILD_KEYS = findExternalsFn(DIR_INPUT, DIR_OUTPUT);
     // console.log('DIR_OUTPUT', DIR_OUTPUT);
@@ -449,6 +527,9 @@ const findExternalsFn = (input, output) => {
       ];
       const isTs = startsWith(path.parse(input).ext, '.ts');
       if (isTs) plugins.unshift(rollupPluginTypescript || rollupPluginSucrase);
+      if (rollupPluginBabel && babelFile) {
+        plugins.push(rollupPluginBabel({ configFile: babelFile }));
+      }
 
       const filePackage = path.resolve(key, 'package.json');
 
@@ -603,5 +684,7 @@ const findExternalsFn = (input, output) => {
     chokidar.watch(argvInput).on('raw', rebuildFn());
     if (pkgFile) chokidar.watch(pkgFile).on('change', rebuildFn(true));
     if (tscFile) chokidar.watch(tscFile).on('change', rebuildFn(true));
+    if (babelFile) chokidar.watch(babelFile).on('change', rebuildFn(true));
+    // if (cfgFile) chokidar.watch(cfgFile).on('change', rebuildFn(true));
   }
 })();

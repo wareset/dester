@@ -1,0 +1,16 @@
+{
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "dester": "dester ./src ./dist --no-tsc --babel",
+    "build": "rm -rf ./dist && npm run -s dester",
+    "dev": "npm run -s dester -- -w"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.9",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
+    "dester": "0.x"
+  }
+}
