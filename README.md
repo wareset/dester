@@ -49,6 +49,7 @@ project-folder
 │
 ...
 │
+├── babel.config.json
 ├── package.json  /* Not necessary */
 ├── README.md
 └── tsconfig.json /* Not necessary */

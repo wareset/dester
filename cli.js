@@ -149,9 +149,8 @@ const findExternalsFn = (input, output) => {
     );
 
     const { name, version, description } = require('./package.json');
-    console.log(name);
-    console.log(version);
     console.log(description);
+    console.log(name + ' version: ' + version);
 
     if (argv.help) {
       console.log('\n--------------------------------------------------------');
@@ -174,7 +173,7 @@ const findExternalsFn = (input, output) => {
       );
       console.log(
         '  -s, --silent' +
-          kleur.blue(' -  Do not display messages. Default: false')
+          kleur.blue(' -  Show only error messages. Default: false')
       );
       console.log(
         '  --sourcemap ' + kleur.blue(' -  Create SourceMap. Default: false')
@@ -367,7 +366,11 @@ const findExternalsFn = (input, output) => {
       const exit = () => tsFork && tsFork.kill(0);
       process.on('SIGTERM', exit), process.on('exit', exit);
       tsFork.stdout.on('data', (data) => {
-        verbose([data.toString()]);
+        data = [data].join('\n');
+        if (/error([^s]|$)/i.test(data)) {
+          console.error('\nTypescript Error:');
+          console.error(kleur.red(data));
+        } else verbose(data);
       });
       tsFork.on('error', (data) => {
         argv.types = false;
@@ -416,6 +419,7 @@ const findExternalsFn = (input, output) => {
 
   let watcher;
   let pkgFile, tscFile, babelFile; // , cfgFile;
+  let pkgFileWatch, tscFileWatch, babelFileWatch;
   const buildRollupFn = () => {
     // if (watcher) watcher.close(), watcher = null;
     if (watcher) return watcher;
@@ -429,6 +433,10 @@ const findExternalsFn = (input, output) => {
       'babel.config.js'
     ]);
     // cfgFile = findFileFn(argv.cfg, 'dester.config.js');
+
+    pkgFileWatch = !!pkgFile;
+    tscFileWatch = !!tscFile;
+    babelFileWatch = !!babelFile;
 
     verbose('\nInput/Output:');
     verbose(kleur.cyan().inverse(' DIR_INPUT: \n    ' + DIR_INPUT + ' '));
@@ -532,6 +540,9 @@ const findExternalsFn = (input, output) => {
       }
 
       const filePackage = path.resolve(key, 'package.json');
+      if (pkgFile && filePackage === path.resolve(pkgFile)) {
+        pkgFileWatch = false;
+      }
 
       plugins.push({
         writeBundle({ format }, data) {
@@ -655,7 +666,9 @@ const findExternalsFn = (input, output) => {
           [...Array(text.length)].map((v) => ' ').join('')
         );
         console.error('\n' + bg + '\n' + kleur.bgRed(text) + '\n' + bg);
+        // event.error = kleur.red(event.error);
         console.error(event);
+        console.error(bg + '\n' + bg + '\n');
         if (!argvWatch) watcher.close(), process.kill(0), process.exit(0);
       }
     });
@@ -682,9 +695,9 @@ const findExternalsFn = (input, output) => {
   if (argvWatch) {
     const chokidar = require('chokidar');
     chokidar.watch(argvInput).on('raw', rebuildFn());
-    if (pkgFile) chokidar.watch(pkgFile).on('change', rebuildFn(true));
-    if (tscFile) chokidar.watch(tscFile).on('change', rebuildFn(true));
-    if (babelFile) chokidar.watch(babelFile).on('change', rebuildFn(true));
+    if (pkgFileWatch) chokidar.watch(pkgFile).on('change', rebuildFn(true));
+    if (tscFileWatch) chokidar.watch(tscFile).on('change', rebuildFn(true));
+    if (babelFileWatch) chokidar.watch(babelFile).on('change', rebuildFn(true));
     // if (cfgFile) chokidar.watch(cfgFile).on('change', rebuildFn(true));
   }
 })();
