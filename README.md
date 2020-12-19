@@ -15,7 +15,7 @@ A simple CLI js/ts lib-builder that uses [Rollup](https://www.npmjs.com/package/
 - For correct compilation, you must adhere to the established requirements for directory structures (below is an example). Examples can be found [here](https://github.com/wareset/dester/tree/main/examples).
 - The files `package.json` and `tsconfig.json` are found automatically by going up the directory tree.
 - When building, `dependencies` from the `package.json` are taken into account.
-- Files and directories that start with a sign `_` are ignored.
+- Files and directories that with `.test(s)` or start with a sign `_` are ignored.
 - Powered on Linux, Mac, Windows. But if something is wrong, [write](https://github.com/wareset/dester/issues) to us)))
 
 ## Example
@@ -35,10 +35,11 @@ project-folder
 │   ├── some-folder
 │   │   ├── _excluded-file.js
 │   │   ├── some-file-1.js
+│   │   ├── some-file-1.test.js
 │   │   └── some-file-2.js
 │   │
 │   ├── _excluded-folder
-│   │   ├── index.js
+│   │   └── index.js
 │   │
 │   └── other-folder
 │       ├── other-file-1.js
@@ -130,6 +131,7 @@ project-folder
 - In a folder `some-folder` not a file `index.js`. Therefore, all files were created in separate folders;
 - The file `index.d.ts` and folder `__types__` will be created if you have the `typescript` (`tsc`) installed.
 - `_excluded-folder` and `_excluded-file.js` were ignored because they start with the `_`.
+- `some-file-1.test.js` were ignored because they with the `.test.`.
 
 #### Generated `dist/package.json` file structure:
 

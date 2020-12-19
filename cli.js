@@ -117,6 +117,7 @@ const findExternalsFn = (input, output) => {
     for (const dirent of files) {
       name = dirent.name;
       if (name[0] === '_') continue;
+      if (/\.tests?(\.|$)/.test(name)) continue;
       if (dirent.isDirectory()) {
         findBuilders(path.resolve(input, name), path.resolve(output, name));
       } else if (!isIndex && dirent.isFile()) {
@@ -314,7 +315,13 @@ const findExternalsFn = (input, output) => {
     const OBJ_TSCONFIG = {
       // Change this to match your project
       include: [toPosix(path.join(DIR_INPUT, '/**/*'))],
-      exclude: [toPosix(path.join(DIR_INPUT, '/**/_*'))],
+      exclude: [
+        toPosix(path.join(DIR_INPUT, '/**/_*')),
+        toPosix(path.join(DIR_INPUT, '/**/*.test.*')),
+        toPosix(path.join(DIR_INPUT, '/**/*.tests.*')),
+        toPosix(path.join(DIR_INPUT, '/**/*.test')),
+        toPosix(path.join(DIR_INPUT, '/**/*.tests'))
+      ],
 
       compilerOptions: {
         // Tells TypeScript to read JS files, as
@@ -588,7 +595,11 @@ const findExternalsFn = (input, output) => {
                 text += `import __default__ from '${importPath}';\n`;
                 text += 'export { __default__ as default };\n';
                 if (k < a.length - 1) text += '\n';
-              } else text += `export { ${v} } from '${importPath}';\n`;
+              } else if (v[0] === '*') {
+                text += `export * from '${importPath}';\n`;
+              } else {
+                text += `export { ${v} } from '${importPath}';\n`;
+              }
             });
 
             files.push(TYPES);
