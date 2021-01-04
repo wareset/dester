@@ -598,6 +598,7 @@ const findExternalsFn = (input, output) => {
             const exports = data[Object.keys(data)[0]].exports
             verbose('exports: ', exports)
 
+            let isAllExport
             let text = ''
             exports.forEach((v, k, a) => {
               if (v === 'default') {
@@ -606,11 +607,18 @@ const findExternalsFn = (input, output) => {
                 text += 'export { __default__ as default };\n'
                 if (k < a.length - 1) text += '\n'
               } else if (v[0] === '*') {
+                isAllExport = true
                 text += `export * from '${importPath}';\n`
               } else {
                 text += `export { ${v} } from '${importPath}';\n`
               }
             })
+
+            // TODO: Fix types
+            // text = `export * from '${importPath}';\n\n/*\n${text}*/\n`
+            // FIX: export types and interfaces
+            if (!isAllExport) text = `export * from '${importPath}';\n\n${text}`
+
 
             files.push(TYPES)
             if (path.resolve(DIR_OUTPUT) === path.dirname(DIR_TYPES)) {
