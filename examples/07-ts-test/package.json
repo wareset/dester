@@ -1,0 +1,14 @@
+{
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "dester": "dester ./src ./dist -s",
+    "build": "rm -rf ./dist && npm run -s dester",
+    "dev": "npm run -s dester -- -w"
+  },
+  "devDependencies": {
+    "dester": "0.x"
+  }
+}

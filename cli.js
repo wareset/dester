@@ -118,7 +118,7 @@ const findExternalsFn = (input, output) => {
     for (const dirent of files) {
       name = dirent.name
       if (name[0] === '_') continue
-      if (/\.tests?(\.|$)/.test(name)) continue
+      if (/(^|\.)tests(\.|$)/.test(name)) continue
       if (dirent.isDirectory()) {
         findBuilders(path.resolve(input, name), path.resolve(output, name))
       } else if (!isIndex && dirent.isFile()) {
@@ -285,6 +285,7 @@ const findExternalsFn = (input, output) => {
   const rollupPluginSucrase = require('@rollup/plugin-sucrase')({
     transforms: ['typescript']
   })
+  const rollupPluginAlias = require('@rollup/plugin-alias')
 
   let typescriptCore = 'tsc'
   let babelCore, rollupPluginBabel
@@ -321,7 +322,9 @@ const findExternalsFn = (input, output) => {
         toPosix(path.join(DIR_INPUT, '/**/*.test.*')),
         toPosix(path.join(DIR_INPUT, '/**/*.tests.*')),
         toPosix(path.join(DIR_INPUT, '/**/*.test')),
-        toPosix(path.join(DIR_INPUT, '/**/*.tests'))
+        toPosix(path.join(DIR_INPUT, '/**/*.tests')),
+        toPosix(path.join(DIR_INPUT, '/**/test.*')),
+        toPosix(path.join(DIR_INPUT, '/**/tests.*'))
       ],
 
       compilerOptions: {
@@ -475,7 +478,7 @@ const findExternalsFn = (input, output) => {
 
     const BUILD_KEYS = findExternalsFn(DIR_INPUT, DIR_OUTPUT)
     // console.log('DIR_OUTPUT', DIR_OUTPUT);
-    // console.log('BUILD_KEYS', BUILD_KEYS);
+    // console.log('BUILD_KEYS', BUILD_KEYS)
 
     const buildDefaultPackage = (key, props = {}) => {
       const filePackage = path.resolve(key, 'package.json')
@@ -544,14 +547,28 @@ const findExternalsFn = (input, output) => {
     const ROLLS = []
     let writeKeys = {}
     for (const key of Object.keys(BUILD_KEYS)) {
-      const { input, output } = BUILD_KEYS[key]
+      const { input, output, name } = BUILD_KEYS[key]
       const plugins = [
         rollupPluginJson
         // rollupPluginResolve,
         // rollupPluginCommonjs
       ]
+
       const isTs = startsWith(path.parse(input).ext, '.ts')
       if (isTs) plugins.unshift(rollupPluginTypescript || rollupPluginSucrase)
+
+      const indexAlias = !startsWith(name, 'index.')
+      if (indexAlias) {
+        plugins.unshift(
+          rollupPluginAlias({
+            entries: [
+              { find: /^\.\//, replacement: '../' },
+              { find: /^\.\.\//, replacement: '../../' }
+            ]
+          })
+        )
+      }
+
       if (rollupPluginBabel && babelFile) {
         plugins.push(rollupPluginBabel({ configFile: babelFile }))
       }
@@ -619,7 +636,6 @@ const findExternalsFn = (input, output) => {
             // FIX: export types and interfaces
             if (!isAllExport) text = `export * from '${importPath}';\n\n${text}`
 
-
             files.push(TYPES)
             if (path.resolve(DIR_OUTPUT) === path.dirname(DIR_TYPES)) {
               files.push(toPosix(path.join(resolveExternals(key, DIR_TYPES))))
@@ -647,13 +663,12 @@ const findExternalsFn = (input, output) => {
         }
       })
 
+      const buildKeysExternals = Object.keys(BUILD_KEYS)
+        .filter((v) => v !== key)
+        .map((v) => toPosix(resolveExternals(key, v)))
+
       const watchOptions = {
-        external: [
-          ...external,
-          ...Object.keys(BUILD_KEYS)
-            .filter((v) => v !== key)
-            .map((v) => toPosix(resolveExternals(key, v)))
-        ],
+        external: [...external, ...buildKeysExternals],
         input,
         plugins,
         output
