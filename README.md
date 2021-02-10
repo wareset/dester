@@ -50,10 +50,10 @@ project-folder
 │
 ...
 │
-├── babel.config.json
-├── package.json  /* Not necessary */
+├── babel.config.json /* Not necessary */
+├── package.json      /* Not necessary */
 ├── README.md
-└── tsconfig.json /* Not necessary */
+└── tsconfig.json     /* Not necessary */
 ```
 
 #### running the dester:
@@ -207,6 +207,18 @@ Arguments:
 Examples:
   dester ./src
   dester ./src ./dist
+
+Remove folders:
+- Not remove:
+  dester ./src ./dist --no-r
+  dester ./src ./dist --no-remove
+- Remove only created subfolders (DEFAULT):
+  dester ./src ./dist -r
+  dester ./src ./dist --remove
+- Remove folder "FOLDERNAME" before build:
+  dester ./src ./dist --remove FOLDERNAME
+  dester ./src ./dist -r ./some/FOLDERNAME
+
 
 Types:
 - Not create types:

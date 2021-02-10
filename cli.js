@@ -36,6 +36,7 @@ const createCacheDir = () => {
 const kleur = require('kleur')
 const argv = require('minimist')(process.argv.slice(2), {
   default: {
+    remove: true,
     types: true,
     silent: false,
     sourcemap: false,
@@ -44,13 +45,14 @@ const argv = require('minimist')(process.argv.slice(2), {
     babel: false,
     cfg: true
   },
-  string: ['input', 'output', 'types', 'pkg', 'tsc', 'babel', 'cfg'],
+  string: ['input', 'output', 'remove', 'types', 'pkg', 'tsc', 'babel', 'cfg'],
   boolean: ['help', 'version', 'watch', 'silent', 'sourcemap'],
   alias: {
     h: 'help',
     v: 'version',
     i: 'input',
     o: 'output',
+    r: 'remove',
     t: 'types',
     w: 'watch',
     s: 'silent'
@@ -167,6 +169,10 @@ const findExternalsFn = (input, output) => {
         '  -o, --output' + kleur.blue(' -  Output folder. Default: "dist"')
       )
       console.log(
+        '  -r, --remove ' +
+          kleur.blue('-  Remove or autoremove folders. Default: "auto"')
+      )
+      console.log(
         '  -t, --types ' +
           kleur.blue(' -  Folder for declarations. Default: "__types__"')
       )
@@ -203,6 +209,17 @@ const findExternalsFn = (input, output) => {
       console.log(kleur.red().bold().inverse('\nExamples:'))
       console.log('  dester ./src')
       console.log('  dester ./src ./dist')
+
+      console.log(kleur.bold().red('\nRemove folders:'))
+      console.log(kleur.blue('- Not remove:'))
+      console.log('  dester ./src ./dist --no-r')
+      console.log('  dester ./src ./dist --no-remove')
+      console.log(kleur.blue('- Remove only created subfolders (DEFAULT):'))
+      console.log('  dester ./src ./dist -r')
+      console.log('  dester ./src ./dist --remove')
+      console.log(kleur.blue('- Remove folder "FOLDERNAME" before build:'))
+      console.log('  dester ./src ./dist --remove FOLDERNAME')
+      console.log('  dester ./src ./dist -r ./some/FOLDERNAME')
 
       console.log(kleur.bold().red('\nTypes:'))
       console.log(kleur.blue('- Not create types:'))
@@ -274,6 +291,7 @@ const findExternalsFn = (input, output) => {
   }
 
   const rollup = require('rollup')
+  const rimraf = require('rimraf').sync
   // const rollupPluginResolve = require('@rollup/plugin-node-resolve').default({
   //   extensions: EXTENSIONS
   // });
@@ -424,8 +442,10 @@ const findExternalsFn = (input, output) => {
     } else if (typeof file === 'string' && file.trim().length) {
       try {
         file = path.resolve(fileFromArgv)
-        if (!path.extname(file)) file = path.resolve(file, base)
-        file = require.resolve(file)
+        if (base) {
+          if (!path.extname(file)) file = path.resolve(file, base)
+          file = require.resolve(file)
+        }
       } catch (err) {
         file = false
         throw new Error(kleur.bgRed(' (' + base + ') - ' + fileFromArgv + ' '))
@@ -435,12 +455,15 @@ const findExternalsFn = (input, output) => {
   }
 
   let watcher
+  let removeFile
   let pkgFile, tscFile, babelFile // , cfgFile;
   let pkgFileWatch, tscFileWatch, babelFileWatch
   const buildRollupFn = () => {
     // if (watcher) watcher.close(), watcher = null;
     if (watcher) return watcher
 
+    removeFile = findFileFn(argv.remove, false)
+    if (removeFile === '') removeFile = true
     pkgFile = findFileFn(argv.pkg, 'package.json')
     tscFile = findFileFn(argv.tsc, 'tsconfig.json')
     babelFile = findFileFn(argv.babel, [
@@ -477,8 +500,23 @@ const findExternalsFn = (input, output) => {
     verbose('')
 
     const BUILD_KEYS = findExternalsFn(DIR_INPUT, DIR_OUTPUT)
-    // console.log('DIR_OUTPUT', DIR_OUTPUT);
+    // console.log('DIR_OUTPUT', DIR_OUTPUT)
     // console.log('BUILD_KEYS', BUILD_KEYS)
+
+    if (typeof removeFile === 'string') {
+      if (
+        DIR_INPUT.indexOf(removeFile) > -1 ||
+        removeFile.indexOf(DIR_OUTPUT) !== 0
+      ) {
+        console.log(
+          kleur.bgRed('Directory: ' + removeFile + " - can't delete it")
+        )
+      } else rimraf(removeFile)
+    } else if (removeFile) {
+      Object.keys(BUILD_KEYS).forEach((key) => {
+        if (key !== DIR_OUTPUT) rimraf(key)
+      })
+    }
 
     const buildDefaultPackage = (key, props = {}) => {
       const filePackage = path.resolve(key, 'package.json')
@@ -579,8 +617,20 @@ const findExternalsFn = (input, output) => {
       }
 
       plugins.push({
+        resolveId(source, file) {
+          // console.log('resolveId', [source, file])
+          // console.log(JSON.stringify(external, null, 2))
+          if (file) {
+            if (!external.some((path) => source.indexOf(path) === 0)) {
+              throw new Error(
+                file + '\ndependency: ' + source + ' - not found in external'
+              )
+            }
+            return { id: source, external: true }
+          }
+        },
         writeBundle({ format }, data) {
-          // console.log('format: ' + format, Object.keys(data));
+          // console.log('format: ' + format, Object.keys(data))
           if (key in writeKeys) return
           writeKeys[key] = true
 
@@ -681,7 +731,7 @@ const findExternalsFn = (input, output) => {
     process.on('SIGTERM', watcher.close), process.on('exit', watcher.close)
 
     watcher.on('event', (event) => {
-      verbose(event)
+      // verbose(event)
       // event.code can be one of:
       //   START        — the watcher is (re)starting
       //   BUNDLE_START — building an individual bundle
@@ -692,6 +742,7 @@ const findExternalsFn = (input, output) => {
       if (event.code === 'BUNDLE_START') {
         verbose('\n')
         verbose(kleur.inverse(' ' + event.input + ' '))
+        verbose(event)
       }
 
       if (event.code === 'BUNDLE_END') {
