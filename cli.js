@@ -772,6 +772,8 @@ const findExternalsFn = (input, output) => {
   watcher = buildRollupFn()
   let last
   const rebuildFn = (force) => (type, file) => {
+    if (file && /^[._]/.test(file[0])) return
+
     const l = type + file
 
     if (last !== l) {
