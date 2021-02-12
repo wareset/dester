@@ -190,6 +190,7 @@ Arguments:
   dester [input] [output]
   -i, --input  -  Input folder. Default: "src"
   -o, --output -  Output folder. Default: "dist"
+  -r, --remove -  Remove or autoremove folders. Default: "auto"
   -t, --types  -  Folder for declarations. Default: "__types__"
   -w, --watch  -  Watch changes in files and configs. Default: false
   -s, --silent -  Do not display messages. Default: false
