@@ -102,10 +102,22 @@ const findExternalsFn = (input, output) => {
   ]
 
   const findBuilders = (input, output) => {
-    const files = fs.readdirSync(input, { withFileTypes: true })
+    let files = fs.readdirSync(input, { withFileTypes: true })
 
     let name, ext, key
-    const isIndex = [...files].some((dirent) => {
+    // const isIndex = [...files].some((dirent) => {
+    //   ;({ name, ext } = path.parse(dirent.name))
+    //   if (dirent.isFile() && name === 'index' && ~EXTENSIONS.indexOf(ext)) {
+    //     BUILD_KEYS[output] = {
+    //       name: dirent.name,
+    //       input: path.resolve(input, dirent.name),
+    //       output: createOutputFn(output)
+    //     }
+    //     return true
+    //   }
+    // })
+
+    files = [...files].filter((dirent) => {
       ;({ name, ext } = path.parse(dirent.name))
       if (dirent.isFile() && name === 'index' && ~EXTENSIONS.indexOf(ext)) {
         BUILD_KEYS[output] = {
@@ -113,8 +125,9 @@ const findExternalsFn = (input, output) => {
           input: path.resolve(input, dirent.name),
           output: createOutputFn(output)
         }
-        return true
+        return false
       }
+      return true
     })
 
     for (const dirent of files) {
@@ -123,7 +136,7 @@ const findExternalsFn = (input, output) => {
       if (/(^|\.)tests(\.|$)/.test(name)) continue
       if (dirent.isDirectory()) {
         findBuilders(path.resolve(input, name), path.resolve(output, name))
-      } else if (!isIndex && dirent.isFile()) {
+      } else if (/* !isIndex && */ dirent.isFile()) {
         ;({ name, ext } = path.parse(name)), (key = path.resolve(output, name))
         if (!(key in BUILD_KEYS) && ~EXTENSIONS.indexOf(ext)) {
           BUILD_KEYS[key] = {

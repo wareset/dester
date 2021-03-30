@@ -6,8 +6,6 @@ var flags = require('../../flags');
 
 /* eslint-disable max-len */
 
-
-
 const createRegExp = ({ next, char, save, raw, slashed, error }) => {
   let is;
   const __test__ = (CHAR) =>

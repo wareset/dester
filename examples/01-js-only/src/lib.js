@@ -1,1 +1,1 @@
-export const CONSTANT = 'some-value';
+export const CONSTANT = 'some-value'

@@ -4,7 +4,9 @@
     "__types__",
     "index.d.ts",
     "index.js",
-    "index.mjs"
+    "index.mjs",
+    "lib-1",
+    "lib-2"
   ],
   "scripts": {
     "build": "dester ./src ./ -s",

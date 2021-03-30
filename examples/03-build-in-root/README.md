@@ -21,7 +21,15 @@ after starting the `Dester`:
 
 ```json
 {
-  "files": ["README.md", "__types__", "index.d.ts", "index.js", "index.mjs"],
+  "files": [
+    "README.md",
+    "__types__",
+    "index.d.ts",
+    "index.js",
+    "index.mjs",
+    "lib-1",
+    "lib-2"
+  ],
   "scripts": {
     "build": "dester ./src ./ -s",
     "dev": "npm run build -- -w"

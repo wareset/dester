@@ -28,8 +28,6 @@ This is an example of the package files:
 project-folder
 │
 ├── src
-│   ├── any-file-1.ts
-│   ├── any-file-2.ts
 │   ├── index.ts      /* Used by `typescript` or `sucrase` */
 │   │
 │   ├── some-folder
@@ -87,7 +85,7 @@ project-folder
 │
 ├── dist
 │   ├── __types__  /* Need a global or local `typescript` */
-│   │   ├── any-file-1.d.ts
+│   │   ├── index.d.ts
 │   │   ...
 │   │   └── other-folder
 │   │
@@ -110,6 +108,18 @@ project-folder
 │   │       └── package.json
 │   │
 │   └── other-folder
+│       ├── other-file-1
+│       │   ├── index.d.ts
+│       │   ├── index.mjs
+│       │   ├── index.js
+│       │   └── package.json
+│       │
+│       ├── other-file-2
+│       │   ├── index.d.ts
+│       │   ├── index.mjs
+│       │   ├── index.js
+│       │   └── package.json
+│       │
 │       ├── index.d.ts
 │       ├── index.mjs
 │       ├── index.js
@@ -127,7 +137,6 @@ project-folder
 
 - The file `package.json` was found automatically;
 - The file `tsconfig.json` was found automatically;
-- The files `any-file-1.ts` and `any-file-2.ts` are missing in the folder because there is a file `index.ts` next to them. But directories always remain;
 - In a folder `some-folder` not a file `index.js`. Therefore, all files were created in separate folders;
 - The file `index.d.ts` and folder `__types__` will be created if you have the `typescript` (`tsc`) installed.
 - `_excluded-folder` and `_excluded-file.js` were ignored because they start with the `_`.

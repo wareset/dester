@@ -5,7 +5,7 @@
   ],
   "scripts": {
     "dester": "dester ./src ./dist",
-    "build": "rm -rf ./dist && npm run -s dester",
+    "build": "npm run -s dester",
     "dev": "npm run -s dester -- -w"
   },
   "devDependencies": {

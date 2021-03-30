@@ -2,8 +2,6 @@ import { TYPE_REGULAR_EXPRESSION, LITERAL } from '../../flags';
 
 /* eslint-disable max-len */
 
-
-
 const createRegExp = ({ next, char, save, raw, slashed, error }) => {
   let is;
   const __test__ = (CHAR) =>

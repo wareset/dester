@@ -1,1 +1,1 @@
-export default () => console.log('util-1');
+export default () => console.log('util-1')

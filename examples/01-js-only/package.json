@@ -4,7 +4,7 @@
     "README.md"
   ],
   "scripts": {
-    "dester": "dester ./src ./dist --no-tsc",
+    "dester": "dester ./src ./dist --no-tsc --no-t",
     "build": "rm -rf ./dist && npm run -s dester",
     "dev": "npm run -s dester -- -w"
   },
