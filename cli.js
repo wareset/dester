@@ -1,3 +1,6 @@
+/* eslint-disable security/detect-child-process */
+/* eslint-disable security/detect-non-literal-fs-filename */
+
 const fs = require('fs')
 const path = require('path')
 
@@ -133,7 +136,7 @@ const findExternalsFn = (input, output) => {
     for (const dirent of files) {
       name = dirent.name
       if (name[0] === '_') continue
-      if (/(^|\.)tests(\.|$)/.test(name)) continue
+      if (/\.tests?(\.|$)/.test(name) || /(^|\.)tests?\./.test(name)) continue
       if (dirent.isDirectory()) {
         findBuilders(path.resolve(input, name), path.resolve(output, name))
       } else if (/* !isIndex && */ dirent.isFile()) {
@@ -350,6 +353,8 @@ const findExternalsFn = (input, output) => {
       include: [toPosix(path.join(DIR_INPUT, '/**/*'))],
       exclude: [
         toPosix(path.join(DIR_INPUT, '/**/_*')),
+        toPosix(path.join(DIR_INPUT, '/**/test')),
+        toPosix(path.join(DIR_INPUT, '/**/tests')),
         toPosix(path.join(DIR_INPUT, '/**/*.test.*')),
         toPosix(path.join(DIR_INPUT, '/**/*.tests.*')),
         toPosix(path.join(DIR_INPUT, '/**/*.test')),
@@ -595,6 +600,16 @@ const findExternalsFn = (input, output) => {
       pkg ? Object.keys(pkg.peerDependencies || {}) : []
     )
 
+    let EXTERNAL_DEPENDENCIES = {}
+    if (pkg) {
+      if (pkg.dependencies) EXTERNAL_DEPENDENCIES = { ...pkg.dependencies }
+      if (pkg.peerDependencies)
+        EXTERNAL_DEPENDENCIES = {
+          ...EXTERNAL_DEPENDENCIES,
+          ...pkg.dependencies
+        }
+    }
+
     const ROLLS = []
     let writeKeys = {}
     for (const key of Object.keys(BUILD_KEYS)) {
@@ -633,16 +648,28 @@ const findExternalsFn = (input, output) => {
         resolveId(source, file) {
           // console.log('resolveId', [source, file])
           // console.log(JSON.stringify(external, null, 2))
+          //  && /^\.*[/\\]/.test(source)
           if (file) {
-            if (!external.some((path) => source.indexOf(path) === 0)) {
-              throw new Error(
-                file + '\ndependency: ' + source + ' - not found in external'
-              )
+            if (!/^\.*[/\\]/.test(source)) {
+              let dep = ''
+              if (
+                !external.some((path) => source.indexOf((dep = path)) === 0)
+              ) {
+                throw new Error(
+                  file + '\ndependency: ' + source + ' - not found in external'
+                )
+              }
+              if (dep in EXTERNAL_DEPENDENCIES)
+                delete EXTERNAL_DEPENDENCIES[dep]
             }
             return { id: source, external: true }
           }
         },
         writeBundle({ format }, data) {
+          const imports = data[Object.keys(data)[0]].imports || []
+          imports.forEach((dep) => {
+            if (dep in EXTERNAL_DEPENDENCIES) delete EXTERNAL_DEPENDENCIES[dep]
+          })
           // console.log('format: ' + format, Object.keys(data))
           if (key in writeKeys) return
           writeKeys[key] = true
@@ -763,6 +790,15 @@ const findExternalsFn = (input, output) => {
       }
 
       if (event.code === 'END') {
+        const EXTERNAL_DEPENDENCIES_ARR = Object.keys(EXTERNAL_DEPENDENCIES)
+        if (EXTERNAL_DEPENDENCIES_ARR.length) {
+          EXTERNAL_DEPENDENCIES_ARR.forEach((name) => {
+            console.log(
+              kleur.black(kleur.bgYellow(name + ' - dependency never used!'))
+            )
+          })
+        }
+
         writeKeys = {}
         if (!argvWatch) watcher.close()
       }
@@ -783,21 +819,19 @@ const findExternalsFn = (input, output) => {
   }
 
   watcher = buildRollupFn()
-  let last
-  const rebuildFn = (force) => (type, file) => {
-    if (file && /^[._]/.test(file[0])) return
+  let lastChokidarFile = ''
+  const rebuildFn = (force) => (type, file, { watchedPath }) => {
+    if (!watcher) return
+    if (!path.extname(watchedPath) || /^[._]/.test(file[0])) return
+    if (lastChokidarFile === (lastChokidarFile = type + watchedPath)) return
+    setTimeout(() => (lastChokidarFile = ''), 100)
 
-    const l = type + file
-
-    if (last !== l) {
-      last = l
-      verbose('\n')
-      verbose(kleur.green().inverse(' ' + type + ': ' + file + ' '))
-    }
+    verbose('\n')
+    verbose(kleur.green().inverse(' ' + type + ': ' + file + ' '))
 
     if (type !== 'change' || force) {
       if (watcher) watcher.close(), (watcher = null)
-      setTimeout(() => (watcher = buildRollupFn()), 1000)
+      setTimeout(() => (watcher = buildRollupFn()), 100)
     }
   }
   if (argvWatch) {

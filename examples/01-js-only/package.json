@@ -5,10 +5,15 @@
   ],
   "scripts": {
     "dester": "dester ./src ./dist --no-tsc --no-t",
-    "build": "rm -rf ./dist && npm run -s dester",
+    "build": "rm -rf ./dist && npm run -s dester -- -s",
     "dev": "npm run -s dester -- -w"
   },
   "devDependencies": {
     "dester": "0.x"
+  },
+  "dependencies": {
+    "@wareset-utilites/array": "0.1.2",
+    "@wareset-utilites/constants": "0.1.0",
+    "@wareset-utilites/is": "0.1.8"
   }
 }
