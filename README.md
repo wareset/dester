@@ -84,12 +84,12 @@ project-folder
 │   └── ...
 │
 ├── dist
-│   ├── __types__  /* Need a global or local `typescript` */
+│   ├── __types__  /* Need `typescript` */
 │   │   ├── index.d.ts
 │   │   ...
 │   │   └── other-folder
 │   │
-│   ├── index.d.ts /* Need a global or local `typescript` */
+│   ├── index.d.ts /* Need `typescript` */
 │   ├── index.js
 │   ├── index.mjs
 │   ├── package.json
@@ -185,9 +185,9 @@ Example of work in a project's `package.json`:
   "name": "project-name",
   "version": "0.0.1",
   "scripts": {
-    "dester": "dester ./src ./dist",
-    "build": "rm -rf ./dist && npm run dester",
-    "dev": "npm run dester -- -w"
+    "dester": "dester ./src ./dist --babel",
+    "build": "npm run dester -- --remove ./dist",
+    "dev": "npm run dester -- -w --no-remove"
   }
 }
 ```
@@ -195,18 +195,23 @@ Example of work in a project's `package.json`:
 ## Command List
 
 ```bash
-Arguments:
-  dester [input] [output]
-  -i, --input  -  Input folder. Default: "src"
-  -o, --output -  Output folder. Default: "dist"
-  -r, --remove -  Remove or autoremove folders. Default: "auto"
-  -t, --types  -  Folder for declarations. Default: "__types__"
-  -w, --watch  -  Watch changes in files and configs. Default: false
-  -s, --silent -  Do not display messages. Default: false
-  --sourcemap  -  Create SourceMap. Default: false
-  --pkg        -  Path to package.json. Default: "auto"
-  --tsc        -  Path to tsconfig.json. Default: "auto"
-  --babel      -  Path to babel.config.json. Default: false
+  Arguments:
+    dester [input] [output]
+    -i, --input  -  Input folder. Default: "src"
+    -o, --output -  Output folder. Default: "dist"
+
+    -r, --remove -  Remove or autoremove folders. Default: true
+    -t, --types  -  Folder for declarations. Default: "__types__"
+    -w, --watch  -  Watch changes in files and configs. Default: false
+    -s, --silent -  Show only error messages. Default: false
+    -f, --force  -  Will ignore some errors. Default: false
+    --pkgbeauty  -  The 'package.json' will be slightly combed. Default: true
+
+    --pkg        -  Path to package.json. Default: true
+    --tsc        -  Path to tsconfig.json. Default: true
+    --babel      -  Path to babel.config.json. Default: false
+
+    -h, --help   -  This help
 ```
 
 - If the path for `types` doesn't start with a `./` or `../`, they the will be created in the `dist` folder.
@@ -214,76 +219,78 @@ Arguments:
 ## Command examples
 
 ```bash
-Examples:
-  dester ./src
-  dester ./src ./dist
+  Examples:
+    dester ./src
+    dester ./src ./dist
+    dester ./dist -i ./src
+    dester -o ./dist ./src
 
-Remove folders:
-- Not remove:
-  dester ./src ./dist --no-r
-  dester ./src ./dist --no-remove
-- Remove only created subfolders (DEFAULT):
-  dester ./src ./dist -r
-  dester ./src ./dist --remove
-- Remove folder "FOLDERNAME" before build:
-  dester ./src ./dist --remove FOLDERNAME
-  dester ./src ./dist -r ./some/FOLDERNAME
+  Remove folders:
+  - Not remove (nothing will be deleted):
+    dester  --no-r
+    dester  --no-remove
+  - Remove only created subfolders (DEFAULT) (the subdirectories that will be found based on the "Input" will be cleared):
+    dester  --r
+    dester  --remove
+  - Remove folder "DIST_FOLDER_NAME" before build ("DIST_FOLDER_NAME" will be cleared only if it does not contain "Input"):
+    dester  --r DIST_FOLDER_NAME
+    dester  --remove DIST_FOLDER_NAME
 
+  Types:
+  - Not create types:
+    dester  --no-t
+    dester  --no-types
+  - Create types (DEFAULT):
+    dester  --t __types__
+    dester  --types __types__
+  - Create types in "TYPES_FOLDER_NAME":
+    dester  --t TYPES_FOLDER_NAME
+    dester  --types TYPES_FOLDER_NAME
 
-Types:
-- Not create types:
-  dester ./src ./dist --no-t
-  dester ./src ./dist --no-types
-- Create types (DEFAULT):
-  dester ./src ./dist --types __types__
-- Create types in "TYPES_FOLDER_NAME":
-  dester ./src ./dist --types TYPES_FOLDER_NAME
-  dester ./src ./dist -t ./dist/TYPES_FOLDER_NAME
+  Watch:
+    dester  --w
+    dester  --watch
 
-Watch:
-  dester ./src ./dist -w
-  dester ./src ./dist --watch
+  Silent mode:
+    dester  --s
+    dester  --silent
 
-Silent mode:
-  dester ./src ./dist -s
-  dester ./src ./dist --silent
+  Force:
+    dester  --f
+    dester  --force
 
-Create source maps:
-  dester ./src ./dist --sourcemap
+  Beauty package.json files (default: true):
+    dester  --pkgbeauty
+    dester  --no-pkgbeauty
 
-Set package.json:
-- Not find package.json:
-  dester ./src ./dist --no-pkg
-- Auto-find package.json (DEFAULT):
-  dester ./src ./dist --pkg
-  dester ./src ./dist --pkg auto
-- Find or auto-find package.json in dir:
-  dester ./src ./dist --pkg ./some-dir
-  dester ./src ./dist --pkg ./some-dir/package.json
-  dester ./src ./dist --pkg ./some-dir/custom-package.json
+  Set package.json:
+  - Not find package.json:
+    dester  --no-pkg
+  - Auto-find package.json (DEFAULT):
+    dester  --pkg
+  - Find or auto-find package.json in dir:
+    dester  --pkg ./some-dir
+    dester  --pkg ./some-dir/custom-name-package.json
 
-Set tsconfig.json:
-(need installed "typescript")
-- Not find tsconfig.json:
-  dester ./src ./dist --no-tsc
-- Auto-find tsconfig.json (DEFAULT):
-  dester ./src ./dist --tsc
-  dester ./src ./dist --tsc auto
-- Find or auto-find tsconfig.json in dir:
-  dester ./src ./dist --tsc ./some-dir
-  dester ./src ./dist --tsc ./some-dir/tsconfig.json
+  Set tsconfig.json:
+  (need dependency "typescript")
+  - Not find tsconfig.json:
+    dester  --no-tsc
+  - Auto-find tsconfig.json (DEFAULT):
+    dester  --tsc
+  - Find or auto-find tsconfig.json in dir:
+    dester  --pkg ./some-dir
+    dester  --pkg ./some-dir/custom-name-tsconfig.json
 
-Set babel.config.json (.babelrc.json):
-(need installed "@babel/core")
-- Not find babel.config.json (DEFAULT):
-  dester ./src ./dist --no-babel
-- Auto-find babel.config.json:
-  dester ./src ./dist --babel
-  dester ./src ./dist --babel auto
-- Find or auto-find babel.config.json in dir:
-  dester ./src ./dist --babel ./some-dir
-  dester ./src ./dist --babel ./some-dir/.babelrc.json
-  dester ./src ./dist --babel ./some-dir/babel.config.js
+  Set babel.config.json (.babelrc.json):
+  (need dependency "@babel/core")
+  - Not find babel.config.json (DEFAULT):
+    dester  --no-babel
+  - Auto-find babel.config.json:
+    dester  --babel
+  - Find or auto-find babel.config.json in dir:
+    dester  --pkg ./some-dir
+    dester  --pkg ./some-dir/babel.config.js
 ```
 
 ## Lisence

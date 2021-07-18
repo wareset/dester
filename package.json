@@ -1,6 +1,6 @@
 {
   "name": "dester",
-  "version": "0.1.2",
+  "version": "0.2.1",
   "description": "A simple CLI js/ts lib-builder that uses Rollup, Babel and TypeScript/Sucrase",
   "author": "cftcview <cftcview@gmail.com>",
   "homepage": "https://github.com/wareset/dester#readme",
@@ -9,11 +9,14 @@
     "dester": "dester"
   },
   "files": [
-    "cli.js",
+    "bin",
     "dester",
     "README.md"
   ],
   "scripts": {
+    "dester": "dester ./src ./bin --no-babel --no-types",
+    "build": "npm run -s dester",
+    "dev": "npm run -s dester -- -w --no-r",
     "pkg:name": "cat package.json | grep '\"name\":' | cut -d '\"' -f4",
     "pkg:version": "cat package.json | grep '\"version\":' | cut -d '\"' -f4",
     "git:get:tag": "echo v$(npm run -s pkg:version)",
@@ -29,28 +32,41 @@
     "url": "https://github.com/wareset/dester/issues"
   },
   "peerDependencies": {
+    "@babel/core": "7.x",
     "typescript": "4.x"
   },
   "peerDependenciesMeta": {
     "typescript": {
       "optional": true
+    },
+    "@babel/core": {
+      "optional": true
     }
   },
   "dependencies": {
-    "@rollup/plugin-alias": "^3.1.2",
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-json": "^4.1.0",
-    "@rollup/plugin-inject": "^4.0.2",
-    "@rollup/plugin-replace": "^2.4.2",
     "@rollup/plugin-sucrase": "^3.1.0",
+    "@wareset-utilites/array": "0.1.4",
+    "@wareset-utilites/hash": "0.1.5",
+    "@wareset-utilites/is": "0.1.10",
+    "@wareset-utilites/lang": "0.1.8",
+    "@wareset-utilites/nearly": "0.1.12",
+    "@wareset-utilites/object": "0.1.5",
+    "@wareset-utilites/string": "0.1.8",
+    "@wareset-utilites/trycatch": "0.0.7",
+    "@wareset-utilites/unique": "1.1.7",
     "chokidar": "^3.5.1",
     "kleur": "^4.1.4",
     "minimist": "^1.2.5",
-    "rimraf": "^3.0.2",
     "rollup": "^2.46.0",
     "rollup-plugin-typescript2": "^0.30.0"
   },
   "devDependencies": {
+    "@babel/core": "7.x",
+    "@types/node": "^12.20.11",
+    "dester": "0.1.x",
+    "ts-node": "^9.1.1",
     "typescript": "4.x"
   }
 }

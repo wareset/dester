@@ -1,4 +1,7 @@
 {
+  "main": "index",
+  "module": "index.mjs",
+  "types": "index.d.ts",
   "files": [
     "README.md",
     "__types__",
@@ -14,8 +17,5 @@
   },
   "devDependencies": {
     "dester": "0.x"
-  },
-  "main": "index",
-  "module": "index.mjs",
-  "types": "index.d.ts"
+  }
 }

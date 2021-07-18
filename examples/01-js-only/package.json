@@ -1,11 +1,14 @@
 {
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "ttt",
+    "TYPES",
+    "types"
   ],
   "scripts": {
     "dester": "dester ./src ./dist --no-tsc --no-t",
-    "build": "rm -rf ./dist && npm run -s dester -- -s",
+    "build": "npm run -s dester --",
     "dev": "npm run -s dester -- -w"
   },
   "devDependencies": {
