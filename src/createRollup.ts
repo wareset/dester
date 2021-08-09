@@ -1,4 +1,4 @@
-import { green } from 'kleur'
+import { green, white } from 'kleur'
 
 import { watch as rollupWatch } from 'rollup'
 
@@ -40,6 +40,7 @@ import { getBabelOutputPlugin as __rollupPluginBabel__ } from '@rollup/plugin-ba
 import jsonStringify from '@wareset-utilites/lang/jsonStringify'
 import jsonParse from '@wareset-utilites/lang/jsonParse'
 import startsWith from '@wareset-utilites/string/startsWith'
+import padStart from '@wareset-utilites/string/padStart'
 // import endsWith from '@wareset-utilites/string/endsWith'
 import concat from '@wareset-utilites/array/concat'
 // import last from '@wareset-utilites/array/last'
@@ -71,6 +72,7 @@ import {
   toPosix,
   existsStatSync,
   isJTSX,
+  isAllowedFile,
   getInputFiles,
   TypeInputFile,
   processExit
@@ -82,6 +84,47 @@ import {
   messageCompileError,
   messageWarn
 } from './messages'
+
+import { minify, MinifyOptions } from 'terser'
+const terserOptions: MinifyOptions = {
+  module: true,
+  toplevel: true,
+  compress: {
+    // expression: true,
+    evaluate: false
+  },
+  format: {
+    quote_style: 1
+  },
+
+  sourceMap: true,
+  safari10: true,
+  keep_classnames: true
+  // compress: {
+  //   evaluate: false
+  //   drop_console: true
+  // },
+  // mangle: {
+  //   safari10: true,
+
+  // },
+  // format: {
+  //   beautify: true
+  // }
+}
+// renderChunk transform
+const rollupPluginTerser = {
+  async transform(code: string): Promise<any> {
+    try {
+      const res = await minify(code, terserOptions)
+      // console.log(code)
+      // console.log(res)
+      return res
+    } catch (e) {
+      messageCompileError(e)
+    }
+  }
+}
 
 // const resolveExternals = (key: string, v?: string): string => {
 //   let res = v !== undefined ? pathRelative(key, v) : key
@@ -175,6 +218,7 @@ const createRollup = (
   babel: string,
   types: string,
   force: boolean,
+  minify: boolean,
   pkgbeauty: boolean,
   watch: boolean,
   silent: boolean
@@ -182,6 +226,11 @@ const createRollup = (
   const inputPosix = toPosix(input)
   const { include } = getInputFiles(input)
   const includeObj: { [key: string]: TypeInputFile } = {}
+  // const excludeObj: { [key: string]: TypeInputFile } = {}
+  // exclude.forEach((v) => {
+  //   excludeObj[v.final] = v
+  // })
+  // console.log(jsonStringify(excludeObj, undefined, 2))
 
   // prettier-ignore
   const packageJsonStrOld: any = pkg
@@ -288,7 +337,19 @@ const createRollup = (
               } else {
                 let ns = pathResolve(pathDirname(file), source)
                 const ext = pathExtname(ns)
-                if (startsWith(ns, input) && (!ext || isJTSX(ext))) {
+
+                // console.log('\n', 12)
+                // console.log(file)
+                // console.log(source)
+                // console.log(isAllowedFile(ns, input))
+                // console.log(isAllowedFile(file, input))
+
+                if (
+                  startsWith(ns, input) &&
+                  // isAllowedFile(ns, input) &&
+                  isAllowedFile(file, input) &&
+                  (!ext || isJTSX(ext))
+                ) {
                   if (ext) ns = ns.slice(0, -ext.length)
                   if (!isIndex(ns)) ns = pathJoin(ns, 'index')
                   const nskey = pathRelative(input, ns)
@@ -296,13 +357,22 @@ const createRollup = (
                     ns = pathRelative(file, pathDirname(ns))
                     if (isIndex(file)) ns = pathRelative('..', ns)
                     ns = toPosix(fixSource(ns))
+
                     return { id: ns, external: true }
                   }
                 }
+
                 // return { id: source, external: true }
               }
             }
           }
+          // load(id: any): any {
+          //   console.log('load', id)
+          //   if (id in resolveCache)
+          //     return `export * from ${jsonStringify(
+          //       '/' + pathRelative(input, resolveCache[id].origin)
+          //     )};`
+          // }
         },
         // prettier-ignore
         ...(isNeedTSC ? [rollupPluginTSC] : [/* rollupPluginSucrase */]),
@@ -340,7 +410,8 @@ const createRollup = (
               fsWriteFileSync(writePath, text)
             }
           }
-        }
+        },
+        ...(minify ? [rollupPluginTerser] : [])
       ]
     })
   })
@@ -350,6 +421,9 @@ const createRollup = (
     watcher && watcher.close()
   })
 
+  const includeObjKeys = keys(includeObj)
+  const includeObjKeysLen = includeObjKeys.length
+  const iokls = (includeObjKeysLen + '').length
   let isError = false
   let isNeedCreatePackages = true
   watcher.on('event', (event) => {
@@ -374,15 +448,22 @@ const createRollup = (
     // }
 
     if (event.code === 'BUNDLE_END') {
+      const resFile = pathRelative(output, event.output[1].slice(0, -3))
       // prettier-ignore
-      isError || silent || log(green('BUILD: ') + inp + ' -> '
-          + pathRelative(output, event.output[1].slice(0, -3)))
-      // silent || logInfo(jsonStringify(event.output, undefined, 2))
+      isError || silent || log(green('BUILD: ')
+          + green(`[${padStart(includeObjKeys.indexOf(resFile) + 1 + '', iokls, '0')}/${includeObjKeysLen}]`)
+          + ' - ' + inp + ' -> ' + resFile
+      )
     }
 
     if (event.code === 'ERROR') {
+      const res: any = event.result || {}
       isError = true
-      messageCompileError(event.error)
+      messageCompileError(
+        white((res!.watchFiles || []).join('\n')),
+        event.error
+      )
+      // console.log(event.result)
     }
 
     if (event.code === 'END') {

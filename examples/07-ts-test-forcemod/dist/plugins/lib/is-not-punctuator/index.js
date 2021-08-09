@@ -1,10 +1,1 @@
-'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-var flags = require('../../../flags');
-
-/* PUNCTUATOR */
-var isNotPunctuator = (self, last = self.tokenLast) => !last || /case|return/.test(last.raw) || last.type === flags.TYPE_PUNCTUATOR;
-
-exports.default = isNotPunctuator;
+Object.defineProperty(exports,"__esModule",{value:!0});var e=require("../../../flags");exports.default=(t,r=t.tokenLast)=>!r||/case|return/.test(r.raw)||r.type===e.TYPE_PUNCTUATOR;

@@ -1,3 +1,1 @@
-var util1 = () => console.log('util-1');
-
-export default util1;
+export default()=>console.log("util-1");

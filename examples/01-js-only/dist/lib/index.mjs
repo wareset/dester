@@ -1,6 +1,1 @@
-const CONSTANT = 'some-value';
-// import ind from '.'
-const ind = require('.');
-console.log(ind);
-
-export { CONSTANT };
+const e="some-value",o=require(".");console.log(o);export{e as CONSTANT};

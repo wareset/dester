@@ -205,6 +205,7 @@ Example of work in a project's `package.json`:
     -w, --watch  -  Watch changes in files and configs. Default: false
     -s, --silent -  Show only error messages. Default: false
     -f, --force  -  Will ignore some errors. Default: false
+    -m, --minify -  Use the "terser" for minify js files. Default: false
     --pkgbeauty  -  The 'package.json' will be slightly combed. Default: true
 
     --pkg        -  Path to package.json. Default: true
@@ -229,10 +230,12 @@ Example of work in a project's `package.json`:
   - Not remove (nothing will be deleted):
     dester  --no-r
     dester  --no-remove
-  - Remove only created subfolders (DEFAULT) (the subdirectories that will be found based on the "Input" will be cleared):
+  - Remove only created subfolders (DEFAULT)
+  (the subdirectories that will be found based on the "Input" will be cleared):
     dester  --r
     dester  --remove
-  - Remove folder "DIST_FOLDER_NAME" before build ("DIST_FOLDER_NAME" will be cleared only if it does not contain "Input"):
+  - Remove folder "DIST_FOLDER_NAME" before build
+  ("DIST_FOLDER_NAME" will be cleared only if it does not contain "Input"):
     dester  --r DIST_FOLDER_NAME
     dester  --remove DIST_FOLDER_NAME
 
@@ -258,6 +261,10 @@ Example of work in a project's `package.json`:
   Force:
     dester  --f
     dester  --force
+
+  Minify:
+    dester  --m
+    dester  --minify
 
   Beauty package.json files (default: true):
     dester  --pkgbeauty

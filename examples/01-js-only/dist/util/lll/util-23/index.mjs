@@ -1,3 +1,1 @@
-const util23 = () => console.log('util-23');
-
-export { util23 };
+const o=()=>console.log("util-23");export{o as util23};

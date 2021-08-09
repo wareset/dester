@@ -21,7 +21,7 @@ var chokidar__default = /*#__PURE__*/_interopDefaultLegacy(chokidar);
 var includes__default = /*#__PURE__*/_interopDefaultLegacy(includes);
 var viewLogo__default = /*#__PURE__*/_interopDefaultLegacy(viewLogo);
 
-const init = ({ input, output, remove, types, watch, silent, pkg: _pkg, tsc: _tsc, babel: _babel, force, pkgbeauty }) => {
+const init = ({ input, output, remove, types, watch, silent, pkg: _pkg, tsc: _tsc, babel: _babel, force, minify, pkgbeauty }) => {
     if ((force = !!force)) {
         messages.logWarn('Force mode is enabled');
     }
@@ -37,13 +37,13 @@ const init = ({ input, output, remove, types, watch, silent, pkg: _pkg, tsc: _ts
         // prettier-ignore
         const babel = utils.getConfigDir(_babel, ['babel.config.json', 'babel.config.js', '.babelrc.json', '.babelrc.js'], silent);
         // prettier-ignore
-        let rollupWatcher = createRollup__default['default'](input, output, pkg, tsc, babel, types, force, pkgbeauty, watch, silent);
+        let rollupWatcher = createRollup__default['default'](input, output, pkg, tsc, babel, types, force, minify, pkgbeauty, watch, silent);
         if (isFirstStart)
             createTypes__default['default'](types, input, output, pkgbeauty, watch, silent);
         if (watch) {
             silent || messages.messageInfo('Start of watchers');
             let isReady;
-            const watchfiles = [input, pkg, tsc, babel].filter((v) => v);
+            const watchfiles = [input, /* pkg, */ tsc, babel].filter((v) => v);
             // eslint-disable-next-line security/detect-non-literal-fs-filename
             const watcher = chokidar__default['default'].watch(watchfiles, { persistent: true });
             const resetWatchers = () => {

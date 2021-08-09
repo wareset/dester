@@ -30,10 +30,11 @@ const __argv__ = minimist(process.argv.slice(2), {
         tsc: true,
         babel: false,
         force: false,
+        minify: false,
         pkgbeauty: true
     },
     string: ['input', 'output', 'remove', 'types'],
-    boolean: ['help', 'watch', 'silent', 'force', 'pkgbeauty'],
+    boolean: ['help', 'watch', 'silent', 'force', 'minify', 'pkgbeauty'],
     alias: {
         h: 'help',
         i: 'input',
@@ -42,7 +43,8 @@ const __argv__ = minimist(process.argv.slice(2), {
         t: 'types',
         w: 'watch',
         s: 'silent',
-        f: 'force'
+        f: 'force',
+        m: 'minify'
     }
 });
 const isValidSrcAndDist = (Input, Output) => {
@@ -95,6 +97,7 @@ const run = () => {
             tsc: true,
             babel: true,
             force: false,
+            minify: false,
             pkgbeauty: true
         };
         keys(argv).forEach((k) => {

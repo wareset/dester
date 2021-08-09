@@ -1,16 +1,1 @@
-import { TYPE_REGULAR_EXPRESSION, LITERAL } from '../../flags';
-import isNotPunctuator from '../lib/is-not-punctuator';
-
-/* eslint-disable max-len */
-const createRegExp = ({ next, char, save, raw, slashed, error }) => {
-    let is;
-    const __test__ = (CHAR) => (is = CHAR === '[' ? 1 : CHAR === ']' ? 0 : is) || CHAR;
-    let isValid = false;
-    while (next() && !(isValid = !slashed() && __test__(char()) === '/'))
-        ;
-    save(TYPE_REGULAR_EXPRESSION, raw(), [LITERAL]);
-    !isValid && error();
-};
-const pluginRegularExpression = (self) => () => self.raw() === '/' && isNotPunctuator(self) && !createRegExp(self);
-
-export { pluginRegularExpression };
+import{TYPE_REGULAR_EXPRESSION as r,LITERAL as o}from"../../flags";import t from"../lib/is-not-punctuator";const a=a=>()=>"/"===a.raw()&&t(a)&&!(({next:t,char:a,save:e,raw:s,slashed:f,error:i})=>{let l,m=!1;for(;t()&&!(m=!f()&&"/"===(n=a(),(l="["===n?1:"]"===n?0:l)||n)););var n;e(r,s(),[o]),!m&&i()})(a);export{a as pluginRegularExpression};

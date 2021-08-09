@@ -41,6 +41,7 @@ const __help__ = `
     -w, --watch  -  Watch changes in files and configs. Default: false
     -s, --silent -  Show only error messages. Default: false
     -f, --force  -  Will ignore some errors. Default: false
+    -m, --minify -  Use the "terser" for minify js files. Default: false
     --pkgbeauty  -  The 'package.json' will be slightly combed. Default: true
 
     --pkg        -  Path to package.json. Default: true
@@ -88,6 +89,10 @@ const __help__ = `
   Force:
     dester  --f
     dester  --force
+
+  Minify:
+    dester  --m
+    dester  --minify
 
   Beauty package.json files (default: true):
     dester  --pkgbeauty

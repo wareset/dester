@@ -1,6 +1,1 @@
-import { TYPE_PUNCTUATOR } from '../../../flags';
-
-/* PUNCTUATOR */
-var isNotPunctuator = (self, last = self.tokenLast) => !last || /case|return/.test(last.raw) || last.type === TYPE_PUNCTUATOR;
-
-export default isNotPunctuator;
+import{TYPE_PUNCTUATOR as t}from"../../../flags";export default(e,r=e.tokenLast)=>!r||/case|return/.test(r.raw)||r.type===t;

@@ -35,6 +35,7 @@ export type TypeAgruments = {
   babel: boolean | string
 
   force: boolean
+  minify: boolean
   pkgbeauty: boolean
 }
 
@@ -49,6 +50,7 @@ const init = ({
   tsc: _tsc,
   babel: _babel,
   force,
+  minify,
   pkgbeauty
 }: TypeAgruments): void => {
   if ((force = !!force)) {
@@ -69,7 +71,7 @@ const init = ({
 
     // prettier-ignore
     let rollupWatcher =
-      createRollup(input, output, pkg, tsc, babel, types, force, pkgbeauty, watch, silent)
+      createRollup(input, output, pkg, tsc, babel, types, force, minify, pkgbeauty, watch, silent)
     if (isFirstStart)
       createTypes(types, input, output, pkgbeauty, watch, silent)
 
@@ -77,7 +79,7 @@ const init = ({
       silent || messageInfo('Start of watchers')
 
       let isReady!: boolean
-      const watchfiles = [input, pkg, tsc, babel].filter((v) => v)
+      const watchfiles = [input, /* pkg, */ tsc, babel].filter((v) => v)
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const watcher = chokidar.watch(watchfiles, { persistent: true })
 

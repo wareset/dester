@@ -1,4 +1,4 @@
-import { green } from 'kleur';
+import { green, white } from 'kleur';
 import { watch } from 'rollup';
 import __rollupPluginJson__ from '@rollup/plugin-json';
 import __rollupPluginTypescript2__ from 'rollup-plugin-typescript2';
@@ -6,6 +6,7 @@ import { getBabelOutputPlugin } from '@rollup/plugin-babel';
 import jsonStringify from '@wareset-utilites/lang/jsonStringify';
 import jsonParse from '@wareset-utilites/lang/jsonParse';
 import startsWith from '@wareset-utilites/string/startsWith';
+import padStart from '@wareset-utilites/string/padStart';
 import concat from '@wareset-utilites/array/concat';
 import keys from '@wareset-utilites/object/keys';
 import unique from '@wareset-utilites/unique';
@@ -13,13 +14,51 @@ import trycatch from '@wareset-utilites/trycatch';
 import sortPackageJson from '../sortPackageJson';
 import { readFileSync, writeFileSync, readdirSync } from 'fs';
 import path, { resolve, dirname, extname, join, relative } from 'path';
-import { toPosix, getInputFiles, isJTSX, processExit, existsStatSync } from '../utils';
+import { toPosix, getInputFiles, isAllowedFile, isJTSX, processExit, existsStatSync } from '../utils';
 import { messageError, messageWarn, log, messageCompileError } from '../messages';
+import { minify } from 'terser';
 
 const rollupPluginJson = __rollupPluginJson__();
 // import rollupPluginSucrase from '@rollup/plugin-sucrase'
 const __rollupPluginSucrase__ = require('@rollup/plugin-sucrase');
 const posixSep = path.posix.sep;
+const terserOptions = {
+    module: true,
+    toplevel: true,
+    compress: {
+        evaluate: false
+    },
+    format: {
+        quote_style: 1
+    },
+    sourceMap: true,
+    safari10: true,
+    keep_classnames: true
+    // compress: {
+    //   evaluate: false
+    //   drop_console: true
+    // },
+    // mangle: {
+    //   safari10: true,
+    // },
+    // format: {
+    //   beautify: true
+    // }
+};
+// renderChunk transform
+const rollupPluginTerser = {
+    async transform(code) {
+        try {
+            const res = await minify(code, terserOptions);
+            // console.log(code)
+            // console.log(res)
+            return res;
+        }
+        catch (e) {
+            messageCompileError(e);
+        }
+    }
+};
 // const resolveExternals = (key: string, v?: string): string => {
 //   let res = v !== undefined ? pathRelative(key, v) : key
 //   if (!startsWith(res, pathSep) && !startsWith(res, '..'))
@@ -88,10 +127,15 @@ const outputProps = {
     sourcemap: false
     // compact: true
 };
-const createRollup = (input, output, pkg, tsc, babel, types, force, pkgbeauty, watch$1, silent) => {
+const createRollup = (input, output, pkg, tsc, babel, types, force, minify, pkgbeauty, watch$1, silent) => {
     const inputPosix = toPosix(input);
     const { include } = getInputFiles(input);
     const includeObj = {};
+    // const excludeObj: { [key: string]: TypeInputFile } = {}
+    // exclude.forEach((v) => {
+    //   excludeObj[v.final] = v
+    // })
+    // console.log(jsonStringify(excludeObj, undefined, 2))
     // prettier-ignore
     const packageJsonStrOld = pkg
         ? trycatch(() => readFileSync(pkg).toString(), () => messageError('The file cannot be read:', pkg))
@@ -182,7 +226,15 @@ const createRollup = (input, output, pkg, tsc, babel, types, force, pkgbeauty, w
                             else {
                                 let ns = resolve(dirname(file), source);
                                 const ext = extname(ns);
-                                if (startsWith(ns, input) && (!ext || isJTSX(ext))) {
+                                // console.log('\n', 12)
+                                // console.log(file)
+                                // console.log(source)
+                                // console.log(isAllowedFile(ns, input))
+                                // console.log(isAllowedFile(file, input))
+                                if (startsWith(ns, input) &&
+                                    // isAllowedFile(ns, input) &&
+                                    isAllowedFile(file, input) &&
+                                    (!ext || isJTSX(ext))) {
                                     if (ext)
                                         ns = ns.slice(0, -ext.length);
                                     if (!isIndex(ns))
@@ -200,6 +252,13 @@ const createRollup = (input, output, pkg, tsc, babel, types, force, pkgbeauty, w
                             }
                         }
                     }
+                    // load(id: any): any {
+                    //   console.log('load', id)
+                    //   if (id in resolveCache)
+                    //     return `export * from ${jsonStringify(
+                    //       '/' + pathRelative(input, resolveCache[id].origin)
+                    //     )};`
+                    // }
                 },
                 // prettier-ignore
                 ...(isNeedTSC ? [rollupPluginTSC] : [ /* rollupPluginSucrase */]),
@@ -227,7 +286,8 @@ const createRollup = (input, output, pkg, tsc, babel, types, force, pkgbeauty, w
                             writeFileSync(writePath, text);
                         }
                     }
-                }
+                },
+                ...(minify ? [rollupPluginTerser] : [])
             ]
         });
     });
@@ -235,6 +295,9 @@ const createRollup = (input, output, pkg, tsc, babel, types, force, pkgbeauty, w
     processExit(() => {
         watcher && watcher.close();
     });
+    const includeObjKeys = keys(includeObj);
+    const includeObjKeysLen = includeObjKeys.length;
+    const iokls = (includeObjKeysLen + '').length;
     let isError = false;
     let isNeedCreatePackages = true;
     watcher.on('event', (event) => {
@@ -256,14 +319,17 @@ const createRollup = (input, output, pkg, tsc, babel, types, force, pkgbeauty, w
         //   isError || silent || logInfo(event.code + ': ' + inp)
         // }
         if (event.code === 'BUNDLE_END') {
+            const resFile = relative(output, event.output[1].slice(0, -3));
             // prettier-ignore
-            isError || silent || log(green('BUILD: ') + inp + ' -> '
-                + relative(output, event.output[1].slice(0, -3)));
-            // silent || logInfo(jsonStringify(event.output, undefined, 2))
+            isError || silent || log(green('BUILD: ')
+                + green(`[${padStart(includeObjKeys.indexOf(resFile) + 1 + '', iokls, '0')}/${includeObjKeysLen}]`)
+                + ' - ' + inp + ' -> ' + resFile);
         }
         if (event.code === 'ERROR') {
+            const res = event.result || {};
             isError = true;
-            messageCompileError(event.error);
+            messageCompileError(white((res.watchFiles || []).join('\n')), event.error);
+            // console.log(event.result)
         }
         if (event.code === 'END') {
             if (!isError && isNeedCreatePackages) {

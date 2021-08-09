@@ -10,6 +10,7 @@ var pluginBabel = require('@rollup/plugin-babel');
 var jsonStringify = require('@wareset-utilites/lang/jsonStringify');
 var jsonParse = require('@wareset-utilites/lang/jsonParse');
 var startsWith = require('@wareset-utilites/string/startsWith');
+var padStart = require('@wareset-utilites/string/padStart');
 var concat = require('@wareset-utilites/array/concat');
 var keys = require('@wareset-utilites/object/keys');
 var unique = require('@wareset-utilites/unique');
@@ -19,6 +20,7 @@ var fs = require('fs');
 var path = require('path');
 var utils = require('../utils');
 var messages = require('../messages');
+var terser = require('terser');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -27,6 +29,7 @@ var __rollupPluginTypescript2____default = /*#__PURE__*/_interopDefaultLegacy(__
 var jsonStringify__default = /*#__PURE__*/_interopDefaultLegacy(jsonStringify);
 var jsonParse__default = /*#__PURE__*/_interopDefaultLegacy(jsonParse);
 var startsWith__default = /*#__PURE__*/_interopDefaultLegacy(startsWith);
+var padStart__default = /*#__PURE__*/_interopDefaultLegacy(padStart);
 var concat__default = /*#__PURE__*/_interopDefaultLegacy(concat);
 var keys__default = /*#__PURE__*/_interopDefaultLegacy(keys);
 var unique__default = /*#__PURE__*/_interopDefaultLegacy(unique);
@@ -38,6 +41,43 @@ const rollupPluginJson = __rollupPluginJson____default['default']();
 // import rollupPluginSucrase from '@rollup/plugin-sucrase'
 const __rollupPluginSucrase__ = require('@rollup/plugin-sucrase');
 const posixSep = path__default['default'].posix.sep;
+const terserOptions = {
+    module: true,
+    toplevel: true,
+    compress: {
+        evaluate: false
+    },
+    format: {
+        quote_style: 1
+    },
+    sourceMap: true,
+    safari10: true,
+    keep_classnames: true
+    // compress: {
+    //   evaluate: false
+    //   drop_console: true
+    // },
+    // mangle: {
+    //   safari10: true,
+    // },
+    // format: {
+    //   beautify: true
+    // }
+};
+// renderChunk transform
+const rollupPluginTerser = {
+    async transform(code) {
+        try {
+            const res = await terser.minify(code, terserOptions);
+            // console.log(code)
+            // console.log(res)
+            return res;
+        }
+        catch (e) {
+            messages.messageCompileError(e);
+        }
+    }
+};
 // const resolveExternals = (key: string, v?: string): string => {
 //   let res = v !== undefined ? pathRelative(key, v) : key
 //   if (!startsWith(res, pathSep) && !startsWith(res, '..'))
@@ -106,10 +146,15 @@ const outputProps = {
     sourcemap: false
     // compact: true
 };
-const createRollup = (input, output, pkg, tsc, babel, types, force, pkgbeauty, watch, silent) => {
+const createRollup = (input, output, pkg, tsc, babel, types, force, minify, pkgbeauty, watch, silent) => {
     const inputPosix = utils.toPosix(input);
     const { include } = utils.getInputFiles(input);
     const includeObj = {};
+    // const excludeObj: { [key: string]: TypeInputFile } = {}
+    // exclude.forEach((v) => {
+    //   excludeObj[v.final] = v
+    // })
+    // console.log(jsonStringify(excludeObj, undefined, 2))
     // prettier-ignore
     const packageJsonStrOld = pkg
         ? trycatch__default['default'](() => fs.readFileSync(pkg).toString(), () => messages.messageError('The file cannot be read:', pkg))
@@ -200,7 +245,15 @@ const createRollup = (input, output, pkg, tsc, babel, types, force, pkgbeauty, w
                             else {
                                 let ns = path.resolve(path.dirname(file), source);
                                 const ext = path.extname(ns);
-                                if (startsWith__default['default'](ns, input) && (!ext || utils.isJTSX(ext))) {
+                                // console.log('\n', 12)
+                                // console.log(file)
+                                // console.log(source)
+                                // console.log(isAllowedFile(ns, input))
+                                // console.log(isAllowedFile(file, input))
+                                if (startsWith__default['default'](ns, input) &&
+                                    // isAllowedFile(ns, input) &&
+                                    utils.isAllowedFile(file, input) &&
+                                    (!ext || utils.isJTSX(ext))) {
                                     if (ext)
                                         ns = ns.slice(0, -ext.length);
                                     if (!isIndex(ns))
@@ -218,6 +271,13 @@ const createRollup = (input, output, pkg, tsc, babel, types, force, pkgbeauty, w
                             }
                         }
                     }
+                    // load(id: any): any {
+                    //   console.log('load', id)
+                    //   if (id in resolveCache)
+                    //     return `export * from ${jsonStringify(
+                    //       '/' + pathRelative(input, resolveCache[id].origin)
+                    //     )};`
+                    // }
                 },
                 // prettier-ignore
                 ...(isNeedTSC ? [rollupPluginTSC] : [ /* rollupPluginSucrase */]),
@@ -245,7 +305,8 @@ const createRollup = (input, output, pkg, tsc, babel, types, force, pkgbeauty, w
                             fs.writeFileSync(writePath, text);
                         }
                     }
-                }
+                },
+                ...(minify ? [rollupPluginTerser] : [])
             ]
         });
     });
@@ -253,6 +314,9 @@ const createRollup = (input, output, pkg, tsc, babel, types, force, pkgbeauty, w
     utils.processExit(() => {
         watcher && watcher.close();
     });
+    const includeObjKeys = keys__default['default'](includeObj);
+    const includeObjKeysLen = includeObjKeys.length;
+    const iokls = (includeObjKeysLen + '').length;
     let isError = false;
     let isNeedCreatePackages = true;
     watcher.on('event', (event) => {
@@ -274,14 +338,17 @@ const createRollup = (input, output, pkg, tsc, babel, types, force, pkgbeauty, w
         //   isError || silent || logInfo(event.code + ': ' + inp)
         // }
         if (event.code === 'BUNDLE_END') {
+            const resFile = path.relative(output, event.output[1].slice(0, -3));
             // prettier-ignore
-            isError || silent || messages.log(kleur.green('BUILD: ') + inp + ' -> '
-                + path.relative(output, event.output[1].slice(0, -3)));
-            // silent || logInfo(jsonStringify(event.output, undefined, 2))
+            isError || silent || messages.log(kleur.green('BUILD: ')
+                + kleur.green(`[${padStart__default['default'](includeObjKeys.indexOf(resFile) + 1 + '', iokls, '0')}/${includeObjKeysLen}]`)
+                + ' - ' + inp + ' -> ' + resFile);
         }
         if (event.code === 'ERROR') {
+            const res = event.result || {};
             isError = true;
-            messages.messageCompileError(event.error);
+            messages.messageCompileError(kleur.white((res.watchFiles || []).join('\n')), event.error);
+            // console.log(event.result)
         }
         if (event.code === 'END') {
             if (!isError && isNeedCreatePackages) {
