@@ -1,5 +1,5 @@
-import repeat from '@wareset-utilites/string/repeat';
-import trycatch from '@wareset-utilites/trycatch';
+import { repeat } from '@wareset-utilites/string/repeat';
+import { trycatch } from '@wareset-utilites/trycatch';
 import { bgBlack, cyan, bold, red } from 'kleur';
 import { x1bLen } from '../messages';
 
@@ -24,4 +24,4 @@ const viewLogo = () => {
     console.log(l);
 };
 
-export default viewLogo;
+export { viewLogo as default };

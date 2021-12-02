@@ -10,18 +10,9 @@ var trycatch = require('@wareset-utilites/trycatch');
 var nearly = require('@wareset-utilites/nearly');
 var kleur = require('kleur');
 
-function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
-
-var jsonStringify__default = /*#__PURE__*/_interopDefaultLegacy(jsonStringify);
-var includes__default = /*#__PURE__*/_interopDefaultLegacy(includes);
-var isObject__default = /*#__PURE__*/_interopDefaultLegacy(isObject);
-var repeat__default = /*#__PURE__*/_interopDefaultLegacy(repeat);
-var trycatch__default = /*#__PURE__*/_interopDefaultLegacy(trycatch);
-var nearly__default = /*#__PURE__*/_interopDefaultLegacy(nearly);
-
 const x1bLen = (str) => {
     let res = 0;
-    // eslint-disable-next-line security/detect-unsafe-regex
+    // eslint-disable-next-line no-control-regex
     str.replace(/\x1b(?:\[\d+m)?/g, (_full) => {
         res += _full.length;
         return '';
@@ -31,19 +22,19 @@ const x1bLen = (str) => {
 const __fixBG__ = (str) => {
     let res = str;
     let s;
-    trycatch__default['default'](() => {
+    trycatch.trycatch(() => {
         const q = +process.stdout.columns;
-        // prettier-ignore
-        if (q)
+        if (q) {
             res = res
                 .split(/\r?\n|\r/)
-                .map((v) => (v + repeat__default['default'](' ', (s = nearly__default['default'](v.length, q, 1)))).slice(0, s + x1bLen(v)))
+                .map((v) => (v + repeat.repeat(' ', s = nearly.nearly(v.length, q, 1))).slice(0, s + x1bLen(v)))
                 .join('\n');
+        }
     });
     return res;
 };
 const __normalize__ = (a) => a
-    .map((v) => (isObject__default['default'](v) ? jsonStringify__default['default'](v, undefined, 2) : v))
+    .map((v) => isObject.isObject(v) ? jsonStringify.jsonStringify(v, void 0, 2) : v)
     .join('\n')
     .split('\n')
     .map((v) => '  ' + v + '  ')
@@ -67,7 +58,7 @@ const log = (...a) => {
 };
 const logColoredFactory = (bgColor = kleur.bgGreen, color = kleur.black) => (...a) => {
     let s = __normalize__(a);
-    const is = includes__default['default'](s, '\n');
+    const is = includes.includes(s, '\n');
     if (is)
         s = '\n' + __fixBG__(s);
     console.log(bgColor(color(s)));

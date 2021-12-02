@@ -1,17 +1,13 @@
 import { statSync, readdirSync, rmdirSync, unlinkSync, mkdirSync } from 'fs';
 import path, { relative, resolve, dirname, parse, join } from 'path';
-import isString from '@wareset-utilites/is/isString';
-import trycatch from '@wareset-utilites/trycatch';
+import { isString } from '@wareset-utilites/is/isString';
+import { trycatch } from '@wareset-utilites/trycatch';
 import { messageError, messageSuccess, messageWarn } from '../messages';
 
 const toPosix = (str) => str.split(path.sep).join(path.posix.sep);
 const isAllowedFile = (file, input) => !/\btests?\b|(^|\/|\\)_/.test(input ? relative(input, file) : file);
-const existsStatSync = (directory) => {
-    return trycatch(() => statSync(directory), false);
-};
-const isDirectory = (directory) => {
-    return trycatch(() => statSync(directory).isDirectory(), false);
-};
+const existsStatSync = (directory) => trycatch(() => statSync(directory), false);
+const isDirectory = (directory) => trycatch(() => statSync(directory).isDirectory(), false);
 // export const isFile = (directory: string): boolean => {
 //   return trycatch(() => !fsStatSync(directory).isDirectory(), false)
 // }
@@ -37,16 +33,17 @@ const getConfigDir = (config, defs, silent) => {
         let root = resolve();
         const rootOrigin = root;
         // prettier-ignore
-        const getRes = () => (res = (defs.map((v) => resolve(root, v))
-            .filter((v) => (Dirent = existsStatSync(v)) && !Dirent.isDirectory())[0] || ''));
+        const getRes = () => res = defs.map((v) => resolve(root, v))
+            .filter((v) => (Dirent = existsStatSync(v)) && !Dirent.isDirectory())[0] || '';
         if (isString(config)) {
             root = resolve(root, config);
             if ((Dirent = existsStatSync(root)) && !Dirent.isDirectory())
                 res = root;
             else
                 getRes();
-            if (res)
+            if (res) {
                 silent || messageSuccess(defs[0] + ' - was selected manually:', res);
+            }
             else
                 messageError(defs[0] + ' - not found in "' + config + '":', root);
         }
@@ -67,17 +64,17 @@ const processExit = (cb) => {
     let isRun;
     process.on('SIGBREAK', (...a) => {
         if (!isRun)
-            cb(...a), (isRun = true);
+            cb(...a), isRun = true;
         process.exit();
     });
     process.on('SIGINT', (...a) => {
         if (!isRun)
-            cb(...a), (isRun = true);
+            cb(...a), isRun = true;
         process.exit();
     });
     process.on('exit', (...a) => {
         if (!isRun)
-            cb(...a), (isRun = true);
+            cb(...a), isRun = true;
     });
 };
 const isJTSX = (fileOrExt) => /\.[jt]sx?$/.test(fileOrExt);

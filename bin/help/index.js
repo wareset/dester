@@ -20,7 +20,7 @@ const colorizeHelp = (source) => {
             v =
                 opts[0]
                     .split(/\s\s/)
-                    .map((v) => (v.trim() ? kleur.bold(kleur.bgWhite(kleur.black(' ' + v + ' '))) : v))
+                    .map((v) => v.trim() ? kleur.bold(kleur.bgWhite(kleur.black(' ' + v + ' '))) : v)
                     .join('  ') +
                     ' - ' +
                     opts[1];
@@ -129,4 +129,4 @@ const __help__ = `
 `;
 var help = colorizeHelp(__help__);
 
-exports.default = help;
+exports["default"] = help;

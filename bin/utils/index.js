@@ -11,17 +11,11 @@ var messages = require('../messages');
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
 var path__default = /*#__PURE__*/_interopDefaultLegacy(path);
-var isString__default = /*#__PURE__*/_interopDefaultLegacy(isString);
-var trycatch__default = /*#__PURE__*/_interopDefaultLegacy(trycatch);
 
-const toPosix = (str) => str.split(path__default['default'].sep).join(path__default['default'].posix.sep);
+const toPosix = (str) => str.split(path__default["default"].sep).join(path__default["default"].posix.sep);
 const isAllowedFile = (file, input) => !/\btests?\b|(^|\/|\\)_/.test(input ? path.relative(input, file) : file);
-const existsStatSync = (directory) => {
-    return trycatch__default['default'](() => fs.statSync(directory), false);
-};
-const isDirectory = (directory) => {
-    return trycatch__default['default'](() => fs.statSync(directory).isDirectory(), false);
-};
+const existsStatSync = (directory) => trycatch.trycatch(() => fs.statSync(directory), false);
+const isDirectory = (directory) => trycatch.trycatch(() => fs.statSync(directory).isDirectory(), false);
 // export const isFile = (directory: string): boolean => {
 //   return trycatch(() => !fsStatSync(directory).isDirectory(), false)
 // }
@@ -39,7 +33,7 @@ const removeSync = (filepath) => {
     }
     return !!stat;
 };
-const createDirSync = (filepath, throwler = () => messages.messageError('Unable to create a folder:', filepath)) => trycatch__default['default'](() => (fs.mkdirSync(filepath, { recursive: true }), true), throwler);
+const createDirSync = (filepath, throwler = () => messages.messageError('Unable to create a folder:', filepath)) => trycatch.trycatch(() => (fs.mkdirSync(filepath, { recursive: true }), true), throwler);
 const getConfigDir = (config, defs, silent) => {
     let res = '';
     if (config) {
@@ -47,16 +41,17 @@ const getConfigDir = (config, defs, silent) => {
         let root = path.resolve();
         const rootOrigin = root;
         // prettier-ignore
-        const getRes = () => (res = (defs.map((v) => path.resolve(root, v))
-            .filter((v) => (Dirent = existsStatSync(v)) && !Dirent.isDirectory())[0] || ''));
-        if (isString__default['default'](config)) {
+        const getRes = () => res = defs.map((v) => path.resolve(root, v))
+            .filter((v) => (Dirent = existsStatSync(v)) && !Dirent.isDirectory())[0] || '';
+        if (isString.isString(config)) {
             root = path.resolve(root, config);
             if ((Dirent = existsStatSync(root)) && !Dirent.isDirectory())
                 res = root;
             else
                 getRes();
-            if (res)
+            if (res) {
                 silent || messages.messageSuccess(defs[0] + ' - was selected manually:', res);
+            }
             else
                 messages.messageError(defs[0] + ' - not found in "' + config + '":', root);
         }
@@ -77,17 +72,17 @@ const processExit = (cb) => {
     let isRun;
     process.on('SIGBREAK', (...a) => {
         if (!isRun)
-            cb(...a), (isRun = true);
+            cb(...a), isRun = true;
         process.exit();
     });
     process.on('SIGINT', (...a) => {
         if (!isRun)
-            cb(...a), (isRun = true);
+            cb(...a), isRun = true;
         process.exit();
     });
     process.on('exit', (...a) => {
         if (!isRun)
-            cb(...a), (isRun = true);
+            cb(...a), isRun = true;
     });
 };
 const isJTSX = (fileOrExt) => /\.[jt]sx?$/.test(fileOrExt);

@@ -3,22 +3,22 @@ import { resolve as pathResolve } from 'path'
 import minimist from 'minimist'
 // import { reset } from 'kleur'
 
-import jsonStringify from '@wareset-utilites/lang/jsonStringify'
-import startsWith from '@wareset-utilites/string/startsWith'
-import isBoolean from '@wareset-utilites/is/isBoolean'
-import isObject from '@wareset-utilites/is/isObject'
-import isString from '@wareset-utilites/is/isString'
-import isNumber from '@wareset-utilites/is/isNumber'
+import { jsonStringify } from '@wareset-utilites/lang/jsonStringify'
+import { startsWith } from '@wareset-utilites/string/startsWith'
+import { isBoolean } from '@wareset-utilites/is/isBoolean'
+import { isObject } from '@wareset-utilites/is/isObject'
+import { isString } from '@wareset-utilites/is/isString'
+import { isNumber } from '@wareset-utilites/is/isNumber'
 
-import keys from '@wareset-utilites/object/keys'
-import trycatch from '@wareset-utilites/trycatch'
+import { keys } from '@wareset-utilites/object/keys'
+import { trycatch } from '@wareset-utilites/trycatch'
 
 import { messageError } from './messages'
 import { isDirectory } from './utils'
 
 import viewLogo from './logo'
 import HELP from './help'
-import INIT, { TypeAgruments } from './init'
+import init, { TypeAgruments } from './init'
 
 let incorrectArg = ''
 if (process.argv.some((v) => startsWith(v, '-no-') && (incorrectArg = v))) {
@@ -29,22 +29,22 @@ const __argv__ = minimist(process.argv.slice(2), {
   default: {
     help: false,
 
-    remove: true,
-    types: true,
-    watch: false,
+    remove: false,
+    types : true,
+    watch : false,
     silent: false,
 
-    pkg: true,
-    tsc: true,
+    pkg  : true,
+    tsc  : true,
     babel: false,
 
-    force: false,
-    minify: false,
+    force    : false,
+    minify   : false,
     pkgbeauty: true
   },
-  string: ['input', 'output', 'remove', 'types'],
+  string : ['input', 'output', 'remove', 'types'],
   boolean: ['help', 'watch', 'silent', 'force', 'minify', 'pkgbeauty'],
-  alias: {
+  alias  : {
     h: 'help',
     i: 'input',
     o: 'output',
@@ -58,11 +58,12 @@ const __argv__ = minimist(process.argv.slice(2), {
 })
 
 const isValidSrcAndDist = (Input: string, Output: string): void | never => {
-  if (startsWith(Output, Input))
+  if (startsWith(Output, Input)) {
     messageError(
       '"Input" and "Output" should be different and separate:',
-      jsonStringify({ Input, Output }, undefined, 2)
+      jsonStringify({ Input, Output }, void 0, 2)
     )
+  }
   if (!isDirectory(Input)) messageError('"Input" is not directory:', Input)
   trycatch(
     () => fsMkdirSync(Output, { recursive: true }),
@@ -100,25 +101,25 @@ const run = (): void => {
     argv.output =
       argv.output ||
       argv._[1] ||
-      (argv._[0] !== argv.input && argv._[0]) ||
+      argv._[0] !== argv.input && argv._[0] ||
       'dist'
 
     const res: TypeAgruments = {
-      help: false,
-      input: '',
+      help  : false,
+      input : '',
       output: '',
 
-      remove: false,
-      types: '',
-      watch: false,
+      remove: '',
+      types : '',
+      watch : false,
       silent: false,
 
-      pkg: true,
-      tsc: true,
+      pkg  : true,
+      tsc  : true,
       babel: true,
 
-      force: false,
-      minify: false,
+      force    : false,
+      minify   : false,
       pkgbeauty: true
     }
 
@@ -126,8 +127,8 @@ const run = (): void => {
       if (k in res) {
         let v = argv[k]
         if (isObject(v)) messageError(`Not valid arguments: ${k}:`, v)
-        if (isString(v) || isNumber(v)) v = (v + '').trim()
-        ;(res as any)[k] = v
+        if (isString(v) || isNumber(v)) v = (v + '').trim();
+        (res as any)[k] = v
       }
     })
 
@@ -137,31 +138,36 @@ const run = (): void => {
 
     const remove = res.remove
     if (!isString(remove)) {
-      if (!isBoolean(remove))
+      if (!isBoolean(remove)) {
         messageError(
           '"Remove" must be String or Boolean.',
           'Current: ' + remove
         )
+      }
+    } else if (remove === '') {
+      res.remove = true
     }
 
     let types = res.types
     if (!isString(types)) {
-      if (!isBoolean(types))
+      if (!isBoolean(types)) {
         messageError('"Types" must be String or Boolean.', 'Current: ' + types)
+      }
       types = res.types = types ? pathResolve(res.output, '__types__') : ''
     }
     if (types) {
       types = res.types = /^\.+[/\\]/.test(types)
         ? pathResolve(types)
         : pathResolve(res.output, types)
-      if (startsWith(types, res.input))
+      if (startsWith(types, res.input)) {
         messageError(
           '"Input" and "TypesDir" should be different and separate:',
           { Input: res.input, TypesDir: types }
         )
+      }
     }
 
-    INIT(res)
+    init(res)
   }
 }
 

@@ -15,14 +15,13 @@ import {
   // execSync as childProcessExecSync
 } from 'child_process'
 
-import jsonStringify from '@wareset-utilites/lang/jsonStringify'
-import jsonParse from '@wareset-utilites/lang/jsonParse'
-// import includes from '@wareset-utilites/array/includes'
-import trycatch from '@wareset-utilites/trycatch'
-import hash from '@wareset-utilites/hash'
+import { jsonStringify } from '@wareset-utilites/lang/jsonStringify'
+import { jsonParse } from '@wareset-utilites/lang/jsonParse'
+import { trycatch } from '@wareset-utilites/trycatch'
+import { hash } from '@wareset-utilites/hash'
+import { unique } from '@wareset-utilites/unique'
 
 import sortPackageJson from './sortPackageJson'
-import unique from '@wareset-utilites/unique'
 
 import {
   log,
@@ -108,32 +107,32 @@ const createTypes = (
       compilerOptions: {
         // Tells TypeScript to read JS files, as
         // normally they are ignored as source files
-        allowJs: true,
+        allowJs            : true,
         // Generate d.ts files
-        declaration: true,
+        declaration        : true,
         // This compiler run should
         // only output d.ts files
         emitDeclarationOnly: true,
         // Types should go into this directory.
         // Removing this would place the .d.ts files
         // next to the .js files
-        outDir: toPosix(types),
+        outDir             : toPosix(types),
         // declarationDir: DIR_TYPES,
 
         experimentalDecorators: true,
-        emitDecoratorMetadata: true,
+        emitDecoratorMetadata : true,
 
-        resolveJsonModule: true,
+        resolveJsonModule           : true,
         allowSyntheticDefaultImports: true,
-        esModuleInterop: true,
-        target: 'esnext',
-        moduleResolution: 'node',
-        module: 'esnext'
+        esModuleInterop             : true,
+        target                      : 'esnext',
+        moduleResolution            : 'node',
+        module                      : 'esnext'
       }
     }
 
     trycatch(
-      () => fsWriteFileSync(configfile, jsonStringify(config, undefined, 2)),
+      () => fsWriteFileSync(configfile, jsonStringify(config, void 0, 2)),
       (e) => messageError(e)
     )
 
@@ -141,23 +140,25 @@ const createTypes = (
       () => {
         let childProcess = childProcessSpawn(
           tsc,
-          ['--build', configfile, ...(watch ? ['--watch'] : [])],
+          ['--build', configfile, ...watch ? ['--watch'] : []],
           { shell: true }
           // { stdio: ['ignore', 'inherit', 'inherit'], shell: true })
         )
 
         const exit = (): void => {
-          childProcess && childProcess.kill(0), (childProcess = null as any)
+          childProcess && childProcess.kill(0), childProcess = null as any
         }
         processExit(exit)
 
         childProcess.stdout.on('data', (data) => {
+          // eslint-disable-next-line no-control-regex
           data = (data + '').replace(/[\u001bc]/g, '').trim()
           if (data) {
             const isErr = /error([^s]|$)/i.test(data)
             const mes = isErr ? logError : log
-            if (!silent || isErr)
+            if (!silent || isErr) {
               mes((isErr ? 'ERROR: ' : green('TYPES: ')) + data)
+            }
           }
         })
         childProcess.stderr.on('data', (data) => {
@@ -173,14 +174,15 @@ const createTypes = (
     const pkgjsonfile = pathResolve(parentDir, 'package.json')
     if (existsStatSync(pkgjsonfile)) {
       const typesFoldername = pathRarse(types).name
-      const pkgJsonStrOld = fsReadFileSync(pkgjsonfile).toString()
+      const pkgJsonStrOld = fsReadFileSync(pkgjsonfile, 'utf8').toString()
 
       let pkgJson = jsonParse(pkgJsonStrOld)
-      if (pkgJson.files)
+      if (pkgJson.files) {
         pkgJson.files = unique([...pkgJson.files, typesFoldername]).sort()
+      }
       if (pkgbeauty) pkgJson = sortPackageJson(pkgJson)
 
-      const pkgJsonStrNew = jsonStringify(pkgJson, undefined, 2)
+      const pkgJsonStrNew = jsonStringify(pkgJson, void 0, 2)
       pkgJsonStrOld.trim() === pkgJsonStrNew.trim() ||
         fsWriteFileSync(pkgjsonfile, pkgJsonStrNew)
     }

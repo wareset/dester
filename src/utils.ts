@@ -14,8 +14,8 @@ import {
   dirname as pathDirname
 } from 'path'
 
-import isString from '@wareset-utilites/is/isString'
-import trycatch from '@wareset-utilites/trycatch'
+import { isString } from '@wareset-utilites/is/isString'
+import { trycatch } from '@wareset-utilites/trycatch'
 
 import { messageError, messageSuccess, messageWarn } from './messages'
 
@@ -27,13 +27,11 @@ export const isAllowedFile = (file: string, input?: string): boolean =>
 
 export const existsStatSync = (
   directory: string
-): false | ReturnType<typeof fsStatSync> => {
-  return trycatch(() => fsStatSync(directory), false as any)
-}
+): false | ReturnType<typeof fsStatSync> =>
+  trycatch(() => fsStatSync(directory), false as any)
 
-export const isDirectory = (directory: string): boolean => {
-  return trycatch(() => fsStatSync(directory).isDirectory(), false)
-}
+export const isDirectory = (directory: string): boolean =>
+  trycatch(() => fsStatSync(directory).isDirectory(), false)
 
 // export const isFile = (directory: string): boolean => {
 //   return trycatch(() => !fsStatSync(directory).isDirectory(), false)
@@ -74,17 +72,17 @@ export const getConfigDir = (
 
     // prettier-ignore
     const getRes = (): string =>
-      (res = (defs.map((v) => pathResolve(root, v))
-        .filter((v) => (Dirent = existsStatSync(v)) && !Dirent.isDirectory())[0] || ''))
+      res = defs.map((v) => pathResolve(root, v))
+        .filter((v) => (Dirent = existsStatSync(v)) && !Dirent.isDirectory())[0] || ''
 
     if (isString(config)) {
       root = pathResolve(root, config)
       if ((Dirent = existsStatSync(root)) && !Dirent.isDirectory()) res = root
       else getRes()
 
-      if (res)
+      if (res) {
         silent || messageSuccess(defs[0] + ' - was selected manually:', res)
-      else messageError(defs[0] + ' - not found in "' + config + '":', root)
+      } else messageError(defs[0] + ' - not found in "' + config + '":', root)
     } else {
       while (!getRes() && root !== (root = pathDirname(root)));
       if (!silent) {
@@ -100,15 +98,15 @@ export const getConfigDir = (
 export const processExit = (cb: (...a: any[]) => void): void => {
   let isRun: boolean
   process.on('SIGBREAK', (...a) => {
-    if (!isRun) cb(...a), (isRun = true)
+    if (!isRun) cb(...a), isRun = true
     process.exit()
   })
   process.on('SIGINT', (...a) => {
-    if (!isRun) cb(...a), (isRun = true)
+    if (!isRun) cb(...a), isRun = true
     process.exit()
   })
   process.on('exit', (...a) => {
-    if (!isRun) cb(...a), (isRun = true)
+    if (!isRun) cb(...a), isRun = true
   })
 }
 
@@ -150,10 +148,10 @@ export const getInputFiles = (input: string): TypeInputFiles => {
           if (final in cache) {
             messageError('Duplicate paths for compiling files in "Input":',
               { File1: cache[final], File2: origin },
-              'The final path for "' + final + '"'
-            )}
+              'The final path for "' + final + '"')
+          }
 
-          ;(isAllowedFile(origin) && (cache[final] = origin)
+          (isAllowedFile(origin) && (cache[final] = origin)
             ? include
             : exclude
           ).push(

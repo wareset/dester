@@ -1,19 +1,19 @@
 import { mkdirSync } from 'fs';
 import { resolve } from 'path';
 import minimist from 'minimist';
-import jsonStringify from '@wareset-utilites/lang/jsonStringify';
-import startsWith from '@wareset-utilites/string/startsWith';
-import isBoolean from '@wareset-utilites/is/isBoolean';
-import isObject from '@wareset-utilites/is/isObject';
-import isString from '@wareset-utilites/is/isString';
-import isNumber from '@wareset-utilites/is/isNumber';
-import keys from '@wareset-utilites/object/keys';
-import trycatch from '@wareset-utilites/trycatch';
+import { jsonStringify } from '@wareset-utilites/lang/jsonStringify';
+import { startsWith } from '@wareset-utilites/string/startsWith';
+import { isBoolean } from '@wareset-utilites/is/isBoolean';
+import { isObject } from '@wareset-utilites/is/isObject';
+import { isString } from '@wareset-utilites/is/isString';
+import { isNumber } from '@wareset-utilites/is/isNumber';
+import { keys } from '@wareset-utilites/object/keys';
+import { trycatch } from '@wareset-utilites/trycatch';
 import { messageError } from './messages';
 import { isDirectory } from './utils';
 import viewLogo from './logo';
 import HELP from './help';
-import INIT from './init';
+import init from './init';
 
 let incorrectArg = '';
 if (process.argv.some((v) => startsWith(v, '-no-') && (incorrectArg = v))) {
@@ -22,7 +22,7 @@ if (process.argv.some((v) => startsWith(v, '-no-') && (incorrectArg = v))) {
 const __argv__ = minimist(process.argv.slice(2), {
     default: {
         help: false,
-        remove: true,
+        remove: false,
         types: true,
         watch: false,
         silent: false,
@@ -48,8 +48,9 @@ const __argv__ = minimist(process.argv.slice(2), {
     }
 });
 const isValidSrcAndDist = (Input, Output) => {
-    if (startsWith(Output, Input))
-        messageError('"Input" and "Output" should be different and separate:', jsonStringify({ Input, Output }, undefined, 2));
+    if (startsWith(Output, Input)) {
+        messageError('"Input" and "Output" should be different and separate:', jsonStringify({ Input, Output }, void 0, 2));
+    }
     if (!isDirectory(Input))
         messageError('"Input" is not directory:', Input);
     trycatch(() => mkdirSync(Output, { recursive: true }), (e) => messageError('Unable to create a "Output" folder', e));
@@ -83,13 +84,13 @@ const run = () => {
         argv.output =
             argv.output ||
                 argv._[1] ||
-                (argv._[0] !== argv.input && argv._[0]) ||
+                argv._[0] !== argv.input && argv._[0] ||
                 'dist';
         const res = {
             help: false,
             input: '',
             output: '',
-            remove: false,
+            remove: '',
             types: '',
             watch: false,
             silent: false,
@@ -115,23 +116,29 @@ const run = () => {
         isValidSrcAndDist(res.input, res.output);
         const remove = res.remove;
         if (!isString(remove)) {
-            if (!isBoolean(remove))
+            if (!isBoolean(remove)) {
                 messageError('"Remove" must be String or Boolean.', 'Current: ' + remove);
+            }
+        }
+        else if (remove === '') {
+            res.remove = true;
         }
         let types = res.types;
         if (!isString(types)) {
-            if (!isBoolean(types))
+            if (!isBoolean(types)) {
                 messageError('"Types" must be String or Boolean.', 'Current: ' + types);
+            }
             types = res.types = types ? resolve(res.output, '__types__') : '';
         }
         if (types) {
             types = res.types = /^\.+[/\\]/.test(types)
                 ? resolve(types)
                 : resolve(res.output, types);
-            if (startsWith(types, res.input))
+            if (startsWith(types, res.input)) {
                 messageError('"Input" and "TypesDir" should be different and separate:', { Input: res.input, TypesDir: types });
+            }
         }
-        INIT(res);
+        init(res);
     }
 };
 run();

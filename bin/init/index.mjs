@@ -4,12 +4,12 @@ import createTypes from '../createTypes';
 import createRollup from '../createRollup';
 import chokidar from 'chokidar';
 import { logWarn, messageInfo, log } from '../messages';
-import includes from '@wareset-utilites/array/includes';
+import { includes } from '@wareset-utilites/array/includes';
 import viewLogo from '../logo';
 import { isDirectory, removeSync, createDirSync, getConfigDir, isAllowedFile, isJTSX } from '../utils';
 
 const init = ({ input, output, remove, types, watch, silent, pkg: _pkg, tsc: _tsc, babel: _babel, force, minify, pkgbeauty }) => {
-    if ((force = !!force)) {
+    if (force = !!force) {
         logWarn('Force mode is enabled');
     }
     if (types && remove && isDirectory(types))
@@ -21,22 +21,20 @@ const init = ({ input, output, remove, types, watch, silent, pkg: _pkg, tsc: _ts
     const compile = () => {
         const pkg = getConfigDir(_pkg, ['package.json'], silent);
         const tsc = getConfigDir(_tsc, ['tsconfig.json'], silent);
-        // prettier-ignore
         const babel = getConfigDir(_babel, ['babel.config.json', 'babel.config.js', '.babelrc.json', '.babelrc.js'], silent);
-        // prettier-ignore
         let rollupWatcher = createRollup(input, output, pkg, tsc, babel, types, force, minify, pkgbeauty, watch, silent);
-        if (isFirstStart)
+        if (isFirstStart) {
             createTypes(types, input, output, pkgbeauty, watch, silent);
+        }
         if (watch) {
             silent || messageInfo('Start of watchers');
             let isReady;
             const watchfiles = [input, /* pkg, */ tsc, babel].filter((v) => v);
-            // eslint-disable-next-line security/detect-non-literal-fs-filename
             const watcher = chokidar.watch(watchfiles, { persistent: true });
             const resetWatchers = () => {
                 isReady = false;
                 if (rollupWatcher)
-                    rollupWatcher.close(), (rollupWatcher = null);
+                    rollupWatcher.close(), rollupWatcher = null;
                 watcher.close().then(() => {
                     console.log('\x1bc');
                     silent || viewLogo();
@@ -47,9 +45,8 @@ const init = ({ input, output, remove, types, watch, silent, pkg: _pkg, tsc: _ts
             const watchFn = (_type, _file) => {
                 if (isReady && _file !== watchfiles[0]) {
                     silent || log(green('WATCH: ') + _type + ': ' + _file);
-                    // prettier-ignore
-                    if (includes(watchfiles, _file) || ((_type === 'add' || _type === 'unlink')
-                        && isAllowedFile(_file, input) && isJTSX(_file)))
+                    if (includes(watchfiles, _file) || (_type === 'add' || _type === 'unlink') &&
+                        isAllowedFile(_file, input) && isJTSX(_file))
                         resetWatchers();
                 }
             };
@@ -63,4 +60,4 @@ const init = ({ input, output, remove, types, watch, silent, pkg: _pkg, tsc: _ts
     // await timeout(30000)
 };
 
-export default init;
+export { init as default };

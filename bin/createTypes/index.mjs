@@ -2,12 +2,12 @@ import { green } from 'kleur';
 import { resolve, join, dirname, parse } from 'path';
 import { writeFileSync, readFileSync } from 'fs';
 import { spawn } from 'child_process';
-import jsonStringify from '@wareset-utilites/lang/jsonStringify';
-import jsonParse from '@wareset-utilites/lang/jsonParse';
-import trycatch from '@wareset-utilites/trycatch';
-import hash from '@wareset-utilites/hash';
+import { jsonStringify } from '@wareset-utilites/lang/jsonStringify';
+import { jsonParse } from '@wareset-utilites/lang/jsonParse';
+import { trycatch } from '@wareset-utilites/trycatch';
+import { hash } from '@wareset-utilites/hash';
+import { unique } from '@wareset-utilites/unique';
 import sortPackageJson from '../sortPackageJson';
-import unique from '@wareset-utilites/unique';
 import { messageInfo, messageError, logError, log } from '../messages';
 import { processExit, removeSync, toPosix, existsStatSync, createDirSync } from '../utils';
 
@@ -72,22 +72,24 @@ const createTypes = (types, input, output, pkgbeauty, watch, silent) => {
                 module: 'esnext'
             }
         };
-        trycatch(() => writeFileSync(configfile, jsonStringify(config, undefined, 2)), (e) => messageError(e));
+        trycatch(() => writeFileSync(configfile, jsonStringify(config, void 0, 2)), (e) => messageError(e));
         trycatch(() => {
-            let childProcess = spawn(tsc, ['--build', configfile, ...(watch ? ['--watch'] : [])], { shell: true }
+            let childProcess = spawn(tsc, ['--build', configfile, ...watch ? ['--watch'] : []], { shell: true }
             // { stdio: ['ignore', 'inherit', 'inherit'], shell: true })
             );
             const exit = () => {
-                childProcess && childProcess.kill(0), (childProcess = null);
+                childProcess && childProcess.kill(0), childProcess = null;
             };
             processExit(exit);
             childProcess.stdout.on('data', (data) => {
+                // eslint-disable-next-line no-control-regex
                 data = (data + '').replace(/[\u001bc]/g, '').trim();
                 if (data) {
                     const isErr = /error([^s]|$)/i.test(data);
                     const mes = isErr ? logError : log;
-                    if (!silent || isErr)
+                    if (!silent || isErr) {
                         mes((isErr ? 'ERROR: ' : green('TYPES: ')) + data);
+                    }
                 }
             });
             childProcess.stderr.on('data', (data) => {
@@ -100,13 +102,14 @@ const createTypes = (types, input, output, pkgbeauty, watch, silent) => {
         const pkgjsonfile = resolve(parentDir, 'package.json');
         if (existsStatSync(pkgjsonfile)) {
             const typesFoldername = parse(types).name;
-            const pkgJsonStrOld = readFileSync(pkgjsonfile).toString();
+            const pkgJsonStrOld = readFileSync(pkgjsonfile, 'utf8').toString();
             let pkgJson = jsonParse(pkgJsonStrOld);
-            if (pkgJson.files)
+            if (pkgJson.files) {
                 pkgJson.files = unique([...pkgJson.files, typesFoldername]).sort();
+            }
             if (pkgbeauty)
                 pkgJson = sortPackageJson(pkgJson);
-            const pkgJsonStrNew = jsonStringify(pkgJson, undefined, 2);
+            const pkgJsonStrNew = jsonStringify(pkgJson, void 0, 2);
             pkgJsonStrOld.trim() === pkgJsonStrNew.trim() ||
                 writeFileSync(pkgjsonfile, pkgJsonStrNew);
         }
@@ -114,4 +117,4 @@ const createTypes = (types, input, output, pkgbeauty, watch, silent) => {
     return !!tsc;
 };
 
-export default createTypes;
+export { createTypes as default };

@@ -17,12 +17,13 @@ const __removeAndMessage__ = (
   removeDir: string,
   silent: boolean,
   prefix = 'auto',
-  warn?: boolean
+  warn = false
 ): void => {
-  if (removeSync(removeDir))
+  if (removeSync(removeDir)) {
     silent || log(green(prefix + 'remove: ') + removeDir)
-  else if (warn)
+  } else if (warn) {
     silent || log(red(prefix + 'remove: file not found ') + removeDir)
+  }
 }
 
 const autoremove = (
@@ -36,28 +37,28 @@ const autoremove = (
     if (isString(remove)) {
       const removeDir = remove.split(',').map((v) => pathResolve(v))
       removeDir.forEach((removeDir) => {
-        if (startsWith(input, removeDir))
+        if (startsWith(input, removeDir)) {
           silent ||
             messageWarn(
               '"Input" and "RemoveDir" should be different and separate:',
               { input, removeDir }
             )
-        else __removeAndMessage__(removeDir, silent, '', true)
+        } else __removeAndMessage__(removeDir, silent, '', true)
       })
     } else if (output) {
       fsReaddirSync(input, { withFileTypes: true }).forEach((Dirent) => {
         let name = Dirent.name
         if (isAllowedFile(name)) {
           let isDir: boolean
-          if (!Dirent.isDirectory())
-            (isDir = true), (name = isJTSX(name) ? pathParse(name).name : '')
+          if (!Dirent.isDirectory()) isDir = true, name = isJTSX(name) ? pathParse(name).name : ''
           if (!isDir! && name === 'index') {
             // __removeAndMessage__(pathResolve(output, name + '.js'), silent)
             // __removeAndMessage__(pathResolve(output, name + '.mjs'), silent)
             types ||
               __removeAndMessage__(pathResolve(output, name + '.d.ts'), silent)
-          } else if (name)
+          } else if (name) {
             __removeAndMessage__(pathResolve(output, name), silent)
+          }
         }
       })
     }

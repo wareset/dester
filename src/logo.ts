@@ -1,5 +1,5 @@
-import repeat from '@wareset-utilites/string/repeat'
-import trycatch from '@wareset-utilites/trycatch'
+import { repeat } from '@wareset-utilites/string/repeat'
+import { trycatch } from '@wareset-utilites/trycatch'
 
 import { red, bold, cyan, bgBlack } from 'kleur'
 

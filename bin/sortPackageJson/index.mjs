@@ -1,8 +1,8 @@
-import includes from '@wareset-utilites/array/includes';
-import concat from '@wareset-utilites/array/concat';
-import keys from '@wareset-utilites/object/keys';
-import unique from '@wareset-utilites/unique';
+import { concat } from '@wareset-utilites/array/concat';
+import { keys } from '@wareset-utilites/object/keys';
+import { unique } from '@wareset-utilites/unique';
 
+// import includes from '@wareset-utilites/array/includes'
 // https://github.com/stereobooster/package.json
 // https://docs.npmjs.com/cli/v7/configuring-npm/package-json#files
 // https://github.com/keithamus/sort-package-json/blob/master/tests/snapshots/main.js.md
@@ -108,7 +108,6 @@ const vscode = [
     'preview',
     'markdown'
 ];
-// prettier-ignore
 const headList = concat(essentials, publishing, info, links, maintainers, 'sideEffects', 'type', createReactApp, yarn, 'bolt', 'jsdelivr', 'unpkg', microbundle, 'jsnext:main', 'main', 'module', types, 'files', 'assets', files, packageBundlers, system, 'preferGlobal', 'example', 'examplestyle', tasks, gitHooks, flow, browserify, 'browserslist', 'babel', 'style', 'xo', 'prettier', eslint, 'npmpkgjsonlint', 'remarkConfig', 'stylelint', 'ava', 'jest', 'mocha', 'nyc', 'tap', metro, stdEsm, jspm, 'size-limit', 'pwmetrics', dependencies, vscode);
 const sortPackageJson = (obj) => {
     const res = {};
@@ -116,10 +115,10 @@ const sortPackageJson = (obj) => {
     // let arr = unique([...dependencies, ...arrOrigin]).reverse()
     // arr = unique([...headList, ...arr], (v) => includes(arrOrigin, v))
     const arr = keys(obj).sort();
-    unique([...headList, ...arr], (v) => includes(arr, v)).forEach((v) => {
+    unique([...headList, ...arr], (v) => arr.indexOf(v) > -1).forEach((v) => {
         res[v] = obj[v];
     });
     return res;
 };
 
-export default sortPackageJson;
+export { sortPackageJson as default };

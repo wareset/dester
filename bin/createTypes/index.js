@@ -10,19 +10,14 @@ var jsonStringify = require('@wareset-utilites/lang/jsonStringify');
 var jsonParse = require('@wareset-utilites/lang/jsonParse');
 var trycatch = require('@wareset-utilites/trycatch');
 var hash = require('@wareset-utilites/hash');
-var sortPackageJson = require('../sortPackageJson');
 var unique = require('@wareset-utilites/unique');
+var sortPackageJson = require('../sortPackageJson');
 var messages = require('../messages');
 var utils = require('../utils');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
-var jsonStringify__default = /*#__PURE__*/_interopDefaultLegacy(jsonStringify);
-var jsonParse__default = /*#__PURE__*/_interopDefaultLegacy(jsonParse);
-var trycatch__default = /*#__PURE__*/_interopDefaultLegacy(trycatch);
-var hash__default = /*#__PURE__*/_interopDefaultLegacy(hash);
 var sortPackageJson__default = /*#__PURE__*/_interopDefaultLegacy(sortPackageJson);
-var unique__default = /*#__PURE__*/_interopDefaultLegacy(unique);
 
 const createCacheDir = () => {
     const res = path.resolve(require.main.paths[0] || path.resolve(), '.cache', 'dester');
@@ -34,7 +29,7 @@ const createTypes = (types, input, output, pkgbeauty, watch, silent) => {
     if (types) {
         silent ||
             messages.messageInfo('Creating types. Trying to start a "tsc". TypesDir:', types);
-        trycatch__default['default'](() => {
+        trycatch.trycatch(() => {
             tsc = require.resolve('.bin/tsc');
             // silent ||
             //   messageSuccess('Module "tsc" ("typescript") has been found:', tsc)
@@ -42,7 +37,7 @@ const createTypes = (types, input, output, pkgbeauty, watch, silent) => {
             messages.messageError('Unable to start creating types. "typescript" not found.', 'Use argument "--no-types" or install "typescript" (npm i typescript)');
         });
         // createDirSync(types)
-        const configfile = path.resolve(createCacheDir(), hash__default['default'](input + output) + '.json');
+        const configfile = path.resolve(createCacheDir(), hash.hash(input + output) + '.json');
         utils.processExit(() => {
             utils.removeSync(configfile);
         });
@@ -85,22 +80,24 @@ const createTypes = (types, input, output, pkgbeauty, watch, silent) => {
                 module: 'esnext'
             }
         };
-        trycatch__default['default'](() => fs.writeFileSync(configfile, jsonStringify__default['default'](config, undefined, 2)), (e) => messages.messageError(e));
-        trycatch__default['default'](() => {
-            let childProcess = child_process.spawn(tsc, ['--build', configfile, ...(watch ? ['--watch'] : [])], { shell: true }
+        trycatch.trycatch(() => fs.writeFileSync(configfile, jsonStringify.jsonStringify(config, void 0, 2)), (e) => messages.messageError(e));
+        trycatch.trycatch(() => {
+            let childProcess = child_process.spawn(tsc, ['--build', configfile, ...watch ? ['--watch'] : []], { shell: true }
             // { stdio: ['ignore', 'inherit', 'inherit'], shell: true })
             );
             const exit = () => {
-                childProcess && childProcess.kill(0), (childProcess = null);
+                childProcess && childProcess.kill(0), childProcess = null;
             };
             utils.processExit(exit);
             childProcess.stdout.on('data', (data) => {
+                // eslint-disable-next-line no-control-regex
                 data = (data + '').replace(/[\u001bc]/g, '').trim();
                 if (data) {
                     const isErr = /error([^s]|$)/i.test(data);
                     const mes = isErr ? messages.logError : messages.log;
-                    if (!silent || isErr)
+                    if (!silent || isErr) {
                         mes((isErr ? 'ERROR: ' : kleur.green('TYPES: ')) + data);
+                    }
                 }
             });
             childProcess.stderr.on('data', (data) => {
@@ -113,13 +110,14 @@ const createTypes = (types, input, output, pkgbeauty, watch, silent) => {
         const pkgjsonfile = path.resolve(parentDir, 'package.json');
         if (utils.existsStatSync(pkgjsonfile)) {
             const typesFoldername = path.parse(types).name;
-            const pkgJsonStrOld = fs.readFileSync(pkgjsonfile).toString();
-            let pkgJson = jsonParse__default['default'](pkgJsonStrOld);
-            if (pkgJson.files)
-                pkgJson.files = unique__default['default']([...pkgJson.files, typesFoldername]).sort();
+            const pkgJsonStrOld = fs.readFileSync(pkgjsonfile, 'utf8').toString();
+            let pkgJson = jsonParse.jsonParse(pkgJsonStrOld);
+            if (pkgJson.files) {
+                pkgJson.files = unique.unique([...pkgJson.files, typesFoldername]).sort();
+            }
             if (pkgbeauty)
-                pkgJson = sortPackageJson__default['default'](pkgJson);
-            const pkgJsonStrNew = jsonStringify__default['default'](pkgJson, undefined, 2);
+                pkgJson = sortPackageJson__default["default"](pkgJson);
+            const pkgJsonStrNew = jsonStringify.jsonStringify(pkgJson, void 0, 2);
             pkgJsonStrOld.trim() === pkgJsonStrNew.trim() ||
                 fs.writeFileSync(pkgjsonfile, pkgJsonStrNew);
         }
@@ -127,4 +125,4 @@ const createTypes = (types, input, output, pkgbeauty, watch, silent) => {
     return !!tsc;
 };
 
-exports.default = createTypes;
+exports["default"] = createTypes;

@@ -2,18 +2,11 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var includes = require('@wareset-utilites/array/includes');
 var concat = require('@wareset-utilites/array/concat');
 var keys = require('@wareset-utilites/object/keys');
 var unique = require('@wareset-utilites/unique');
 
-function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
-
-var includes__default = /*#__PURE__*/_interopDefaultLegacy(includes);
-var concat__default = /*#__PURE__*/_interopDefaultLegacy(concat);
-var keys__default = /*#__PURE__*/_interopDefaultLegacy(keys);
-var unique__default = /*#__PURE__*/_interopDefaultLegacy(unique);
-
+// import includes from '@wareset-utilites/array/includes'
 // https://github.com/stereobooster/package.json
 // https://docs.npmjs.com/cli/v7/configuring-npm/package-json#files
 // https://github.com/keithamus/sort-package-json/blob/master/tests/snapshots/main.js.md
@@ -119,18 +112,17 @@ const vscode = [
     'preview',
     'markdown'
 ];
-// prettier-ignore
-const headList = concat__default['default'](essentials, publishing, info, links, maintainers, 'sideEffects', 'type', createReactApp, yarn, 'bolt', 'jsdelivr', 'unpkg', microbundle, 'jsnext:main', 'main', 'module', types, 'files', 'assets', files, packageBundlers, system, 'preferGlobal', 'example', 'examplestyle', tasks, gitHooks, flow, browserify, 'browserslist', 'babel', 'style', 'xo', 'prettier', eslint, 'npmpkgjsonlint', 'remarkConfig', 'stylelint', 'ava', 'jest', 'mocha', 'nyc', 'tap', metro, stdEsm, jspm, 'size-limit', 'pwmetrics', dependencies, vscode);
+const headList = concat.concat(essentials, publishing, info, links, maintainers, 'sideEffects', 'type', createReactApp, yarn, 'bolt', 'jsdelivr', 'unpkg', microbundle, 'jsnext:main', 'main', 'module', types, 'files', 'assets', files, packageBundlers, system, 'preferGlobal', 'example', 'examplestyle', tasks, gitHooks, flow, browserify, 'browserslist', 'babel', 'style', 'xo', 'prettier', eslint, 'npmpkgjsonlint', 'remarkConfig', 'stylelint', 'ava', 'jest', 'mocha', 'nyc', 'tap', metro, stdEsm, jspm, 'size-limit', 'pwmetrics', dependencies, vscode);
 const sortPackageJson = (obj) => {
     const res = {};
     // const arrOrigin = keys(obj).sort().reverse()
     // let arr = unique([...dependencies, ...arrOrigin]).reverse()
     // arr = unique([...headList, ...arr], (v) => includes(arrOrigin, v))
-    const arr = keys__default['default'](obj).sort();
-    unique__default['default']([...headList, ...arr], (v) => includes__default['default'](arr, v)).forEach((v) => {
+    const arr = keys.keys(obj).sort();
+    unique.unique([...headList, ...arr], (v) => arr.indexOf(v) > -1).forEach((v) => {
         res[v] = obj[v];
     });
     return res;
 };
 
-exports.default = sortPackageJson;
+exports["default"] = sortPackageJson;

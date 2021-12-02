@@ -24,7 +24,7 @@ const colorizeHelp = (source: string): string => {
       v =
         opts[0]
           .split(/\s\s/)
-          .map((v) => (v.trim() ? bold(bgWhite(black(' ' + v + ' '))) : v))
+          .map((v) => v.trim() ? bold(bgWhite(black(' ' + v + ' '))) : v)
           .join('  ') +
         ' - ' +
         opts[1]

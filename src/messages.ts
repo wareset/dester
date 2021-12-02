@@ -1,16 +1,15 @@
-import jsonStringify from '@wareset-utilites/lang/jsonStringify'
-import includes from '@wareset-utilites/array/includes'
-import isObject from '@wareset-utilites/is/isObject'
-import repeat from '@wareset-utilites/string/repeat'
-// import { throwError } from '@wareset-utilites/error'
-import trycatch from '@wareset-utilites/trycatch'
-import nearly from '@wareset-utilites/nearly'
+import { jsonStringify } from '@wareset-utilites/lang/jsonStringify'
+import { includes } from '@wareset-utilites/array/includes'
+import { isObject } from '@wareset-utilites/is/isObject'
+import { repeat } from '@wareset-utilites/string/repeat'
+import { trycatch } from '@wareset-utilites/trycatch'
+import { nearly } from '@wareset-utilites/nearly'
 
 import { bgRed, bgYellow, bgGreen, bgBlue, black, bold, white } from 'kleur'
 
 export const x1bLen = (str: string): number => {
   let res = 0
-  // eslint-disable-next-line security/detect-unsafe-regex
+  // eslint-disable-next-line no-control-regex
   str.replace(/\x1b(?:\[\d+m)?/g, (_full) => {
     res += _full.length
     return ''
@@ -23,21 +22,20 @@ const __fixBG__ = (str: string): string => {
   let s: number
   trycatch(() => {
     const q = +process.stdout.columns
-    // prettier-ignore
-    if (q)
+    if (q) {
       res = res
         .split(/\r?\n|\r/)
         .map((v) =>
-          (v + repeat(' ', (s = nearly(v.length, q, 1)))).slice(0, s + x1bLen(v))
-        )
+          (v + repeat(' ', s = nearly(v.length, q, 1))).slice(0, s + x1bLen(v)))
         .join('\n')
+    }
   })
   return res
 }
 
 const __normalize__ = (a: any[]): string =>
   a
-    .map((v: any) => (isObject(v) ? jsonStringify(v, undefined, 2) : v))
+    .map((v: any) => isObject(v) ? jsonStringify(v, void 0, 2) : v)
     .join('\n')
     .split('\n')
     .map((v: string) => '  ' + v + '  ')

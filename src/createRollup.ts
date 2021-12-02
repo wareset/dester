@@ -87,36 +87,35 @@ import {
 
 import { minify, MinifyOptions } from 'terser'
 const terserOptions: MinifyOptions = {
-  module: true,
+  module  : true,
   toplevel: true,
-  compress: {
-    // expression: true,
-    evaluate: false
-  },
-  format: {
-    quote_style: 1
-  },
-
-  sourceMap: true,
-  safari10: true,
-  keep_classnames: true
   // compress: {
+  //   // expression: true,
+  //   // drop_console: true,
   //   evaluate: false
-  //   drop_console: true
   // },
-  // mangle: {
-  //   safari10: true,
 
+  // format: {
+  //   quote_style: 1
   // },
+
+  sourceMap      : true,
+  keep_classnames: true,
+  // mangle: {
+  //   safari10: true
+  //   // properties: true
+  // }
+  safari10       : true
   // format: {
   //   beautify: true
   // }
 }
 // renderChunk transform
 const rollupPluginTerser = {
+  // eslint-disable-next-line consistent-return
   async transform(code: string): Promise<any> {
     try {
-      const res = await minify(code, terserOptions)
+      const res = await minify(`/* ${Date.now()} */\n${code}`, terserOptions)
       // console.log(code)
       // console.log(res)
       return res
@@ -157,18 +156,22 @@ const createPackages = (
     if (stat && stat.isDirectory()) {
       const obj: any = {}
       // prettier-ignore
-      fsReaddirSync(filepath).forEach((name) => { obj[name] = 1 })
+      fsReaddirSync(filepath).forEach((name) => {
+        obj[name] = 1
+      })
 
       const filepkgjson = pathJoin(filepath, __packagejson__)
 
       const pkgJsonStrOld =
-        __packagejson__ in obj ? fsReadFileSync(filepkgjson).toString() : '{}'
+        __packagejson__ in obj
+          ? fsReadFileSync(filepkgjson, 'utf8').toString()
+          : '{}'
       let pkgJson = jsonParse(pkgJsonStrOld)
 
       if (pkgJson.files || !keys(pkgJson).length) {
         const files = [
           ...[__indexjs__, __indexmjs__, __indexdts__],
-          ...(pkgJson.files || []),
+          ...pkgJson.files || [],
           ...paths.map((v) => v.split(posixSep)[0])
         ].sort()
         pkgJson.files = unique(files, (v) => v in obj).sort()
@@ -180,11 +183,15 @@ const createPackages = (
 
       if (pkgbeauty) pkgJson = sortPackageJson(pkgJson)
 
-      const pkgJsonStrNew = jsonStringify(pkgJson, undefined, 2)
+      const pkgJsonStrNew = jsonStringify(pkgJson, void 0, 2)
       // prettier-ignore
       pkgJsonStrOld.trim() === pkgJsonStrNew.trim() || trycatch(
-        () => { fsWriteFileSync(filepkgjson, pkgJsonStrNew) },
-        () => { messageError(`Unable to create a "${__packagejson__}":`, filepkgjson) }
+        () => {
+          fsWriteFileSync(filepkgjson, pkgJsonStrNew)
+        },
+        () => {
+          messageError(`Unable to create a "${__packagejson__}":`, filepkgjson)
+        }
       )
 
       const obj2: any = {}
@@ -205,7 +212,7 @@ const createPackages = (
 }
 
 const outputProps = {
-  exports: 'named',
+  exports  : 'named',
   sourcemap: false
   // compact: true
 }
@@ -236,12 +243,13 @@ const createRollup = (
   const packageJsonStrOld: any = pkg
     ? trycatch(
       () => fsReadFileSync(pkg).toString(),
-      () => messageError('The file cannot be read:', pkg))
+      () => messageError('The file cannot be read:', pkg)
+    )
     : '{}'
   let packageJson = jsonParse(packageJsonStrOld)
   if (pkg && pkgbeauty) {
     packageJson = sortPackageJson(packageJson)
-    const packageJsonStrNew = jsonStringify(packageJson, undefined, 2)
+    const packageJsonStrNew = jsonStringify(packageJson, void 0, 2)
     packageJsonStrOld.trim() === packageJsonStrNew.trim() ||
       fsWriteFileSync(pkg, packageJsonStrNew)
   }
@@ -259,27 +267,39 @@ const createRollup = (
 
   // prettier-ignore
   tsc && trycatch(
-    () => { !!require.resolve('.bin/tsc') },
-    () => { messageError('"typescript" not found.',
-      'Use argument "--no-tsc" or install "typescript" (npm i typescript)')})
+    () => {
+      !!require.resolve('.bin/tsc')
+    },
+    () => {
+      messageError('"typescript" not found.',
+        'Use argument "--no-tsc" or install "typescript" (npm i typescript)')
+    }
+  )
   // prettier-ignore
   const rollupPluginSucrase =
-    __rollupPluginSucrase__({ transforms: [/* 'jsx',*/ 'typescript'] })
+    __rollupPluginSucrase__({ transforms: ['typescript'] })
   // prettier-ignore
   const rollupPluginTSC = !tsc
     ? rollupPluginSucrase
     : __rollupPluginTypescript2__({
-      check: !force,
+      check           : !force,
       // verbosity: 2,
-      tsconfig: tsc, tsconfigOverride: {
+      tsconfig        : tsc,
+      tsconfigOverride: {
         // buildOptions: { verbose: true },
-        compilerOptions: { declaration: false }, include: [toPosix(input)] } })
+        compilerOptions: { declaration: false }, include: [toPosix(input)]
+      }
+    })
 
   // prettier-ignore
   babel && trycatch(
-    () => { require.resolve('@babel/core') },
-    () => { messageError('"@babel/core" not found.',
-      'Use argument "--no-babel" or install "@babel/core" (npm i @babel/core)') }
+    () => {
+      require.resolve('@babel/core')
+    },
+    () => {
+      messageError('"@babel/core" not found.',
+        'Use argument "--no-babel" or install "@babel/core" (npm i @babel/core)')
+    }
   )
   const rollupPluginBabel: any = babel
     ? (__rollupPluginBabel__ as any)({ configFile: babel })
@@ -306,31 +326,41 @@ const createRollup = (
 
     rolls.push({
       external: externalDefault,
-      input: toPosix(pathResolve(input, inputFile.origin)),
+      input   : toPosix(pathResolve(input, inputFile.origin)),
       // prettier-ignore
-      output: [
-        { file: toPosix(pathResolve(output, inputFile.final + '.mjs')),
-          format: 'esm', ...outputProps },
-        { file: toPosix(pathResolve(output, inputFile.final + '.js')),
-          format: 'cjs', ...outputProps }
+      output  : [
+        {
+          file  : toPosix(pathResolve(output, inputFile.final + '.mjs')),
+          format: 'esm',
+          ...outputProps
+        },
+        {
+          file  : toPosix(pathResolve(output, inputFile.final + '.js')),
+          format: 'cjs',
+          ...outputProps
+        }
       ],
       plugins: [
         // ...(inputFile.name !== 'index' ? [rollupPluginAlias] : []),
         rollupPluginJson,
         {
+          // eslint-disable-next-line consistent-return
           resolveId(source: any, file: any): any {
             if (file && startsWith(toPosix(file), inputPosix)) {
-              if (!(file in depsInspect) || depsInspect[file][dikey])
+              if (!(file in depsInspect) || depsInspect[file][dikey]) {
                 depsInspect[file] = { deps: {} }
+              }
 
               if (!/^[./\\]/.test(source)) {
                 let dep = ''
                 let isDevDep = false
                 // prettier-ignore
-                if (!external.some((path) => startsWith(source, (dep = path)))
-                  && !(isDevDep = devDependencies.some((path) => startsWith(source, path))))
+                if (!external.some((path) => startsWith(source, dep = path)) &&
+                  !(isDevDep = devDependencies.some((path) => startsWith(source, path)))) {
                   (force || watch ? messageWarn : messageError)(
-                    'Dependency "' + source + '" - not found. File:', file)
+                    'Dependency "' + source + '" - not found. File:', file
+                  )
+                }
 
                 if (dep) depsInspect[file].deps[dep] = 1
                 if (!isDevDep) return { id: source, external: true }
@@ -374,23 +404,37 @@ const createRollup = (
           //     )};`
           // }
         },
+        {
+          transform(_code: string, _id: string): any {
+            // console.log(3434, _id)
+            return `/* filename: ${pathRelative(
+              input,
+              _id
+            )}\n  timestamp: ${new Date().toISOString()} */\n${_code}`
+            // return `/*! file: ${pathRelative(input, id)} */\n${code}`
+          }
+        },
         // prettier-ignore
-        ...(isNeedTSC ? [rollupPluginTSC] : [/* rollupPluginSucrase */]),
-        ...(babel ? [rollupPluginBabel] : []),
+        ...isNeedTSC ? [rollupPluginTSC] : [/* rollupPluginSucrase */],
+        ...babel ? [rollupPluginBabel] : [],
         {
           writeBundle({ format }: any, data: any): any {
             if (format === 'cjs' && types) {
               let exports: string[] = []
               // prettier-ignore
-              keys(data).forEach((k) => { exports.push(...(data[k].exports || [])) })
+              keys(data).forEach((k) => {
+                exports.push(...data[k].exports || [])
+              })
               exports = unique(exports)
 
               // prettier-ignore
               const source = jsonStringify(fixSource(toPosix(pathJoin(
                 pathRelative(
                   pathDirname(pathJoin(output, inputFile.final)),
-                  pathJoin(types, inputFile.dir)),
-                pathDirname(pathRelative(inputFile.dir, inputFile.final))))))
+                  pathJoin(types, inputFile.dir)
+                ),
+                pathDirname(pathRelative(inputFile.dir, inputFile.final))
+              ))))
 
               let text = `export * from ${source};\n`
               exports.forEach((v) => {
@@ -411,7 +455,16 @@ const createRollup = (
             }
           }
         },
-        ...(minify ? [rollupPluginTerser] : [])
+        ...minify ? [rollupPluginTerser] : [],
+        {
+          renderChunk(code: string, data: any): string {
+            return `/* eslint-disable */\n/*\ndester builds:\n${keys(
+              data.modules
+            )
+              .map((v: string) => pathRelative(input, v) + '\n')
+              .join('')}*/\n${code}`
+          }
+        }
       ]
     })
   })
@@ -450,10 +503,9 @@ const createRollup = (
     if (event.code === 'BUNDLE_END') {
       const resFile = pathRelative(output, event.output[1].slice(0, -3))
       // prettier-ignore
-      isError || silent || log(green('BUILD: ')
-          + green(`[${padStart(includeObjKeys.indexOf(resFile) + 1 + '', iokls, '0')}/${includeObjKeysLen}]`)
-          + ' - ' + inp + ' -> ' + resFile
-      )
+      isError || silent || log(green('BUILD: ') +
+          green(`[${padStart(includeObjKeys.indexOf(resFile) + 1 + '', iokls, '0')}/${includeObjKeysLen}]`) +
+          ' - ' + inp + ' -> ' + resFile)
     }
 
     if (event.code === 'ERROR') {
@@ -475,8 +527,8 @@ const createRollup = (
       }
 
       if (!isError && pkg) {
-        const deps = { ...(packageJson.dependencies || {}) }
-        const depsPeer = { ...(packageJson.peerDependencies || {}) }
+        const deps = { ...packageJson.dependencies || {} }
+        const depsPeer = { ...packageJson.peerDependencies || {} }
         keys(depsInspect).forEach((k) => {
           depsInspect[k][dikey] = true
           keys(depsInspect[k].deps).forEach((dep) => {
@@ -487,12 +539,13 @@ const createRollup = (
 
         const depsArr = keys(deps)
         const depsPArr = keys(depsPeer)
-        if (depsPArr[0])
+        if (depsPArr[0]) {
           silent || messageWarn('Unused peerDependencies:\n', ...depsPArr)
+        }
         if (depsArr[0]) messageWarn('Unused dependencies:\n', ...depsArr)
       }
 
-      isError || silent || log(green('BUILD: COMPLETE'))
+      isError || silent || log(green('BUILD: WAIT...'))
       if (!watch) watcher.close()
     }
   })
