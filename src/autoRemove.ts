@@ -8,8 +8,7 @@ import {
 } from 'fs'
 import { resolve as pathResolve, parse as pathParse } from 'path'
 
-import startsWith from '@wareset-utilites/string/startsWith'
-import isString from '@wareset-utilites/is/isString'
+import { isString } from './ws-utils'
 import { log, messageWarn } from './messages'
 import { removeSync, isAllowedFile, isJTSX } from './utils'
 
@@ -37,7 +36,7 @@ const autoremove = (
     if (isString(remove)) {
       const removeDir = remove.split(',').map((v) => pathResolve(v))
       removeDir.forEach((removeDir) => {
-        if (startsWith(input, removeDir)) {
+        if (input.startsWith(removeDir)) {
           silent ||
             messageWarn(
               '"Input" and "RemoveDir" should be different and separate:',

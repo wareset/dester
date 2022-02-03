@@ -15,11 +15,7 @@ import {
   // execSync as childProcessExecSync
 } from 'child_process'
 
-import { jsonStringify } from '@wareset-utilites/lang/jsonStringify'
-import { jsonParse } from '@wareset-utilites/lang/jsonParse'
-import { trycatch } from '@wareset-utilites/trycatch'
-import { hash } from '@wareset-utilites/hash'
-import { unique } from '@wareset-utilites/unique'
+import { hash, trycatch, jsonParse, jsonStringify, filterUnique } from './ws-utils'
 
 import sortPackageJson from './sortPackageJson'
 
@@ -178,7 +174,7 @@ const createTypes = (
 
       let pkgJson = jsonParse(pkgJsonStrOld)
       if (pkgJson.files) {
-        pkgJson.files = unique([...pkgJson.files, typesFoldername]).sort()
+        pkgJson.files = filterUnique([...pkgJson.files, typesFoldername]).sort()
       }
       if (pkgbeauty) pkgJson = sortPackageJson(pkgJson)
 

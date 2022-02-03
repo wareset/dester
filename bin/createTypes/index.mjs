@@ -2,11 +2,7 @@ import { green } from 'kleur';
 import { resolve, join, dirname, parse } from 'path';
 import { writeFileSync, readFileSync } from 'fs';
 import { spawn } from 'child_process';
-import { jsonStringify } from '@wareset-utilites/lang/jsonStringify';
-import { jsonParse } from '@wareset-utilites/lang/jsonParse';
-import { trycatch } from '@wareset-utilites/trycatch';
-import { hash } from '@wareset-utilites/hash';
-import { unique } from '@wareset-utilites/unique';
+import { trycatch, hash, jsonStringify, jsonParse, filterUnique } from '../ws-utils';
 import sortPackageJson from '../sortPackageJson';
 import { messageInfo, messageError, logError, log } from '../messages';
 import { processExit, removeSync, toPosix, existsStatSync, createDirSync } from '../utils';
@@ -105,7 +101,7 @@ const createTypes = (types, input, output, pkgbeauty, watch, silent) => {
             const pkgJsonStrOld = readFileSync(pkgjsonfile, 'utf8').toString();
             let pkgJson = jsonParse(pkgJsonStrOld);
             if (pkgJson.files) {
-                pkgJson.files = unique([...pkgJson.files, typesFoldername]).sort();
+                pkgJson.files = filterUnique([...pkgJson.files, typesFoldername]).sort();
             }
             if (pkgbeauty)
                 pkgJson = sortPackageJson(pkgJson);

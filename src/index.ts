@@ -3,15 +3,7 @@ import { resolve as pathResolve } from 'path'
 import minimist from 'minimist'
 // import { reset } from 'kleur'
 
-import { jsonStringify } from '@wareset-utilites/lang/jsonStringify'
-import { startsWith } from '@wareset-utilites/string/startsWith'
-import { isBoolean } from '@wareset-utilites/is/isBoolean'
-import { isObject } from '@wareset-utilites/is/isObject'
-import { isString } from '@wareset-utilites/is/isString'
-import { isNumber } from '@wareset-utilites/is/isNumber'
-
-import { keys } from '@wareset-utilites/object/keys'
-import { trycatch } from '@wareset-utilites/trycatch'
+import { keys, trycatch, isString, isNumber, isBoolean, isObject, jsonStringify } from './ws-utils'
 
 import { messageError } from './messages'
 import { isDirectory } from './utils'
@@ -21,7 +13,7 @@ import HELP from './help'
 import init, { TypeAgruments } from './init'
 
 let incorrectArg = ''
-if (process.argv.some((v) => startsWith(v, '-no-') && (incorrectArg = v))) {
+if (process.argv.some((v) => v.startsWith('-no-') && (incorrectArg = v))) {
   messageError(`Incorrect argument: ${incorrectArg}`)
 }
 
@@ -58,7 +50,7 @@ const __argv__ = minimist(process.argv.slice(2), {
 })
 
 const isValidSrcAndDist = (Input: string, Output: string): void | never => {
-  if (startsWith(Output, Input)) {
+  if (Output.startsWith(Input)) {
     messageError(
       '"Input" and "Output" should be different and separate:',
       jsonStringify({ Input, Output }, void 0, 2)
@@ -127,8 +119,8 @@ const run = (): void => {
       if (k in res) {
         let v = argv[k]
         if (isObject(v)) messageError(`Not valid arguments: ${k}:`, v)
-        if (isString(v) || isNumber(v)) v = (v + '').trim();
-        (res as any)[k] = v
+        if (isString(v) || isNumber(v)) v = (v + '').trim()
+        ;(res as any)[k] = v
       }
     })
 
@@ -159,7 +151,7 @@ const run = (): void => {
       types = res.types = /^\.+[/\\]/.test(types)
         ? pathResolve(types)
         : pathResolve(res.output, types)
-      if (startsWith(types, res.input)) {
+      if (types.startsWith(res.input)) {
         messageError(
           '"Input" and "TypesDir" should be different and separate:',
           { Input: res.input, TypesDir: types }

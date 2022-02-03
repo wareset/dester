@@ -12,6 +12,7 @@
     "logo",
     "messages",
     "sortPackageJson",
-    "utils"
+    "utils",
+    "ws-utils"
   ]
 }

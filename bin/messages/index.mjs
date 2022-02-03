@@ -1,9 +1,4 @@
-import { jsonStringify } from '@wareset-utilites/lang/jsonStringify';
-import { includes } from '@wareset-utilites/array/includes';
-import { isObject } from '@wareset-utilites/is/isObject';
-import { repeat } from '@wareset-utilites/string/repeat';
-import { trycatch } from '@wareset-utilites/trycatch';
-import { nearly } from '@wareset-utilites/nearly';
+import { isObject, jsonStringify, trycatch, nearly } from '../ws-utils';
 import { bold, bgRed, bgYellow, bgGreen, bgBlue, black, white } from 'kleur';
 
 const x1bLen = (str) => {
@@ -23,7 +18,7 @@ const __fixBG__ = (str) => {
         if (q) {
             res = res
                 .split(/\r?\n|\r/)
-                .map((v) => (v + repeat(' ', s = nearly(v.length, q, 1))).slice(0, s + x1bLen(v)))
+                .map((v) => (v + ' '.repeat(s = nearly(v.length, q, 1))).slice(0, s + x1bLen(v)))
                 .join('\n');
         }
     });
@@ -54,7 +49,7 @@ const log = (...a) => {
 };
 const logColoredFactory = (bgColor = bgGreen, color = black) => (...a) => {
     let s = __normalize__(a);
-    const is = includes(s, '\n');
+    const is = s.includes('\n');
     if (is)
         s = '\n' + __fixBG__(s);
     console.log(bgColor(color(s)));

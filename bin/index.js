@@ -3,14 +3,7 @@
 var fs = require('fs');
 var path = require('path');
 var minimist = require('minimist');
-var jsonStringify = require('@wareset-utilites/lang/jsonStringify');
-var startsWith = require('@wareset-utilites/string/startsWith');
-var isBoolean = require('@wareset-utilites/is/isBoolean');
-var isObject = require('@wareset-utilites/is/isObject');
-var isString = require('@wareset-utilites/is/isString');
-var isNumber = require('@wareset-utilites/is/isNumber');
-var keys = require('@wareset-utilites/object/keys');
-var trycatch = require('@wareset-utilites/trycatch');
+var wsUtils = require('./ws-utils');
 var messages = require('./messages');
 var utils = require('./utils');
 var viewLogo = require('./logo');
@@ -25,7 +18,7 @@ var HELP__default = /*#__PURE__*/_interopDefaultLegacy(HELP);
 var init__default = /*#__PURE__*/_interopDefaultLegacy(init);
 
 let incorrectArg = '';
-if (process.argv.some((v) => startsWith.startsWith(v, '-no-') && (incorrectArg = v))) {
+if (process.argv.some((v) => v.startsWith('-no-') && (incorrectArg = v))) {
     messages.messageError(`Incorrect argument: ${incorrectArg}`);
 }
 const __argv__ = minimist__default["default"](process.argv.slice(2), {
@@ -57,12 +50,12 @@ const __argv__ = minimist__default["default"](process.argv.slice(2), {
     }
 });
 const isValidSrcAndDist = (Input, Output) => {
-    if (startsWith.startsWith(Output, Input)) {
-        messages.messageError('"Input" and "Output" should be different and separate:', jsonStringify.jsonStringify({ Input, Output }, void 0, 2));
+    if (Output.startsWith(Input)) {
+        messages.messageError('"Input" and "Output" should be different and separate:', wsUtils.jsonStringify({ Input, Output }, void 0, 2));
     }
     if (!utils.isDirectory(Input))
         messages.messageError('"Input" is not directory:', Input);
-    trycatch.trycatch(() => fs.mkdirSync(Output, { recursive: true }), (e) => messages.messageError('Unable to create a "Output" folder', e));
+    wsUtils.trycatch(() => fs.mkdirSync(Output, { recursive: true }), (e) => messages.messageError('Unable to create a "Output" folder', e));
 };
 // const __autotypes__ = (input: string, output: string): string => {
 //   let res: string
@@ -110,12 +103,12 @@ const run = () => {
             minify: false,
             pkgbeauty: true
         };
-        keys.keys(argv).forEach((k) => {
+        wsUtils.keys(argv).forEach((k) => {
             if (k in res) {
                 let v = argv[k];
-                if (isObject.isObject(v))
+                if (wsUtils.isObject(v))
                     messages.messageError(`Not valid arguments: ${k}:`, v);
-                if (isString.isString(v) || isNumber.isNumber(v))
+                if (wsUtils.isString(v) || wsUtils.isNumber(v))
                     v = (v + '').trim();
                 res[k] = v;
             }
@@ -124,8 +117,8 @@ const run = () => {
         res.output = path.resolve(res.output);
         isValidSrcAndDist(res.input, res.output);
         const remove = res.remove;
-        if (!isString.isString(remove)) {
-            if (!isBoolean.isBoolean(remove)) {
+        if (!wsUtils.isString(remove)) {
+            if (!wsUtils.isBoolean(remove)) {
                 messages.messageError('"Remove" must be String or Boolean.', 'Current: ' + remove);
             }
         }
@@ -133,8 +126,8 @@ const run = () => {
             res.remove = true;
         }
         let types = res.types;
-        if (!isString.isString(types)) {
-            if (!isBoolean.isBoolean(types)) {
+        if (!wsUtils.isString(types)) {
+            if (!wsUtils.isBoolean(types)) {
                 messages.messageError('"Types" must be String or Boolean.', 'Current: ' + types);
             }
             types = res.types = types ? path.resolve(res.output, '__types__') : '';
@@ -143,7 +136,7 @@ const run = () => {
             types = res.types = /^\.+[/\\]/.test(types)
                 ? path.resolve(types)
                 : path.resolve(res.output, types);
-            if (startsWith.startsWith(types, res.input)) {
+            if (types.startsWith(res.input)) {
                 messages.messageError('"Input" and "TypesDir" should be different and separate:', { Input: res.input, TypesDir: types });
             }
         }

@@ -1,8 +1,5 @@
-import { concat } from '@wareset-utilites/array/concat';
-import { keys } from '@wareset-utilites/object/keys';
-import { unique } from '@wareset-utilites/unique';
+import { concat, keys } from '../ws-utils';
 
-// import includes from '@wareset-utilites/array/includes'
 // https://github.com/stereobooster/package.json
 // https://docs.npmjs.com/cli/v7/configuring-npm/package-json#files
 // https://github.com/keithamus/sort-package-json/blob/master/tests/snapshots/main.js.md
@@ -115,7 +112,9 @@ const sortPackageJson = (obj) => {
     // let arr = unique([...dependencies, ...arrOrigin]).reverse()
     // arr = unique([...headList, ...arr], (v) => includes(arrOrigin, v))
     const arr = keys(obj).sort();
-    unique([...headList, ...arr], (v) => arr.indexOf(v) > -1).forEach((v) => {
+    [...headList, ...arr]
+        .filter((v, k, a) => arr.indexOf(v) > -1 && k === a.indexOf(v))
+        .forEach((v) => {
         res[v] = obj[v];
     });
     return res;

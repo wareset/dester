@@ -1,8 +1,7 @@
 import { green, red } from 'kleur';
 import { readdirSync } from 'fs';
 import { resolve, parse } from 'path';
-import startsWith from '@wareset-utilites/string/startsWith';
-import isString from '@wareset-utilites/is/isString';
+import { isString } from '../ws-utils';
 import { messageWarn, log } from '../messages';
 import { isAllowedFile, isJTSX, removeSync } from '../utils';
 
@@ -19,7 +18,7 @@ const autoremove = (remove, input, output, types, silent) => {
         if (isString(remove)) {
             const removeDir = remove.split(',').map((v) => resolve(v));
             removeDir.forEach((removeDir) => {
-                if (startsWith(input, removeDir)) {
+                if (input.startsWith(removeDir)) {
                     silent ||
                         messageWarn('"Input" and "RemoveDir" should be different and separate:', { input, removeDir });
                 }

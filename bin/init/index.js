@@ -8,7 +8,6 @@ var createTypes = require('../createTypes');
 var createRollup = require('../createRollup');
 var chokidar = require('chokidar');
 var messages = require('../messages');
-var includes = require('@wareset-utilites/array/includes');
 var viewLogo = require('../logo');
 var utils = require('../utils');
 
@@ -57,7 +56,7 @@ const init = ({ input, output, remove, types, watch, silent, pkg: _pkg, tsc: _ts
             const watchFn = (_type, _file) => {
                 if (isReady && _file !== watchfiles[0]) {
                     silent || messages.log(kleur.green('WATCH: ') + _type + ': ' + _file);
-                    if (includes.includes(watchfiles, _file) || (_type === 'add' || _type === 'unlink') &&
+                    if (watchfiles.includes(_file) || (_type === 'add' || _type === 'unlink') &&
                         utils.isAllowedFile(_file, input) && utils.isJTSX(_file))
                         resetWatchers();
                 }

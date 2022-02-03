@@ -1,9 +1,4 @@
-import { jsonStringify } from '@wareset-utilites/lang/jsonStringify'
-import { includes } from '@wareset-utilites/array/includes'
-import { isObject } from '@wareset-utilites/is/isObject'
-import { repeat } from '@wareset-utilites/string/repeat'
-import { trycatch } from '@wareset-utilites/trycatch'
-import { nearly } from '@wareset-utilites/nearly'
+import { nearly, trycatch, isObject, jsonStringify } from './ws-utils'
 
 import { bgRed, bgYellow, bgGreen, bgBlue, black, bold, white } from 'kleur'
 
@@ -26,7 +21,7 @@ const __fixBG__ = (str: string): string => {
       res = res
         .split(/\r?\n|\r/)
         .map((v) =>
-          (v + repeat(' ', s = nearly(v.length, q, 1))).slice(0, s + x1bLen(v)))
+          (v + ' '.repeat(s = nearly(v.length, q, 1))).slice(0, s + x1bLen(v)))
         .join('\n')
     }
   })
@@ -72,7 +67,7 @@ export const logColoredFactory = (bgColor = bgGreen, color = black) => (
   ...a: any
 ): void => {
   let s = __normalize__(a)
-  const is = includes(s, '\n')
+  const is = s.includes('\n')
   if (is) s = '\n' + __fixBG__(s)
   console.log(bgColor(color(s)))
   if (is) console.log('')

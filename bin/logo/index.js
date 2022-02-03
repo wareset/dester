@@ -2,8 +2,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var repeat = require('@wareset-utilites/string/repeat');
-var trycatch = require('@wareset-utilites/trycatch');
+var wsUtils = require('../ws-utils');
 var kleur = require('kleur');
 var messages = require('../messages');
 
@@ -18,10 +17,10 @@ const LOGO = kleur.bgBlack(kleur.cyan(kleur.bold(`
 // prettier-ignore
 const viewLogo = () => {
     let l = LOGO;
-    trycatch.trycatch(() => {
+    wsUtils.trycatch(() => {
         const qs = +process.stdout.columns;
         if (qs) {
-            const r = repeat.repeat(' ', qs);
+            const r = ' '.repeat(qs);
             l = LOGO.split('\n').map((v) => (v + r).slice(0, qs + messages.x1bLen(v))).join('\n');
         }
     });

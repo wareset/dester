@@ -4,7 +4,6 @@ import createTypes from '../createTypes';
 import createRollup from '../createRollup';
 import chokidar from 'chokidar';
 import { logWarn, messageInfo, log } from '../messages';
-import { includes } from '@wareset-utilites/array/includes';
 import viewLogo from '../logo';
 import { isDirectory, removeSync, createDirSync, getConfigDir, isAllowedFile, isJTSX } from '../utils';
 
@@ -45,7 +44,7 @@ const init = ({ input, output, remove, types, watch, silent, pkg: _pkg, tsc: _ts
             const watchFn = (_type, _file) => {
                 if (isReady && _file !== watchfiles[0]) {
                     silent || log(green('WATCH: ') + _type + ': ' + _file);
-                    if (includes(watchfiles, _file) || (_type === 'add' || _type === 'unlink') &&
+                    if (watchfiles.includes(_file) || (_type === 'add' || _type === 'unlink') &&
                         isAllowedFile(_file, input) && isJTSX(_file))
                         resetWatchers();
                 }

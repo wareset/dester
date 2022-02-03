@@ -4,8 +4,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var fs = require('fs');
 var path = require('path');
-var isString = require('@wareset-utilites/is/isString');
-var trycatch = require('@wareset-utilites/trycatch');
+var wsUtils = require('../ws-utils');
 var messages = require('../messages');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
@@ -14,8 +13,8 @@ var path__default = /*#__PURE__*/_interopDefaultLegacy(path);
 
 const toPosix = (str) => str.split(path__default["default"].sep).join(path__default["default"].posix.sep);
 const isAllowedFile = (file, input) => !/\btests?\b|(^|\/|\\)_/.test(input ? path.relative(input, file) : file);
-const existsStatSync = (directory) => trycatch.trycatch(() => fs.statSync(directory), false);
-const isDirectory = (directory) => trycatch.trycatch(() => fs.statSync(directory).isDirectory(), false);
+const existsStatSync = (directory) => wsUtils.trycatch(() => fs.statSync(directory), false);
+const isDirectory = (directory) => wsUtils.trycatch(() => fs.statSync(directory).isDirectory(), false);
 // export const isFile = (directory: string): boolean => {
 //   return trycatch(() => !fsStatSync(directory).isDirectory(), false)
 // }
@@ -33,7 +32,7 @@ const removeSync = (filepath) => {
     }
     return !!stat;
 };
-const createDirSync = (filepath, throwler = () => messages.messageError('Unable to create a folder:', filepath)) => trycatch.trycatch(() => (fs.mkdirSync(filepath, { recursive: true }), true), throwler);
+const createDirSync = (filepath, throwler = () => messages.messageError('Unable to create a folder:', filepath)) => wsUtils.trycatch(() => (fs.mkdirSync(filepath, { recursive: true }), true), throwler);
 const getConfigDir = (config, defs, silent) => {
     let res = '';
     if (config) {
@@ -43,7 +42,7 @@ const getConfigDir = (config, defs, silent) => {
         // prettier-ignore
         const getRes = () => res = defs.map((v) => path.resolve(root, v))
             .filter((v) => (Dirent = existsStatSync(v)) && !Dirent.isDirectory())[0] || '';
-        if (isString.isString(config)) {
+        if (wsUtils.isString(config)) {
             root = path.resolve(root, config);
             if ((Dirent = existsStatSync(root)) && !Dirent.isDirectory())
                 res = root;

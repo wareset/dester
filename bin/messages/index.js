@@ -2,12 +2,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var jsonStringify = require('@wareset-utilites/lang/jsonStringify');
-var includes = require('@wareset-utilites/array/includes');
-var isObject = require('@wareset-utilites/is/isObject');
-var repeat = require('@wareset-utilites/string/repeat');
-var trycatch = require('@wareset-utilites/trycatch');
-var nearly = require('@wareset-utilites/nearly');
+var wsUtils = require('../ws-utils');
 var kleur = require('kleur');
 
 const x1bLen = (str) => {
@@ -22,19 +17,19 @@ const x1bLen = (str) => {
 const __fixBG__ = (str) => {
     let res = str;
     let s;
-    trycatch.trycatch(() => {
+    wsUtils.trycatch(() => {
         const q = +process.stdout.columns;
         if (q) {
             res = res
                 .split(/\r?\n|\r/)
-                .map((v) => (v + repeat.repeat(' ', s = nearly.nearly(v.length, q, 1))).slice(0, s + x1bLen(v)))
+                .map((v) => (v + ' '.repeat(s = wsUtils.nearly(v.length, q, 1))).slice(0, s + x1bLen(v)))
                 .join('\n');
         }
     });
     return res;
 };
 const __normalize__ = (a) => a
-    .map((v) => isObject.isObject(v) ? jsonStringify.jsonStringify(v, void 0, 2) : v)
+    .map((v) => wsUtils.isObject(v) ? wsUtils.jsonStringify(v, void 0, 2) : v)
     .join('\n')
     .split('\n')
     .map((v) => '  ' + v + '  ')
@@ -58,7 +53,7 @@ const log = (...a) => {
 };
 const logColoredFactory = (bgColor = kleur.bgGreen, color = kleur.black) => (...a) => {
     let s = __normalize__(a);
-    const is = includes.includes(s, '\n');
+    const is = s.includes('\n');
     if (is)
         s = '\n' + __fixBG__(s);
     console.log(bgColor(color(s)));

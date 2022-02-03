@@ -5,7 +5,6 @@ import createRollup from './createRollup'
 
 import chokidar from 'chokidar'
 import { log, messageInfo, logWarn } from './messages'
-import { includes } from '@wareset-utilites/array/includes'
 
 import viewLogo from './logo'
 
@@ -94,7 +93,7 @@ const init = ({
       const watchFn = (_type: string, _file: string): void => {
         if (isReady && _file !== watchfiles[0]) {
           silent || log(green('WATCH: ') + _type + ': ' + _file)
-          if (includes(watchfiles, _file) || (_type === 'add' || _type === 'unlink') &&
+          if (watchfiles.includes(_file) || (_type === 'add' || _type === 'unlink') &&
             isAllowedFile(_file, input) && isJTSX(_file)) resetWatchers()
         }
       }

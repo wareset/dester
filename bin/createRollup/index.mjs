@@ -3,14 +3,7 @@ import { watch } from 'rollup';
 import __rollupPluginJson__ from '@rollup/plugin-json';
 import __rollupPluginTypescript2__ from 'rollup-plugin-typescript2';
 import { getBabelOutputPlugin } from '@rollup/plugin-babel';
-import jsonStringify from '@wareset-utilites/lang/jsonStringify';
-import jsonParse from '@wareset-utilites/lang/jsonParse';
-import startsWith from '@wareset-utilites/string/startsWith';
-import padStart from '@wareset-utilites/string/padStart';
-import concat from '@wareset-utilites/array/concat';
-import keys from '@wareset-utilites/object/keys';
-import unique from '@wareset-utilites/unique';
-import trycatch from '@wareset-utilites/trycatch';
+import { trycatch, jsonParse, jsonStringify, keys, concat, filterUnique } from '../ws-utils';
 import sortPackageJson from '../sortPackageJson';
 import { readFileSync, writeFileSync, readdirSync } from 'fs';
 import path, { resolve, dirname, extname, join, relative } from 'path';
@@ -97,7 +90,8 @@ const createPackages = (output, paths, pkgbeauty) => {
                     ...pkgJson.files || [],
                     ...paths.map((v) => v.split(posixSep)[0])
                 ].sort();
-                pkgJson.files = unique(files, (v) => v in obj).sort();
+                pkgJson.files =
+                    files.filter((v, k, a) => v in obj && k === a.indexOf(v)).sort();
             }
             if (__indexdts__ in obj)
                 pkgJson.types = __indexdts__;
@@ -121,7 +115,7 @@ const createPackages = (output, paths, pkgbeauty) => {
                 if (newPath && pathsArr[0] && !(newPath in obj2) && newPath in obj) {
                     obj2[newPath] = 1;
                     const newPaths = paths
-                        .filter((v) => startsWith(v, newPath + posixSep))
+                        .filter((v) => v.startsWith(newPath + posixSep))
                         .map((v) => v.split(posixSep).slice(1).join(posixSep));
                     each(join(filepath, newPath), newPaths);
                 }
@@ -228,7 +222,7 @@ const createRollup = (input, output, pkg, tsc, babel, types, force, minify, pkgb
                 {
                     // eslint-disable-next-line consistent-return
                     resolveId(source, file) {
-                        if (file && startsWith(toPosix(file), inputPosix)) {
+                        if (file && toPosix(file).startsWith(inputPosix)) {
                             if (!(file in depsInspect) || depsInspect[file][dikey]) {
                                 depsInspect[file] = { deps: {} };
                             }
@@ -236,8 +230,8 @@ const createRollup = (input, output, pkg, tsc, babel, types, force, minify, pkgb
                                 let dep = '';
                                 let isDevDep = false;
                                 // prettier-ignore
-                                if (!external.some((path) => startsWith(source, dep = path)) &&
-                                    !(isDevDep = devDependencies.some((path) => startsWith(source, path)))) {
+                                if (!external.some((path) => source.startsWith(dep = path)) &&
+                                    !(isDevDep = devDependencies.some((path) => source.startsWith(path)))) {
                                     (force || watch$1 ? messageWarn : messageError)('Dependency "' + source + '" - not found. File:', file);
                                 }
                                 if (dep)
@@ -253,7 +247,7 @@ const createRollup = (input, output, pkg, tsc, babel, types, force, minify, pkgb
                                 // console.log(source)
                                 // console.log(isAllowedFile(ns, input))
                                 // console.log(isAllowedFile(file, input))
-                                if (startsWith(ns, input) &&
+                                if (ns.startsWith(input) &&
                                     // isAllowedFile(ns, input) &&
                                     isAllowedFile(file, input) &&
                                     (!ext || isJTSX(ext))) {
@@ -300,7 +294,7 @@ const createRollup = (input, output, pkg, tsc, babel, types, force, minify, pkgb
                             keys(data).forEach((k) => {
                                 exports.push(...data[k].exports || []);
                             });
-                            exports = unique(exports);
+                            exports = filterUnique(exports);
                             // prettier-ignore
                             const source = jsonStringify(fixSource(toPosix(join(relative(dirname(join(output, inputFile.final)), join(types, inputFile.dir)), dirname(relative(inputFile.dir, inputFile.final))))));
                             let text = `export * from ${source};\n`;
@@ -360,7 +354,7 @@ const createRollup = (input, output, pkg, tsc, babel, types, force, minify, pkgb
             const resFile = relative(output, event.output[1].slice(0, -3));
             // prettier-ignore
             isError || silent || log(green('BUILD: ') +
-                green(`[${padStart(includeObjKeys.indexOf(resFile) + 1 + '', iokls, '0')}/${includeObjKeysLen}]`) +
+                green(`[${(includeObjKeys.indexOf(resFile) + 1 + '').padStart(iokls, '0')}/${includeObjKeysLen}]`) +
                 ' - ' + inp + ' -> ' + resFile);
         }
         if (event.code === 'ERROR') {

@@ -14,8 +14,7 @@ import {
   dirname as pathDirname
 } from 'path'
 
-import { isString } from '@wareset-utilites/is/isString'
-import { trycatch } from '@wareset-utilites/trycatch'
+import { trycatch, isString } from './ws-utils'
 
 import { messageError, messageSuccess, messageWarn } from './messages'
 

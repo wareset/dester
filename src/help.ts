@@ -67,10 +67,10 @@ const __help__ = `
     dester  --no-r
     dester  --no-remove
   - Remove only created subfolders (DEFAULT) (the subdirectories that will be found based on the "Input" will be cleared):
-    dester  --r
+    dester  -r
     dester  --remove
   - Remove folder "DIST_FOLDER_NAME" before build ("DIST_FOLDER_NAME" will be cleared only if it does not contain "Input"):
-    dester  --r DIST_FOLDER_NAME
+    dester  -r DIST_FOLDER_NAME
     dester  --remove DIST_FOLDER_NAME
 
   Types:
@@ -78,26 +78,26 @@ const __help__ = `
     dester  --no-t
     dester  --no-types
   - Create types (DEFAULT):
-    dester  --t __types__
+    dester  -t __types__
     dester  --types __types__
   - Create types in "TYPES_FOLDER_NAME":
-    dester  --t TYPES_FOLDER_NAME
+    dester  -t TYPES_FOLDER_NAME
     dester  --types TYPES_FOLDER_NAME
 
   Watch:
-    dester  --w
+    dester  -w
     dester  --watch
 
   Silent mode:
-    dester  --s
+    dester  -s
     dester  --silent
 
   Force:
-    dester  --f
+    dester  -f
     dester  --force
 
   Minify:
-    dester  --m
+    dester  -m
     dester  --minify
 
   Beauty package.json files (default: true):

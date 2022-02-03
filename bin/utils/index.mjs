@@ -1,7 +1,6 @@
 import { statSync, readdirSync, rmdirSync, unlinkSync, mkdirSync } from 'fs';
 import path, { relative, resolve, dirname, parse, join } from 'path';
-import { isString } from '@wareset-utilites/is/isString';
-import { trycatch } from '@wareset-utilites/trycatch';
+import { trycatch, isString } from '../ws-utils';
 import { messageError, messageSuccess, messageWarn } from '../messages';
 
 const toPosix = (str) => str.split(path.sep).join(path.posix.sep);

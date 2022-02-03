@@ -1,14 +1,7 @@
 import { mkdirSync } from 'fs';
 import { resolve } from 'path';
 import minimist from 'minimist';
-import { jsonStringify } from '@wareset-utilites/lang/jsonStringify';
-import { startsWith } from '@wareset-utilites/string/startsWith';
-import { isBoolean } from '@wareset-utilites/is/isBoolean';
-import { isObject } from '@wareset-utilites/is/isObject';
-import { isString } from '@wareset-utilites/is/isString';
-import { isNumber } from '@wareset-utilites/is/isNumber';
-import { keys } from '@wareset-utilites/object/keys';
-import { trycatch } from '@wareset-utilites/trycatch';
+import { keys, isObject, isString, isNumber, isBoolean, jsonStringify, trycatch } from './ws-utils';
 import { messageError } from './messages';
 import { isDirectory } from './utils';
 import viewLogo from './logo';
@@ -16,7 +9,7 @@ import HELP from './help';
 import init from './init';
 
 let incorrectArg = '';
-if (process.argv.some((v) => startsWith(v, '-no-') && (incorrectArg = v))) {
+if (process.argv.some((v) => v.startsWith('-no-') && (incorrectArg = v))) {
     messageError(`Incorrect argument: ${incorrectArg}`);
 }
 const __argv__ = minimist(process.argv.slice(2), {
@@ -48,7 +41,7 @@ const __argv__ = minimist(process.argv.slice(2), {
     }
 });
 const isValidSrcAndDist = (Input, Output) => {
-    if (startsWith(Output, Input)) {
+    if (Output.startsWith(Input)) {
         messageError('"Input" and "Output" should be different and separate:', jsonStringify({ Input, Output }, void 0, 2));
     }
     if (!isDirectory(Input))
@@ -134,7 +127,7 @@ const run = () => {
             types = res.types = /^\.+[/\\]/.test(types)
                 ? resolve(types)
                 : resolve(res.output, types);
-            if (startsWith(types, res.input)) {
+            if (types.startsWith(res.input)) {
                 messageError('"Input" and "TypesDir" should be different and separate:', { Input: res.input, TypesDir: types });
             }
         }

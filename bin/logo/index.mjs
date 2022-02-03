@@ -1,5 +1,4 @@
-import { repeat } from '@wareset-utilites/string/repeat';
-import { trycatch } from '@wareset-utilites/trycatch';
+import { trycatch } from '../ws-utils';
 import { bgBlack, cyan, bold, red } from 'kleur';
 import { x1bLen } from '../messages';
 
@@ -17,7 +16,7 @@ const viewLogo = () => {
     trycatch(() => {
         const qs = +process.stdout.columns;
         if (qs) {
-            const r = repeat(' ', qs);
+            const r = ' '.repeat(qs);
             l = LOGO.split('\n').map((v) => (v + r).slice(0, qs + x1bLen(v))).join('\n');
         }
     });

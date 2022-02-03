@@ -2,11 +2,8 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var concat = require('@wareset-utilites/array/concat');
-var keys = require('@wareset-utilites/object/keys');
-var unique = require('@wareset-utilites/unique');
+var wsUtils = require('../ws-utils');
 
-// import includes from '@wareset-utilites/array/includes'
 // https://github.com/stereobooster/package.json
 // https://docs.npmjs.com/cli/v7/configuring-npm/package-json#files
 // https://github.com/keithamus/sort-package-json/blob/master/tests/snapshots/main.js.md
@@ -112,14 +109,16 @@ const vscode = [
     'preview',
     'markdown'
 ];
-const headList = concat.concat(essentials, publishing, info, links, maintainers, 'sideEffects', 'type', createReactApp, yarn, 'bolt', 'jsdelivr', 'unpkg', microbundle, 'jsnext:main', 'main', 'module', types, 'files', 'assets', files, packageBundlers, system, 'preferGlobal', 'example', 'examplestyle', tasks, gitHooks, flow, browserify, 'browserslist', 'babel', 'style', 'xo', 'prettier', eslint, 'npmpkgjsonlint', 'remarkConfig', 'stylelint', 'ava', 'jest', 'mocha', 'nyc', 'tap', metro, stdEsm, jspm, 'size-limit', 'pwmetrics', dependencies, vscode);
+const headList = wsUtils.concat(essentials, publishing, info, links, maintainers, 'sideEffects', 'type', createReactApp, yarn, 'bolt', 'jsdelivr', 'unpkg', microbundle, 'jsnext:main', 'main', 'module', types, 'files', 'assets', files, packageBundlers, system, 'preferGlobal', 'example', 'examplestyle', tasks, gitHooks, flow, browserify, 'browserslist', 'babel', 'style', 'xo', 'prettier', eslint, 'npmpkgjsonlint', 'remarkConfig', 'stylelint', 'ava', 'jest', 'mocha', 'nyc', 'tap', metro, stdEsm, jspm, 'size-limit', 'pwmetrics', dependencies, vscode);
 const sortPackageJson = (obj) => {
     const res = {};
     // const arrOrigin = keys(obj).sort().reverse()
     // let arr = unique([...dependencies, ...arrOrigin]).reverse()
     // arr = unique([...headList, ...arr], (v) => includes(arrOrigin, v))
-    const arr = keys.keys(obj).sort();
-    unique.unique([...headList, ...arr], (v) => arr.indexOf(v) > -1).forEach((v) => {
+    const arr = wsUtils.keys(obj).sort();
+    [...headList, ...arr]
+        .filter((v, k, a) => arr.indexOf(v) > -1 && k === a.indexOf(v))
+        .forEach((v) => {
         res[v] = obj[v];
     });
     return res;

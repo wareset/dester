@@ -5,15 +5,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var kleur = require('kleur');
 var fs = require('fs');
 var path = require('path');
-var startsWith = require('@wareset-utilites/string/startsWith');
-var isString = require('@wareset-utilites/is/isString');
+var wsUtils = require('../ws-utils');
 var messages = require('../messages');
 var utils = require('../utils');
-
-function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
-
-var startsWith__default = /*#__PURE__*/_interopDefaultLegacy(startsWith);
-var isString__default = /*#__PURE__*/_interopDefaultLegacy(isString);
 
 const __removeAndMessage__ = (removeDir, silent, prefix = 'auto', warn = false) => {
     if (utils.removeSync(removeDir)) {
@@ -25,10 +19,10 @@ const __removeAndMessage__ = (removeDir, silent, prefix = 'auto', warn = false) 
 };
 const autoremove = (remove, input, output, types, silent) => {
     if (remove) {
-        if (isString__default["default"](remove)) {
+        if (wsUtils.isString(remove)) {
             const removeDir = remove.split(',').map((v) => path.resolve(v));
             removeDir.forEach((removeDir) => {
-                if (startsWith__default["default"](input, removeDir)) {
+                if (input.startsWith(removeDir)) {
                     silent ||
                         messages.messageWarn('"Input" and "RemoveDir" should be different and separate:', { input, removeDir });
                 }
