@@ -32,15 +32,13 @@ const terserOptions = {
     //   safari10: true
     //   // properties: true
     // }
-    safari10: true
-    // format: {
-    //   beautify: true
-    // }
+    safari10: true,
+    format: { beautify: true }
 };
 // renderChunk transform
 const rollupPluginTerser = {
     // eslint-disable-next-line consistent-return
-    async transform(code) {
+    async renderChunk(code) {
         try {
             const res = await minify(`/* ${Date.now()} */\n${code}`, terserOptions);
             // console.log(code)
