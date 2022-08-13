@@ -25,6 +25,22 @@ var path__default = /*#__PURE__*/_interopDefaultLegacy(path);
 const rollupPluginJson = __rollupPluginJson____default["default"]();
 // import rollupPluginSucrase from '@rollup/plugin-sucrase'
 const __rollupPluginSucrase__ = require('@rollup/plugin-sucrase');
+const babelDefault = pluginBabel.getBabelOutputPlugin({
+    plugins: [
+        [
+            '@babel/plugin-transform-template-literals',
+            { loose: true }
+        ],
+        [
+            '@babel/plugin-proposal-class-properties',
+            { loose: true }
+        ],
+        [
+            '@babel/plugin-transform-block-scoping',
+            { loose: true }
+        ]
+    ]
+});
 const posixSep = path__default["default"].posix.sep;
 const terserOptions = {
     module: true,
@@ -294,6 +310,7 @@ const createRollup = (input, output, pkg, tsc, babel, types, force, minify, pkgb
                 },
                 // prettier-ignore
                 ...isNeedTSC ? [rollupPluginTSC] : [ /* rollupPluginSucrase */],
+                babelDefault,
                 ...babel ? [rollupPluginBabel] : [],
                 {
                     writeBundle({ format }, data) {

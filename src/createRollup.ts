@@ -36,6 +36,22 @@ import __rollupPluginTypescript2__ from 'rollup-plugin-typescript2'
 
 // import __rollupPluginBabel__ from '@rollup/plugin-babel'
 import { getBabelOutputPlugin as __rollupPluginBabel__ } from '@rollup/plugin-babel'
+const babelDefault = __rollupPluginBabel__({
+  plugins: [
+    [
+      '@babel/plugin-transform-template-literals',
+      { loose: true }
+    ],
+    [
+      '@babel/plugin-proposal-class-properties',
+      { loose: true }
+    ],
+    [
+      '@babel/plugin-transform-block-scoping',
+      { loose: true }
+    ]
+  ]
+})
 
 import { keys, concat, trycatch, jsonParse, jsonStringify, filterUnique } from './ws-utils'
 
@@ -405,6 +421,7 @@ const createRollup = (
         },
         // prettier-ignore
         ...isNeedTSC ? [rollupPluginTSC] : [/* rollupPluginSucrase */],
+        babelDefault,
         ...babel ? [rollupPluginBabel] : [],
         {
           writeBundle({ format }: any, data: any): any {

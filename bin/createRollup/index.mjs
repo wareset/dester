@@ -14,6 +14,22 @@ import { minify } from 'terser';
 const rollupPluginJson = __rollupPluginJson__();
 // import rollupPluginSucrase from '@rollup/plugin-sucrase'
 const __rollupPluginSucrase__ = require('@rollup/plugin-sucrase');
+const babelDefault = getBabelOutputPlugin({
+    plugins: [
+        [
+            '@babel/plugin-transform-template-literals',
+            { loose: true }
+        ],
+        [
+            '@babel/plugin-proposal-class-properties',
+            { loose: true }
+        ],
+        [
+            '@babel/plugin-transform-block-scoping',
+            { loose: true }
+        ]
+    ]
+});
 const posixSep = path.posix.sep;
 const terserOptions = {
     module: true,
@@ -283,6 +299,7 @@ const createRollup = (input, output, pkg, tsc, babel, types, force, minify, pkgb
                 },
                 // prettier-ignore
                 ...isNeedTSC ? [rollupPluginTSC] : [ /* rollupPluginSucrase */],
+                babelDefault,
                 ...babel ? [rollupPluginBabel] : [],
                 {
                     writeBundle({ format }, data) {
