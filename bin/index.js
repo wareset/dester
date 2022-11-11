@@ -212,18 +212,18 @@ const argv = minimist(process.argv.slice(2), {
         out: "",
         types: "types",
         watch: false,
-        minify: false,
+        min: false,
         ie: false
     },
     number: [ "ie" ],
     string: [ "dir", "src", "out", "types" ],
-    boolean: [ "help", "watch", "minify" ],
+    boolean: [ "help", "watch", "min" ],
     alias: {
         h: "help",
         d: "dir",
         t: "types",
         w: "watch",
-        m: "minify"
+        m: "min"
     }
 });
 
@@ -349,7 +349,7 @@ const argv = minimist(process.argv.slice(2), {
                     };
                 }(), sucrasePlugin(), argv.ie && babelPlugin(argv.ie), resolve({
                     extensions: [ ".mjs", ".js", ".jsx", ".mts", ".ts", ".tsx", ".json" ]
-                }), commonjs(), terserPlugin(argv.minify), {
+                }), commonjs(), terserPlugin(argv.min), {
                     renderChunk(e, t) {
                         if (!r) {
                             const {fileName: e, facadeModuleId: s} = t;
@@ -420,18 +420,18 @@ const argv = minimist(process.argv.slice(2), {
                     s.exports[e[r]] = o[e[r]];
                 }
                 s.files = [];
-                let f;
+                let m;
                 if (r) n[path.relative(argv.dir, argv.types).split(/[\\/]/)[0]] = true;
                 for (let e in n) {
-                    if (fs.existsSync(f = path.join(argv.dir, e))) {
+                    if (fs.existsSync(m = path.join(argv.dir, e))) {
                         //! FIX FOR NPM
-                        if (fs.lstatSync(f).isDirectory()) e += "/**/*";
+                        if (fs.lstatSync(m).isDirectory()) e += "/**/*";
                         s.files.push(e);
                     }
                 }
                 s.files.sort();
-                const m = sort_pkg_json(s);
-                fs.writeFileSync(e, JSON.stringify(m, null, 2));
+                const f = sort_pkg_json(s);
+                fs.writeFileSync(e, JSON.stringify(f, null, 2));
             }
         }));
     }

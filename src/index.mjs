@@ -90,19 +90,19 @@ const argv = minimist(process.argv.slice(2), {
 
     watch: false,
 
-    minify: false,
+    min: false,
 
     ie: false,
   },
   number : ['ie'],
   string : ['dir', 'src', 'out', 'types'],
-  boolean: ['help', 'watch', 'minify'],
+  boolean: ['help', 'watch', 'min'],
   alias  : {
     h: 'help',
     d: 'dir',
     t: 'types',
     w: 'watch',
-    m: 'minify'
+    m: 'min'
   }
 })
 
@@ -307,7 +307,7 @@ const argv = minimist(process.argv.slice(2), {
           argv.ie && babel_custom(argv.ie),
           resolve({ extensions: ['.mjs', '.js', '.jsx', '.mts', '.ts', '.tsx', '.json'] }),
           commonjs(),
-          terser_custom(argv.minify),
+          terser_custom(argv.min),
           {
             renderChunk(code, id) {
               if (!k) {

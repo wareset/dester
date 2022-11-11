@@ -1,6 +1,6 @@
 {
   "name": "dester",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "description": "A simple CLI js/ts lib-builder that uses Rollup, Babel and TypeScript/Sucrase",
   "keywords": [
     "dester"

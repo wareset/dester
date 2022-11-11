@@ -210,18 +210,18 @@ const argv = minimist(process.argv.slice(2), {
         out: "",
         types: "types",
         watch: false,
-        minify: false,
+        min: false,
         ie: false
     },
     number: [ "ie" ],
     string: [ "dir", "src", "out", "types" ],
-    boolean: [ "help", "watch", "minify" ],
+    boolean: [ "help", "watch", "min" ],
     alias: {
         h: "help",
         d: "dir",
         t: "types",
         w: "watch",
-        m: "minify"
+        m: "min"
     }
 });
 
@@ -347,7 +347,7 @@ const argv = minimist(process.argv.slice(2), {
                     };
                 }(), sucrasePlugin(), argv.ie && babelPlugin(argv.ie), resolve$1({
                     extensions: [ ".mjs", ".js", ".jsx", ".mts", ".ts", ".tsx", ".json" ]
-                }), commonjs(), terserPlugin(argv.minify), {
+                }), commonjs(), terserPlugin(argv.min), {
                     renderChunk(e, t) {
                         if (!n) {
                             const {fileName: e, facadeModuleId: r} = t;
