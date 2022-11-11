@@ -1,305 +1,137 @@
-# dester
+# debounce-safe
+Safe debounce.
 
-A simple CLI js/ts lib-builder that uses [Rollup](https://www.npmjs.com/package/rollup), [@babel/core](https://www.npmjs.com/package/@babel/core) and [TypeScript](https://www.npmjs.com/package/typescript)/[Sucrase](https://www.npmjs.com/package/sucrase)
+## Usage:
+debounce(func: `function`, [wait: `number` = 1, [leading: `boolean` = false, [trailing*: `boolean`]]])
 
-```bash
-   ___       __ _ _ _ _ /_,_  _______   ____
-  / _ \_(/(/(_(/ (-_)(-/_ _) / ___/ /  /  _/
- / _/ / -_/_ —/ __/ -_/ __/ / /__/ /___/ /
-/____/\__/___/\__/\__/_/    \___/____/___/
+// * - if "leading" is `false`, "trailing" always will be `true`. Otherwise, the 'func' will never be called.
+
+#### Base:
+```js
+import debounce from 'debounce-safe'
+// or const debounce = require('debounce-safe').default
+
+debounce(func, 21)
+debounce(func, 21, false),
+debounce(func, 21, false, true) //the last argument is ignored
+debounce(func, 21, false, false) // the last argument is ignored
+// like lodash.debounce(func, 21, { leading: false, trailing: true })
+
+debounce(func, 12, true)
+debounce(func, 12, true, false)
+// like lodash.debounce(func, 12, { leading: true, trailing: false })
+
+debounce(func, 111, true, true)
+// like lodash.debounce(func, 111, { leading: true, trailing: true })
+
 ```
 
-## Note
+#### Methods:
+`clear`, `flush` and `cause`
+```js
+import debounce from 'debounce-safe'
 
-- `Dester` is needed to easily and quickly compile `js/ts` scripts into the final library.
-- For correct compilation, you must adhere to the established requirements for directory structures (below is an example). Examples can be found [here](https://github.com/wareset/dester/tree/main/examples).
-- The files `package.json` and `tsconfig.json` are found automatically by going up the directory tree.
-- When building, `dependencies` from the `package.json` are taken into account.
-- Files and directories that with `.test(s)` or start with a sign `_` are ignored.
-- Powered on Linux, Mac, Windows. But if something is wrong, [write](https://github.com/wareset/dester/issues) to us)))
+const func = (a, b) => { return a + b }
 
-## Example
+const debouncedFunc = debounce(func, 2000)
 
-This is an example of the package files:
+// standard call. "func" is called after 2 seconds 
+debouncedFunc(1, 2) // => void
 
-### Example of a structure:
+// Reset as if the "debouncedFunc" had never been called.
+debouncedFunc.clear() // => void
 
-```bash
-project-folder
-│
-├── src
-│   ├── index.ts      /* Used by `typescript` or `sucrase` */
-│   │
-│   ├── some-folder
-│   │   ├── _excluded-file.js
-│   │   ├── some-file-1.js
-│   │   ├── some-file-1.test.js
-│   │   └── some-file-2.js
-│   │
-│   ├── _excluded-folder
-│   │   └── index.js
-│   │
-│   └── other-folder
-│       ├── other-file-1.js
-│       ├── other-file-2.js
-│       └── index.js
-│
-├── dist
-│
-...
-│
-├── babel.config.json /* Not necessary */
-├── package.json      /* Not necessary */
-├── README.md
-└── tsconfig.json     /* Not necessary */
+// Execute the "func" synchronously,
+// but if it was to be executed after a while.
+// It works as a 'TIME ACCELERATION' - the next call 
+// will be possible only after 2 seconds
+debouncedFunc.flush() // => void
+
+// Synchronously calls a "func" with arguments.
+// This also works as a 'TIME ACCELERATION'
+debouncedFunc.cause(2, 3) // => 5
+
 ```
 
-#### running the dester:
+## Why is there another `debounce` on the `npm`?
+I was looking for a function that could work quickly without having anything extra in the code. And, most importantly, it should be safe to recursively call itself. 
 
-```bash
-cd ./project-folder
-dester ./src ./dist
-```
+But I didn't find any, because all the other libraries can be divided into two types - either very simple or very redundant.
 
-or run use babel:
+And none of the existing solutions were safe for recursive calls.
 
-```bash
-dester ./src ./dist --babel
-```
+For example:
 
-##### `babel.config.json`:
+```js
+import _debounce from 'lodash.debounce'
 
-```json
-{
-  "plugins": [["@babel/plugin-proposal-class-properties"]]
+const func = (n) => {
+  console.log('lodash open', n)
+  if (n < 5) debouncedFunc(n + 1)
+  console.log('lodash exit', n)
+  return n
 }
+
+const debouncedFunc = _debounce(func, 1000, {
+  leading: true,
+  trailing: true
+})
+
+debouncedFunc(0)
+// console.log =>
+/*
+22:20:14.012 lodash open 0
+22:20:14.013 lodash exit 0
+22:20:15.013 lodash open 1
+22:20:15.013 lodash open 2
+22:20:15.013 lodash exit 2
+22:20:15.013 lodash exit 1
+22:20:16.013 lodash open 3
+22:20:16.013 lodash open 4
+22:20:16.013 lodash exit 4
+22:20:16.014 lodash exit 3
+22:20:17.013 lodash open 5
+22:20:17.014 lodash exit 5
+*/
+
+// WHAT'S GOING ON HERE ANYWAY???
+
 ```
 
-#### result:
+And here is my library:
 
-```bash
-project-folder
-│
-├── src
-│   └── ...
-│
-├── dist
-│   ├── __types__  /* Need `typescript` */
-│   │   ├── index.d.ts
-│   │   ...
-│   │   └── other-folder
-│   │
-│   ├── index.d.ts /* Need `typescript` */
-│   ├── index.js
-│   ├── index.mjs
-│   ├── package.json
-│   │
-│   ├── some-folder
-│   │   ├── some-file-1
-│   │   │   ├── index.d.ts
-│   │   │   ├── index.mjs
-│   │   │   ├── index.js
-│   │   │   └── package.json
-│   │   │
-│   │   └── some-file-2
-│   │       ├── index.d.ts
-│   │       ├── index.mjs
-│   │       ├── index.js
-│   │       └── package.json
-│   │
-│   └── other-folder
-│       ├── other-file-1
-│       │   ├── index.d.ts
-│       │   ├── index.mjs
-│       │   ├── index.js
-│       │   └── package.json
-│       │
-│       ├── other-file-2
-│       │   ├── index.d.ts
-│       │   ├── index.mjs
-│       │   ├── index.js
-│       │   └── package.json
-│       │
-│       ├── index.d.ts
-│       ├── index.mjs
-│       ├── index.js
-│       └── package.json
-│
-...
-│
-├── babel.config.json
-├── package.json
-├── README.md
-└── tsconfig.json
-```
+```js
+import debounceSafe from 'debounce-safe'
 
-#### interpretation:
-
-- The file `package.json` was found automatically;
-- The file `tsconfig.json` was found automatically;
-- In a folder `some-folder` not a file `index.js`. Therefore, all files were created in separate folders;
-- The file `index.d.ts` and folder `__types__` will be created if you have the `typescript` (`tsc`) installed.
-- `_excluded-folder` and `_excluded-file.js` were ignored because they start with the `_`.
-- `some-file-1.test.js` were ignored because they with the `.test.`.
-
-#### Generated `dist/package.json` file structure:
-
-```json
-{
-  "main": "index",
-  "module": "index.mjs",
-  "types": "index.d.ts",
-  "files": [
-    "__types__",
-    "index.d.ts",
-    "index.js",
-    "index.mjs",
-    "some-folder",
-    "other-folder"
-  ]
+const func = (n) => {
+  console.log('safely open', n)
+  if (n < 5) debouncedFunc(n + 1)
+  console.log('safely exit', n)
+  return n
 }
+
+const debouncedFunc = debounceSafe(func, 1000, true, true)
+
+debouncedFunc(0)
+// console.log =>
+/*
+22:20:52.989 safely open 0
+22:20:52.989 safely exit 0
+22:20:53.989 safely open 1
+22:20:53.989 safely exit 1
+22:20:54.989 safely open 2
+22:20:54.990 safely exit 2
+22:20:55.990 safely open 3
+22:20:55.990 safely exit 3
+22:20:56.990 safely open 4
+22:20:56.990 safely exit 4
+22:20:57.991 safely open 5
+22:20:57.991 safely exit 5
+*/
+
+// And this is the behavior that I expected
+
 ```
 
-More examples can be found [here](https://github.com/wareset/dester/tree/main/examples).
-
-## Installation
-
-```bash
-npm install -D dester # yarn add -D dester
-npm install -D typescript # if needed
-```
-
-or globally:
-
-```bash
-npm install -g dester
-npm install -g typescript # if needed
-```
-
-## Use
-
-Example of work in a project's `package.json`:
-
-```json
-{
-  "name": "project-name",
-  "version": "0.0.1",
-  "scripts": {
-    "dester": "dester ./src ./dist --babel",
-    "build": "npm run dester -- --remove ./dist",
-    "dev": "npm run dester -- -w --no-remove"
-  }
-}
-```
-
-## Command List
-
-```bash
-  Arguments:
-    dester [input] [output]
-    -i, --input  -  Input folder. Default: "src"
-    -o, --output -  Output folder. Default: "dist"
-
-    -r, --remove -  Remove or autoremove folders. Default: true
-    -t, --types  -  Folder for declarations. Default: "__types__"
-    -w, --watch  -  Watch changes in files and configs. Default: false
-    -s, --silent -  Show only error messages. Default: false
-    -f, --force  -  Will ignore some errors. Default: false
-    -m, --minify -  Use the "terser" for minify js files. Default: false
-    --pkgbeauty  -  The 'package.json' will be slightly combed. Default: true
-
-    --pkg        -  Path to package.json. Default: true
-    --tsc        -  Path to tsconfig.json. Default: true
-    --babel      -  Path to babel.config.json. Default: false
-
-    -h, --help   -  This help
-```
-
-- If the path for `types` doesn't start with a `./` or `../`, they the will be created in the `dist` folder.
-
-## Command examples
-
-```bash
-  Examples:
-    dester ./src
-    dester ./src ./dist
-    dester ./dist -i ./src
-    dester -o ./dist ./src
-
-  Remove folders:
-  - Not remove (nothing will be deleted):
-    dester  --no-r
-    dester  --no-remove
-  - Remove only created subfolders (DEFAULT)
-  (the subdirectories that will be found based on the "Input" will be cleared):
-    dester  -r
-    dester  --remove
-  - Remove folder "DIST_FOLDER_NAME" before build
-  ("DIST_FOLDER_NAME" will be cleared only if it does not contain "Input"):
-    dester  -r DIST_FOLDER_NAME
-    dester  --remove DIST_FOLDER_NAME
-
-  Types:
-  - Not create types:
-    dester  --no-t
-    dester  --no-types
-  - Create types (DEFAULT):
-    dester  -t __types__
-    dester  --types __types__
-  - Create types in "TYPES_FOLDER_NAME":
-    dester  -t TYPES_FOLDER_NAME
-    dester  --types TYPES_FOLDER_NAME
-
-  Watch:
-    dester  -w
-    dester  --watch
-
-  Silent mode:
-    dester  -s
-    dester  --silent
-
-  Force:
-    dester  -f
-    dester  --force
-
-  Minify:
-    dester  -m
-    dester  --minify
-
-  Beauty package.json files (default: true):
-    dester  --pkgbeauty
-    dester  --no-pkgbeauty
-
-  Set package.json:
-  - Not find package.json:
-    dester  --no-pkg
-  - Auto-find package.json (DEFAULT):
-    dester  --pkg
-  - Find or auto-find package.json in dir:
-    dester  --pkg ./some-dir
-    dester  --pkg ./some-dir/custom-name-package.json
-
-  Set tsconfig.json:
-  (need dependency "typescript")
-  - Not find tsconfig.json:
-    dester  --no-tsc
-  - Auto-find tsconfig.json (DEFAULT):
-    dester  --tsc
-  - Find or auto-find tsconfig.json in dir:
-    dester  --pkg ./some-dir
-    dester  --pkg ./some-dir/custom-name-tsconfig.json
-
-  Set babel.config.json (.babelrc.json):
-  (need dependency "@babel/core")
-  - Not find babel.config.json (DEFAULT):
-    dester  --no-babel
-  - Auto-find babel.config.json:
-    dester  --babel
-  - Find or auto-find babel.config.json in dir:
-    dester  --pkg ./some-dir
-    dester  --pkg ./some-dir/babel.config.js
-```
-
-## Lisence
-
-MIT
+## License
+[MIT](LICENSE)

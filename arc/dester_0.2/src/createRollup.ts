@@ -159,8 +159,11 @@ const createPackages = (
     const stat = existsStatSync(filepath)
     if (stat && stat.isDirectory()) {
       const obj: any = {}
+
       // prettier-ignore
-      fsReaddirSync(filepath).forEach((name) => {
+      fsReaddirSync(filepath, { withFileTypes: true }).forEach((dirent) => {
+        let name = dirent.name
+        if (dirent.isDirectory()) name += '/**/*'
         obj[name] = 1
       })
 
@@ -176,7 +179,8 @@ const createPackages = (
         const files = [
           ...[__indexjs__, __indexmjs__, __indexdts__],
           ...pkgJson.files || [],
-          ...paths.map((v) => v.split(posixSep)[0])
+          ...paths.map((v) => v.split(posixSep)[0]),
+          ...paths.map((v) => v.split(posixSep)[0] + '/**/*')
         ].sort()
         pkgJson.files =
           files.filter((v, k, a) => v in obj && k === a.indexOf(v)).sort()

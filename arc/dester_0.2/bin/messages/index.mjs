@@ -1,5 +1,5 @@
-import { isObject, jsonStringify, trycatch, nearly } from '../ws-utils';
-import { bold, bgRed, bgYellow, bgGreen, bgBlue, black, white } from 'kleur';
+import { trycatch, nearly, isObject, jsonStringify } from '../ws-utils';
+import { bgGreen, black, bgRed, bgBlue, bgYellow, bold, white } from 'kleur';
 
 const x1bLen = (str) => {
     let res = 0;
