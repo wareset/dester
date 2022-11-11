@@ -1,3 +1,0 @@
-var LIB = {};
-
-export { LIB };

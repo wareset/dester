@@ -1,1 +1,0 @@
-Object.defineProperty(exports,"__esModule",{value:!0});exports.LITERAL="Literal",exports.PUNCTUATOR="Punctuator",exports.REGULAR_EXPRESSION="RegularExpression",exports.TYPE_PUNCTUATOR="Punctuator",exports.TYPE_REGULAR_EXPRESSION="RegularExpression";

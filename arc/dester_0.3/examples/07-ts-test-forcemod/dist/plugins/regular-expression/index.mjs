@@ -1,1 +1,0 @@
-import{TYPE_REGULAR_EXPRESSION as r,LITERAL as o}from"../../flags";import t from"../lib/is-not-punctuator";const a=a=>()=>"/"===a.raw()&&t(a)&&!(({next:t,char:a,save:e,raw:s,slashed:f,error:i})=>{let l,m=!1;for(;t()&&!(m=!f()&&"/"===(n=a(),(l="["===n?1:"]"===n?0:l)||n)););var n;e(r,s(),[o]),!m&&i()})(a);export{a as pluginRegularExpression};
