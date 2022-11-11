@@ -1,0 +1,12 @@
+export declare const x1bLen: (str: string) => number;
+export declare const messageError: (...a: any) => never;
+export declare const messageCompileError: (...a: any) => void;
+export declare const messageWarn: (...a: any) => void;
+export declare const messageSuccess: (...a: any) => void;
+export declare const messageInfo: (...a: any) => void;
+export declare const log: (...a: any) => void;
+export declare const logColoredFactory: (bgColor?: import("kleur").Color, color?: import("kleur").Color) => (...a: any) => void;
+export declare const logError: (...a: any) => void;
+export declare const logInfo: (...a: any) => void;
+export declare const logWarn: (...a: any) => void;
+export declare const logSuccess: (...a: any) => void;

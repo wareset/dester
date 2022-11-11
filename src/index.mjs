@@ -5,7 +5,6 @@
 console.clear()
 
 import { LOGO } from './_logo.mjs'
-import { getTSC } from './_tsc.mjs'
 import { sort_pkg_json } from './_sort_pkg_json.mjs'
 
 import {
@@ -23,9 +22,39 @@ import {
   readFileSync as fs_readFileSync,
   writeFileSync as fs_writeFileSync
 } from 'fs'
-import { spawn as child_process_spawn } from 'child_process'
+import os from 'os'
+import { createRequire } from 'module'
+import {
+  spawn as child_process_spawn,
+  spawnSync as child_process_spawnSync
+} from 'child_process'
 
 import kleur from 'kleur'
+
+const REQUIRE = typeof require !== 'undefined'
+  ? require
+  : createRequire(import.meta.url)
+
+export function getTSC() {
+  let tsc
+  const title = kleur.bgBlue(kleur.black(kleur.bold('tsc: ')))
+
+  try {
+    tsc = REQUIRE.resolve('.bin/tsc')
+    console.log(title + kleur.bgBlue(kleur.black(tsc)))
+    // console.log(kleur.bgBlue(kleur.black(
+    //   tscPATH = path_resolve(REQUIRE.main && REQUIRE.main.path || '', 'tsconfig/tsc.json')
+    // )))
+
+    child_process_spawnSync(tsc, ['-v'], {
+      stdio: ['ignore', 'inherit', 'inherit'],
+      shell: true
+    })
+  } catch {
+    console.warn(title + kleur.bgRed(kleur.black('not found')))
+  }
+  return tsc
+}
 
 import { watch as rollup_watch, VERSION as ROLLUP_VERSION } from 'rollup'
 import commonjs from '@rollup/plugin-commonjs'
@@ -172,39 +201,64 @@ const argv = minimist(process.argv.slice(2), {
       }
   
       if (tsc = getTSC()) {
-        // const exclude = JSON.stringify(['**/{.,_}*', '**/*.{test,tests}.*'])
-  
-        // JSON.stringify(toPosix(argv.src) + '/**/*.{ts,d.ts,js,cts,d.cts,cjs,mts,d.mts,mjs}'),
+        const tsconfigPath = path_resolve(os.tmpdir(), 'dester-tsconfig.json')
+
+        const tsconfig = {
+          include: [toPosix(path_resolve(argv.src, '**/*'))],
+          exclude: [
+            '**/node_modules',
+            '**/_*',
+            '**/*.test.*',
+            '**/*.tests.*'
+          ],
+          compilerOptions: {
+            target                          : 'esnext',
+            module                          : 'esnext',
+            moduleResolution                : 'node',
+            allowJs                         : true,
+            declaration                     : true,
+            emitDeclarationOnly             : true,
+            esModuleInterop                 : true,
+            resolveJsonModule               : true,
+            emitDecoratorMetadata           : true,
+            experimentalDecorators          : true,
+            allowSyntheticDefaultImports    : true,
+            forceConsistentCasingInFileNames: true,
+            rootDir                         : toPosix(argv.src),
+            baseUrl                         : toPosix(argv.src),
+            outDir                          : toPosix(argv.types),
+            declarationDir                  : toPosix(argv.types),
+          }
+        }
+
+        fs_writeFileSync(tsconfigPath, JSON.stringify(tsconfig))
       
         const tscProcess = child_process_spawn(
           tsc,
           [
-            // JSON.stringify(toPosix(argv.src) + ''),
+            ...['--build', tsconfigPath],
 
             ...argv.watch ? ['--watch'] : [],
-
-            // ...['--excludeDirectories', '*'],
-            // ...['--excludeFiles', exclude],
-            // ...['--showConfig'],
               
-            ...['--target', 'esnext'],
-            ...['--module', 'esnext'],
-            ...['--moduleResolution', 'node'],
+            // ...['--target', 'esnext'],
+            // ...['--module', 'esnext'],
+            // ...['--moduleResolution', 'node'],
               
-            '--allowJs',
-            '--declaration',
-            '--emitDeclarationOnly',
+            // '--noEmit',
+            // '--allowJs',
+            // '--declaration',
+            // '--emitDeclarationOnly',
   
-            '--esModuleInterop',
-            '--resolveJsonModule',
-            '--emitDecoratorMetadata',
-            '--experimentalDecorators',
-            '--allowSyntheticDefaultImports',
+            // '--esModuleInterop',
+            // '--resolveJsonModule',
+            // '--emitDecoratorMetadata',
+            // '--experimentalDecorators',
+            // '--allowSyntheticDefaultImports',
   
-            ...['--rootDir', argv.src],
-            ...['--baseUrl', argv.src],
-            ...['--outDir', argv.types],
-            ...['--declarationDir', argv.types],
+            // ...['--rootDir', argv.src],
+            // ...['--baseUrl', argv.src],
+            // ...['--outDir', argv.types],
+            // ...['--declarationDir', argv.types],
           ],
           {
             cwd  : argv.src,
