@@ -1,219 +1,37 @@
 /* eslint-disable */
-"use strict";
+const e = require("kleur"), t = require("module"), s = require("child_process"), n = require("path"), o = require("fs"), r = require("rollup"), i = require("@rollup/plugin-commonjs"), l = require("@rollup/plugin-node-resolve"), c = require("@babel/core"), a = require("terser"), p = require("sucrase"), d = require("minimist"), {red: u, cyan: m, bold: f} = e, g = m(f(`\n    ___       ${u("__")} _ ${u("_ _ _ /_,_")}  ${u("_______   ____")}\n   / _ \\_${u("(/(/(_(")}/ ${u("(-_)(-/_ _)")} ${u("/ ___/ /  /  _/")}\n  / _/ / -_/_ —/ __/ -_/ __/ ${u("/ /__/ /___/ /")}\n  \\___/\\__/___/\\__/\\__/_/    ${u("\\___/____/___/")}\n\n`)), b = "undefined" != typeof require ? require : t.createRequire("undefined" == typeof document ? new (require("url").URL)("file:" + __filename).href : document.currentScript && document.currentScript.src || new URL("index.js", document.baseURI).href), y = e.bgBlue(e.black(e.bold("tsc: ")));
 
-const kleur = require("kleur");
+const _ = [].concat([ "$schema", "name", "displayName", "version" ], [ "private", "publishConfig" ], [ "description", "categories", "keywords", "license", "qna" ], [ "homepage", "bugs", "repository", "funding" ], [ "author", "maintainers", "contributors", "publisher" ], "sideEffects", "type", [ "proxy", "homepage" ], [ "flat", "resolutions", "workspaces" ], "bolt", "jsdelivr", "unpkg", [ "source", "umd:main" ], "jsnext:main", "main", "module", [ "types", "typesVersions", "typings" ], "files", "assets", [ "imports", "exports", "bin", "man", "directories" ], [ "browser", "esnext", "es2015", "esm", "module-browser", "modules.root" ], [ "engines", "engineStrict", "languageName", "os", "cpu" ], "preferGlobal", "example", "examplestyle", [ "binary", "scripts", "betterScripts", "capabilities", "activationEvents", "contributes", "husky", "simple-git-hooks", "commitlint", "lint-staged", "config", "nodemonConfig" ], [ "applypatch-msg", "pre-applypatch", "post-applypatch", "pre-commit", "pre-merge-commit", "prepare-commit-msg", "commit-msg", "post-commit", "pre-rebase", "post-checkout", "post-merge", "pre-push", "pre-receive", "update", "proc-receive", "post-receive", "post-update", "reference-transaction", "push-to-checkout", "pre-auto-gc", "post-rewrite", "sendemail-validate", "fsmonitor-watchman", "p4-changelist", "p4-prepare-changelist", "p4-post-changelist", "p4-pre-submit", "post-index-change" ], [ "flow", "flow:main" ], [ "browserify", "browserify.transform" ], "browserslist", "babel", "style", "xo", "prettier", [ "eslintConfig", "eslintIgnore" ], "npmpkgjsonlint", "remarkConfig", "stylelint", "ava", "jest", "mocha", "nyc", "tap", [ "react-native" ], [ "@std", "@std/esm" ], [ "jspm", "ignore", "format", "registry", "shim", "map" ], "size-limit", "pwmetrics", [ "peerDependencies", "peerDependenciesMeta", "optionalDependencies", "optionalDependenciesMeta", "bundledDependencies", "bundledDependenciesMeta", "bundleDependencies", "bundleDependenciesMeta", "devDependencies", "devDependenciesMeta", "dependencies", "dependenciesMeta" ], [ "extensionPack", "extensionDependencies", "icon", "badges", "galleryBanner", "preview", "markdown" ]);
 
-const module$1 = require("module");
-
-const child_process = require("child_process");
-
-const path = require("path");
-
-const fs = require("fs");
-
-const rollup = require("rollup");
-
-const commonjs = require("@rollup/plugin-commonjs");
-
-const resolve = require("@rollup/plugin-node-resolve");
-
-const core = require("@babel/core");
-
-const terser = require("terser");
-
-const sucrase = require("sucrase");
-
-const minimist = require("minimist");
-
-const {red: red, cyan: cyan, bold: bold} = kleur;
-
-const LOGO = cyan(bold(`\n    ___       ${red("__")} _ ${red("_ _ _ /_,_")}  ${red("_______   ____")}\n   / _ \\_${red("(/(/(_(")}/ ${red("(-_)(-/_ _)")} ${red("/ ___/ /  /  _/")}\n  / _/ / -_/_ —/ __/ -_/ __/ ${red("/ /__/ /___/ /")}\n  \\___/\\__/___/\\__/\\__/_/    ${red("\\___/____/___/")}\n\n`));
-
-const REQUIRE = typeof require !== "undefined" ? require : module$1.createRequire(typeof document === "undefined" ? new (require("u" + "rl").URL)("file:" + __filename).href : document.currentScript && document.currentScript.src || new URL("index.js", document.baseURI).href);
-
-const title = kleur.bgBlue(kleur.black(kleur.bold("tsc: ")));
-
-function getTSC() {
-    let e;
-    try {
-        e = REQUIRE.resolve(".bin/tsc");
-        console.log(title + kleur.bgBlue(kleur.black(e)));
-        child_process.spawnSync(e, [ "-v" ], {
-            stdio: [ "ignore", "inherit", "inherit" ],
-            shell: true
-        });
-    } catch {
-        console.warn(title + kleur.bgRed(kleur.black("not found")));
-    }
-    return e;
+function h(e) {
+    return e.replace(/\\+/, "/");
 }
 
-const essentials = [ "$schema", "name", "displayName", "version" ];
-
-const info = [ "description", "categories", "keywords", "license", "qna" ];
-
-const links = [ "homepage", "bugs", "repository", "funding" ];
-
-const maintainers = [ "author", "maintainers", "contributors", "publisher" ];
-
-const files = [ "imports", "exports", "bin", "man", "directories" ];
-
-const tasks = [ "binary", "scripts", "betterScripts", "capabilities", "activationEvents", "contributes", "husky", "simple-git-hooks", "commitlint", "lint-staged", "config", "nodemonConfig" ];
-
-const gitHooks = [ "applypatch-msg", "pre-applypatch", "post-applypatch", "pre-commit", "pre-merge-commit", "prepare-commit-msg", "commit-msg", "post-commit", "pre-rebase", "post-checkout", "post-merge", "pre-push", "pre-receive", "update", "proc-receive", "post-receive", "post-update", "reference-transaction", "push-to-checkout", "pre-auto-gc", "post-rewrite", "sendemail-validate", "fsmonitor-watchman", "p4-changelist", "p4-prepare-changelist", "p4-post-changelist", "p4-pre-submit", "post-index-change" ];
-
-const dependencies = [ "peerDependencies", "peerDependenciesMeta", "optionalDependencies", "optionalDependenciesMeta", "bundledDependencies", "bundledDependenciesMeta", "bundleDependencies", "bundleDependenciesMeta", "devDependencies", "devDependenciesMeta", "dependencies", "dependenciesMeta" ];
-
-const system = [ "engines", "engineStrict", "languageName", "os", "cpu" ];
-
-const publishing = [ "private", "publishConfig" ];
-
-const yarn = [ "flat", "resolutions", "workspaces" ];
-
-const types = [ "types", "typesVersions", "typings" ];
-
-const flow = [ "flow", "flow:main" ];
-
-const packageBundlers = [ "browser", "esnext", "es2015", "esm", "module-browser", "modules.root" ];
-
-const metro = [ "react-native" ];
-
-const microbundle = [ "source", "umd:main" ];
-
-const stdEsm = [ "@std", "@std/esm" ];
-
-const jspm = [ "jspm", "ignore", "format", "registry", "shim", "map" ];
-
-const browserify = [ "browserify", "browserify.transform" ];
-
-const createReactApp = [ "proxy", "homepage" ];
-
-const eslint = [ "eslintConfig", "eslintIgnore" ];
-
-const vscode = [ "extensionPack", "extensionDependencies", "icon", "badges", "galleryBanner", "preview", "markdown" ];
-
-const headList = [].concat(essentials, publishing, info, links, maintainers, "sideEffects", "type", createReactApp, yarn, "bolt", "jsdelivr", "unpkg", microbundle, "jsnext:main", "main", "module", types, "files", "assets", files, packageBundlers, system, "preferGlobal", "example", "examplestyle", tasks, gitHooks, flow, browserify, "browserslist", "babel", "style", "xo", "prettier", eslint, "npmpkgjsonlint", "remarkConfig", "stylelint", "ava", "jest", "mocha", "nyc", "tap", metro, stdEsm, jspm, "size-limit", "pwmetrics", dependencies, vscode);
-
-function sort_pkg_json(e) {
-    const t = {};
-    const s = Object.keys(e).sort();
-    [ ...headList, ...s ].filter((function(e, t, r) {
-        return s.indexOf(e) > -1 && t === r.indexOf(e);
-    })).forEach((function(s) {
-        t[s] = e[s];
-    }));
+function v(e) {
+    const t = [], s = o.readdirSync(e, {
+        withFileTypes: !0
+    });
+    for (let o, r, i = s.length; i-- > 0; ) o = s[i], /^[^._]/.test(o.name) && !/\.tests?($|\.)/i.test(o.name) && (r = n.join(e, o.name), 
+    o.isDirectory() ? t.push(...v(r)) : /\.[mc]?[jt]s$/.test(o.name) && t.push(r));
     return t;
 }
 
-function babelPlugin(e) {
-    return {
-        name: "babel-custom",
-        async transform(t) {
-            const s = await core.transformAsync(t, {
-                presets: [ [ "@babel/preset-env", {
-                    corejs: 3,
-                    loose: true,
-                    bugfixes: true,
-                    modules: false,
-                    useBuiltIns: "entry",
-                    targets: "> 1%, not dead" + (e ? ", ie " + Math.max(9, +e || 11) : "")
-                } ] ],
-                plugins: [ "@babel/plugin-transform-runtime" ]
-            });
-            return {
-                code: s.code
-            };
-        }
-    };
-}
-
-function terserPlugin(e) {
-    return {
-        name: "terser-custom",
-        async renderChunk(t) {
-            t = (await terser.minify(t, {
-                safari10: true,
-                mangle: true,
-                ...e ? {
-                    toplevel: true,
-                    compress: true,
-                    keep_classnames: false
-                } : {
-                    toplevel: false,
-                    compress: false,
-                    keep_classnames: true,
-                    format: {
-                        beautify: true
-                    }
-                }
-            })).code;
-            return {
-                code: t
-            };
-        }
-    };
-}
-
-function sucrasePlugin() {
-    return {
-        name: "sucrase-custom",
-        transform(e, t) {
-            return /\.tsx?$/.test(t) ? sucrase.transform(e, {
-                transforms: [ "typescript" ]
-            }).code : null;
-        }
-    };
+function k(t) {
+    throw console.log(e.bgRed(e.black("ERROR: " + t))), process.kill(0), t;
 }
 
 console.clear();
 
-function toPosix(e) {
-    return e.replace(/\\+/, "/");
-}
-
-function unique(e) {
-    return e.filter(((e, t, s) => e && s.indexOf(e) === t)).sort();
-}
-
-function fixClearScreen(e) {
-    return e.replace(/[\u001bc]/g, "").trim();
-}
-
-function getInputValidFiles(e) {
-    const t = [];
-    const s = fs.readdirSync(e, {
-        withFileTypes: true
-    });
-    for (let r, n, o = s.length; o-- > 0; ) {
-        r = s[o];
-        if (/^[^._]/.test(r.name) && !/\.tests?($|\.)/i.test(r.name)) {
-            n = path.join(e, r.name);
-            if (r.isDirectory()) {
-                t.push(...getInputValidFiles(n));
-            } else if (/\.[mc]?[jt]s$/.test(r.name)) {
-                t.push(n);
-            }
-        }
-    }
-    return t;
-}
-
-function ERROR(e) {
-    console.log(kleur.bgRed(kleur.black("ERROR: " + e)));
-    process.kill(0);
-    throw e;
-}
-
-const argv = minimist(process.argv.slice(2), {
+const j = d(process.argv.slice(2), {
     default: {
-        help: false,
+        help: !1,
         dir: "",
         src: "src",
         out: "",
         types: "types",
-        watch: false,
-        min: false,
-        ie: false
+        watch: !1,
+        min: !1,
+        ie: !1
     },
     number: [ "ie" ],
     string: [ "dir", "src", "out", "types" ],
@@ -227,212 +45,193 @@ const argv = minimist(process.argv.slice(2), {
     }
 });
 
-(function() {
-    console.log(LOGO);
-    if (argv.help) {
-        console.log("help");
-    } else {
-        console.log("rollup: v" + rollup.VERSION);
-        console.log("babel:  v" + core.version);
-        console.log("");
-        argv.dir = path.resolve(argv.dir);
-        argv.src = path.resolve(argv.dir, argv.src);
-        argv.out = path.resolve(argv.dir, argv.out);
-        console.log(kleur.bgGreen(kleur.black(kleur.bold("dir: ") + argv.dir)));
-        console.log(kleur.bgGreen(kleur.black(kleur.bold("src: ") + argv.src)));
-        console.log(kleur.bgGreen(kleur.black(kleur.bold("out: ") + argv.out)));
-        console.log("");
-        if (!argv.out.startsWith(argv.dir)) {
-            return ERROR("dir OUT must be in dir DIR");
+!function() {
+    if (console.log(g), j.help) console.log("help"); else {
+        if (console.log("rollup: v" + r.VERSION), console.log("babel:  v" + c.version), 
+        console.log(""), j.dir = n.resolve(j.dir), j.src = n.resolve(j.dir, j.src), j.out = n.resolve(j.dir, j.out), 
+        console.log(e.bgGreen(e.black(e.bold("dir: ") + j.dir))), console.log(e.bgGreen(e.black(e.bold("src: ") + j.src))), 
+        console.log(e.bgGreen(e.black(e.bold("out: ") + j.out))), console.log(""), !j.out.startsWith(j.dir)) return k("dir OUT must be in dir DIR");
+        const u = n.resolve(j.dir, "package.json");
+        if (!o.existsSync(u)) return k("package.json not found in " + j.dir);
+        let m, f, w;
+        function t() {
+            const e = JSON.parse(o.readFileSync(u, "utf8")), t = e.dependencies || {}, s = e.peerDependencies || {};
+            var n;
+            m = (n = [ ...Object.keys(t), ...Object.keys(s) ], n.filter(((e, t, s) => e && s.indexOf(e) === t)).sort()).map((e => new RegExp(`^${e}($|/|\\\\)`)));
         }
-        const e = path.resolve(argv.dir, "package.json");
-        if (!fs.existsSync(e)) {
-            return ERROR("package.json not found in " + argv.dir);
-        }
-        console.log(kleur.bgMagenta(kleur.black(kleur.bold("package.json: ") + e)));
-        console.log("");
-        let t;
-        function s() {
-            const s = JSON.parse(fs.readFileSync(e, "utf8"));
-            const r = s.dependencies || {};
-            const n = s.peerDependencies || {};
-            t = unique([ ...Object.keys(r), ...Object.keys(n) ]).map((e => new RegExp(`^${e}($|/|\\\\)`)));
-        }
-        s();
-        let r;
-        if (argv.types) {
-            if (typeof argv.types !== "string") argv.types = "types";
-            argv.types = path.resolve(argv.dir, argv.types);
-            console.log(kleur.bgGreen(kleur.black(kleur.bold("types: ") + argv.types)));
-            if (!argv.types.startsWith(argv.dir)) {
-                console.log(kleur.bgRed(kleur.black("ERROR:")));
-                return ERROR("dir TYPES must be in dir DIR");
-            }
-            if (r = getTSC()) {
-                const u = child_process.spawn(r, [ ...argv.watch ? [ "--watch" ] : [], ...[ "--target", "esnext" ], ...[ "--moduleResolution", "node" ], ...[ "--module", "esnext" ], "--allowJs", "--declaration", "--emitDeclarationOnly", "--esModuleInterop", "--resolveJsonModule", "--emitDecoratorMetadata", "--experimentalDecorators", "--allowSyntheticDefaultImports", ...[ "--rootDir", argv.src ], ...[ "--baseUrl", argv.src ], ...[ "--declarationDir", argv.types ] ], {
-                    shell: true
+        if (console.log(e.bgMagenta(e.black(e.bold("package.json: ") + u))), console.log(""), 
+        t(), j.types) {
+            if ("string" != typeof j.types && (j.types = "types"), j.types = n.resolve(j.dir, j.types), 
+            console.log(e.bgGreen(e.black(e.bold("types: ") + j.types))), !j.types.startsWith(j.dir)) return console.log(e.bgRed(e.black("ERROR:"))), 
+            k("dir TYPES must be in dir DIR");
+            if (f = function() {
+                let t;
+                try {
+                    t = b.resolve(".bin/tsc"), console.log(y + e.bgBlue(e.black(t))), s.spawnSync(t, [ "-v" ], {
+                        stdio: [ "ignore", "inherit", "inherit" ],
+                        shell: !0
+                    });
+                } catch {
+                    console.warn(y + e.bgRed(e.black("not found")));
+                }
+                return t;
+            }()) {
+                const q = s.spawn(f, [ ...j.watch ? [ "--watch" ] : [], "--target", "esnext", "--module", "esnext", "--moduleResolution", "node", "--allowJs", "--declaration", "--emitDeclarationOnly", "--esModuleInterop", "--resolveJsonModule", "--emitDecoratorMetadata", "--experimentalDecorators", "--allowSyntheticDefaultImports", "--rootDir", j.src, "--baseUrl", j.src, "--outDir", j.types, "--declarationDir", j.types ], {
+                    cwd: j.src,
+                    shell: !0
                 });
-                u.stdout.on("data", (function(e) {
-                    e = fixClearScreen(e.toString());
-                    if (e) console.log("\n" + kleur.bgBlue(kleur.black("tsc: ")), e);
+                q.stdout.on("data", (function(t) {
+                    t = t.toString().trim(), console.log("\n" + e.bgBlue(e.black("tsc: "))), console.dir(t);
+                })), q.stderr.on("data", (function(t) {
+                    t = t.toString().trim(), console.log("\n" + e.bgRed(e.black("tsc: "))), console.dir(t);
                 }));
-                u.stderr.on("data", (function(e) {
-                    e = fixClearScreen(e.toString());
-                    if (e) console.log("\n" + kleur.bgRed(kleur.black("tsc: ")), e);
-                }));
-                const p = function() {
-                    u.kill(0);
+                const $ = function() {
+                    q.kill(0);
                 };
-                process.on("SIGTERM", p);
-                process.on("exit", p);
+                process.on("SIGTERM", $), process.on("exit", $);
             }
         }
-        console.log("");
-        let n;
-        function o() {
-            if (!n) {
-                const e = getInputValidFiles(argv.src).map((function(e) {
-                    const {dir: t, name: s} = path.parse(path.relative(argv.src, e));
-                    const r = path.join(t, s === "index" ? s : path.join(s, "index"));
+        function d() {
+            if (!w) {
+                const e = v(j.src).map((function(e) {
+                    const {dir: t, name: s} = n.parse(n.relative(j.src, e));
                     return {
                         id: e,
-                        fileName: r
+                        fileName: n.join(t, "index" === s ? s : n.join(s, "index"))
                     };
                 }));
-                n = e.sort((function(e, t) {
+                w = e.sort((function(e, t) {
                     return e.fileName.localeCompare(t.fileName);
                 }));
             }
         }
-        const i = {
+        console.log("");
+        const x = {
             preset: "es5",
-            arrowFunctions: false,
-            constBindings: true,
-            objectShorthand: false,
-            reservedNamesAsProps: true,
-            symbols: false
+            arrowFunctions: !1,
+            constBindings: !0,
+            objectShorthand: !1,
+            reservedNamesAsProps: !0,
+            symbols: !1
         };
-        let l = {}, a;
-        const c = rollup.watch([ ".mjs", ".js" ].map((function(s, r) {
+        let D, S = {};
+        const R = r.watch([ ".mjs", ".js" ].map((function(e, t) {
             return {
                 output: {
                     exports: "named",
-                    format: s === ".js" ? "commonjs" : "esm",
-                    dir: argv.out,
-                    chunkFileNames: "_includes/[name]-[hash]" + s,
-                    generatedCode: i
+                    format: ".js" === e ? "commonjs" : "esm",
+                    dir: j.out,
+                    chunkFileNames: "_includes/[name]-[hash]" + e,
+                    generatedCode: x
                 },
-                external: function(e, s) {
-                    if (s) {
-                        if (/^\.?[/\\]|\\/.test(e)) return void 0; else return t.some((t => t.test(e)));
+                external: function(e, t) {
+                    if (t) return /^\.?[/\\]|\\/.test(e) ? void 0 : m.some((t => t.test(e)));
+                },
+                plugins: [ {
+                    name: "chunks",
+                    buildStart() {
+                        w || d(), t || (this.addWatchFile(j.src), this.addWatchFile(u));
+                        for (let t = w.length; t-- > 0; ) this.emitFile({
+                            type: "chunk",
+                            id: w[t].id,
+                            fileName: w[t].fileName + e,
+                            preserveSignature: "strict",
+                            generatedCode: x
+                        });
                     }
-                },
-                plugins: [ function() {
-                    return {
-                        name: "chunks",
-                        buildStart() {
-                            n || o();
-                            if (!r) {
-                                this.addWatchFile(argv.src);
-                                this.addWatchFile(e);
-                            }
-                            for (let e = n.length; e-- > 0; ) {
-                                this.emitFile({
-                                    type: "chunk",
-                                    id: n[e].id,
-                                    fileName: n[e].fileName + s,
-                                    preserveSignature: "strict",
-                                    generatedCode: i
-                                });
-                            }
-                        }
-                    };
-                }(), sucrasePlugin(), argv.ie && babelPlugin(argv.ie), resolve({
+                }, {
+                    name: "sucrase-custom",
+                    transform: (e, t) => /\.tsx?$/.test(t) ? p.transform(e, {
+                        transforms: [ "typescript" ]
+                    }).code : null
+                }, j.ie && (n = j.ie, {
+                    name: "babel-custom",
+                    transform: async e => ({
+                        code: (await c.transformAsync(e, {
+                            presets: [ [ "@babel/preset-env", {
+                                corejs: 3,
+                                loose: !0,
+                                bugfixes: !0,
+                                modules: !1,
+                                useBuiltIns: "entry",
+                                targets: "> 1%, not dead" + (n ? ", ie " + Math.max(9, +n || 11) : "")
+                            } ] ],
+                            plugins: [ "@babel/plugin-transform-runtime" ]
+                        })).code
+                    })
+                }), l({
                     extensions: [ ".mjs", ".js", ".jsx", ".mts", ".ts", ".tsx", ".json" ]
-                }), commonjs(), terserPlugin(argv.min), {
-                    renderChunk(e, t) {
-                        if (!r) {
-                            const {fileName: e, facadeModuleId: s} = t;
-                            l[e] = s;
+                }), i(), (s = j.min, {
+                    name: "terser-custom",
+                    renderChunk: async e => ({
+                        code: e = (await a.minify(e, {
+                            safari10: !0,
+                            mangle: !0,
+                            module: !0,
+                            toplevel: !0,
+                            compress: !0,
+                            ...s ? {
+                                keep_classnames: !1
+                            } : {
+                                keep_classnames: !0,
+                                format: {
+                                    beautify: !0
+                                }
+                            }
+                        })).code
+                    })
+                }), {
+                    renderChunk(e, s) {
+                        if (!t) {
+                            const {fileName: e, facadeModuleId: t} = s;
+                            S[e] = t;
                         }
                         return "/* eslint-disable */\n" + e;
                     }
                 } ]
             };
-        }))).on("change", (function(t, r) {
-            if (t === e) s();
-            if (r.event !== "update") {
-                n = null;
-                console.log(r.event + ": " + t);
-            }
+            var s, n;
+        }))).on("change", (function(e, s) {
+            e === u && t(), "update" !== s.event && (w = null, console.log(s.event + ": " + e));
         })).on("event", (function(t) {
-            if (t.code === "END") {
-                if (!argv.watch) c.close(); else console.log("\n...WATCH...\n");
-                console.log("");
-                const t = l;
-                l = {};
-                if (a === (a = JSON.stringify(t))) return;
-                const s = JSON.parse(fs.readFileSync(e, "utf8"));
-                delete s.main;
-                delete s.module;
-                delete s.types;
-                const n = {};
-                if (s.files) {
-                    for (let e of s.files) {
-                        e = path.relative(argv.dir, path.join(argv.dir, e));
-                        if (/^\.?[\\/]/.test(e)) ERROR(e);
-                        e = e.split(/[\\/]/)[0];
-                        n[e] = true;
-                    }
-                }
-                const o = {};
-                let i, u, p, d, g;
-                for (const e in t) {
-                    u = null;
-                    i = t[e];
-                    p = path.relative(argv.dir, path.join(argv.out, e));
-                    n[p.split(/[\\/]/)[0]] = true;
-                    if (i) {
-                        d = "./" + toPosix(path.dirname(p));
-                        if (g = p === "index.mjs") {
-                            s.main = "index", s.module = "index.mjs";
-                            d = ".";
-                        }
-                        p = toPosix(p);
-                        console.log(kleur.green("BUILD: " + path.relative(argv.src, i) + " => " + p));
-                        o[d] = {
-                            import: "./" + p,
-                            require: "./" + p.slice(0, -3) + "js"
-                        };
-                        if (r) {
-                            u = path.relative(argv.dir, path.join(argv.types, path.relative(argv.src, i)));
-                            u = toPosix(u.replace(/\.([mc]?)[tj]s$/, ".d.$1ts"));
-                            if (!/\.d\.[mc]?ts$/.test(u)) ERROR("type: " + u);
-                            if (g) s.types = u;
-                            o[d].types = "./" + u;
-                        }
-                    }
-                }
+            if ("END" === t.code) {
+                j.watch ? console.log("\n...WATCH...\n") : R.close(), console.log("");
+                const t = S;
+                if (S = {}, D === (D = JSON.stringify(t))) return;
+                const s = JSON.parse(o.readFileSync(u, "utf8"));
+                delete s.main, delete s.module, delete s.types;
+                const r = {};
+                if (s.files) for (let e of s.files) e = n.relative(j.dir, n.join(j.dir, e)), /^\.?[\\/]/.test(e) && k(e), 
+                e = e.split(/[\\/]/)[0], r[e] = !0;
+                const i = {};
+                let l, c, a, p, d, m, g;
+                for (const o in t) c = null, l = t[o], a = n.relative(j.dir, n.join(j.out, o)), 
+                r[a.split(/[\\/]/)[0]] = !0, l && (p = "./" + h(n.dirname(a)), (d = "index.mjs" === a) && (s.main = "index", 
+                s.module = "index.mjs", p = "."), a = h(a), console.log(e.green("BUILD: " + n.relative(j.src, l) + " => " + a)), 
+                i[p] = {
+                    import: "./" + a,
+                    require: "./" + a.slice(0, -3) + "js"
+                }, f && (c = n.relative(j.dir, n.join(j.types, n.relative(j.src, l))), c = h(c.replace(/\.([mc]?)[tj]s$/, ".d.$1ts")), 
+                /\.d\.[mc]?ts$/.test(c) || k("type: " + c), d && (s.types = c), i[p].types = "./" + c));
                 s.exports = {
                     "./package.json": "./package.json"
                 };
-                for (let e = Object.keys(o).sort(), r = 0; r < e.length; r++) {
-                    s.exports[e[r]] = o[e[r]];
-                }
-                s.files = [];
-                let m;
-                if (r) n[path.relative(argv.dir, argv.types).split(/[\\/]/)[0]] = true;
-                for (let e in n) {
-                    if (fs.existsSync(m = path.join(argv.dir, e))) {
-                        //! FIX FOR NPM
-                        if (fs.lstatSync(m).isDirectory()) e += "/**/*";
-                        s.files.push(e);
-                    }
-                }
+                for (let e = Object.keys(i).sort(), n = 0; n < e.length; n++) s.exports[e[n]] = i[e[n]];
+                s.files = [], f && (r[g = n.relative(j.dir, j.types).split(/[\\/]/)[0]] = !0);
+                for (let e in r) g && g === e ? s.files.push(e + "/**/*") : o.existsSync(m = n.join(j.dir, e)) && (
+                //! FIX FOR NPM
+                o.lstatSync(m).isDirectory() && (e += "/**/*"), s.files.push(e));
                 s.files.sort();
-                const f = sort_pkg_json(s);
-                fs.writeFileSync(e, JSON.stringify(f, null, 2));
+                const b = function(e) {
+                    const t = {}, s = Object.keys(e).sort();
+                    return [ ..._, ...s ].filter((function(e, t, n) {
+                        return s.indexOf(e) > -1 && t === n.indexOf(e);
+                    })).forEach((function(s) {
+                        t[s] = e[s];
+                    })), t;
+                }(s);
+                o.writeFileSync(u, JSON.stringify(b, null, 2));
             }
         }));
     }
-})();
+}();

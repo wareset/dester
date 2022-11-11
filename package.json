@@ -33,7 +33,7 @@
   },
   "scripts": {
     "build": "npm run clear && node ./src/index.mjs --out bin",
-    "dev": "nodemon --inspect ./src/index.mjs --watch ./src/index.mjs",
+    "dev": "nodemon --inspect ./src/index.mjs --watch ./src/index.mjs -- --out bin",
     "clear": "rm -rf -- bin/* && rm -rf -- types/*"
   },
   "peerDependencies": {

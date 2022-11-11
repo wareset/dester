@@ -8,15 +8,12 @@ export default function terserPlugin(minify) {
       code = (await terser(code, {
         safari10: true,
         mangle  : true,
+        module  : true,
+        toplevel: true,
+        compress: true,
         ...minify
-          ? {
-            toplevel       : true,
-            compress       : true,
-            keep_classnames: false,
-          }
+          ? { keep_classnames: false }
           : {
-            toplevel       : false,
-            compress       : false,
             keep_classnames: true,
             format         : { beautify: true },
           }

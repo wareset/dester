@@ -47,11 +47,6 @@ function unique(list) {
   return list.filter((v, k, a) => v && a.indexOf(v) === k).sort()
 }
 
-function fixClearScreen(s) {
-  // eslint-disable-next-line no-control-regex
-  return s.replace(/[\u001bc]/g, '').trim()
-}
-
 function getInputValidFiles(dir) {
   const res = []
 
@@ -177,19 +172,24 @@ const argv = minimist(process.argv.slice(2), {
       }
   
       if (tsc = getTSC()) {
-        // const exclude = JSON.stringify(['**/{.|_}*', '**/*.{test|tests}.*'])
+        // const exclude = JSON.stringify(['**/{.,_}*', '**/*.{test,tests}.*'])
   
+        // JSON.stringify(toPosix(argv.src) + '/**/*.{ts,d.ts,js,cts,d.cts,cjs,mts,d.mts,mjs}'),
+      
         const tscProcess = child_process_spawn(
           tsc,
           [
+            // JSON.stringify(toPosix(argv.src) + ''),
+
             ...argv.watch ? ['--watch'] : [],
-  
-            // ...['--excludeDirectories', exclude],
+
+            // ...['--excludeDirectories', '*'],
             // ...['--excludeFiles', exclude],
+            // ...['--showConfig'],
               
             ...['--target', 'esnext'],
-            ...['--moduleResolution', 'node'],
             ...['--module', 'esnext'],
+            ...['--moduleResolution', 'node'],
               
             '--allowJs',
             '--declaration',
@@ -203,21 +203,25 @@ const argv = minimist(process.argv.slice(2), {
   
             ...['--rootDir', argv.src],
             ...['--baseUrl', argv.src],
+            ...['--outDir', argv.types],
             ...['--declarationDir', argv.types],
           ],
           {
+            cwd  : argv.src,
             // stdio: ['ignore', 'inherit', 'inherit'],
             shell: true
           }
         )
   
         tscProcess.stdout.on('data', function(data) {
-          data = fixClearScreen(data.toString())
-          if (data) console.log('\n' + kleur.bgBlue(kleur.black('tsc: ')), data)
+          data = data.toString().trim()
+          console.log('\n' + kleur.bgBlue(kleur.black('tsc: ')))
+          console.dir(data)
         })
         tscProcess.stderr.on('data', function(data) {
-          data = fixClearScreen(data.toString())
-          if (data) console.log('\n' + kleur.bgRed(kleur.black('tsc: ')), data)
+          data = data.toString().trim()
+          console.log('\n' + kleur.bgRed(kleur.black('tsc: ')))
+          console.dir(data)
         })
   
         // eslint-disable-next-line func-style
@@ -407,9 +411,13 @@ const argv = minimist(process.argv.slice(2), {
             */
           pkg.files = []
           let filePath
-          if (tsc) filesOBJ[path_relative(argv.dir, argv.types).split(/[\\/]/)[0]] = true
+          let typesDir
+          if (tsc) {
+            filesOBJ[typesDir = path_relative(argv.dir, argv.types).split(/[\\/]/)[0]] = true
+          }
           for (let fileName in filesOBJ) {
-            if (fs_existsSync(filePath = path_join(argv.dir, fileName))) {
+            if (typesDir && typesDir === fileName) pkg.files.push(fileName + '/**/*')
+            else if (fs_existsSync(filePath = path_join(argv.dir, fileName))) {
               //! FIX FOR NPM
               if (fs_lstatSync(filePath).isDirectory()) fileName += '/**/*'
               pkg.files.push(fileName)
