@@ -78,7 +78,7 @@ import sucrase_custom from './_rollup-plugins/sucrase_custom.mjs'
 import minimist from 'minimist'
 
 function toPosix(s) {
-  return s.replace(/\\+/, '/')
+  return s.replace(/[/\\]+/, '/')
 }
 
 function unique(list) {
@@ -186,7 +186,11 @@ const argv = minimist(process.argv.slice(2), {
       const dependencies = json.dependencies || {}
       const peerDependencies = json.peerDependencies || {}
   
-      externals = unique([...Object.keys(dependencies), ...Object.keys(peerDependencies)])
+      externals = unique([
+        ...Object.keys(process.binding('natives')),
+        ...Object.keys(dependencies),
+        ...Object.keys(peerDependencies)
+      ])
         .map((v) => new RegExp(`^${v}($|/|\\\\)`))
     }
     getExternals()
@@ -212,6 +216,14 @@ const argv = minimist(process.argv.slice(2), {
       if (tsc = getTSC()) {
         const tsconfigPath = path_resolve(argv.dir, '.dester.tsconfig.json')
 
+        let tsconfigCompilerOptions = {}
+        if (fs_existsSync(tsconfigPath)) {
+          try {
+            tsconfigCompilerOptions =
+              JSON.parse(fs_readFileSync(tsconfigPath)).compilerOptions || {}
+          } catch {}
+        }
+
         const tsconfig = {
           include: [toPosix(path_resolve(argv.src, '**/*'))],
           exclude: [
@@ -221,22 +233,23 @@ const argv = minimist(process.argv.slice(2), {
             toPosix(path_resolve(argv.src, '**/*.tests.*'))
           ],
           compilerOptions: {
-            target                          : 'esnext',
-            module                          : 'esnext',
-            moduleResolution                : 'node',
-            allowJs                         : true,
-            declaration                     : true,
-            emitDeclarationOnly             : true,
-            esModuleInterop                 : true,
-            resolveJsonModule               : true,
-            emitDecoratorMetadata           : true,
-            experimentalDecorators          : true,
-            allowSyntheticDefaultImports    : true,
-            forceConsistentCasingInFileNames: true,
-            rootDir                         : toPosix(argv.src),
-            baseUrl                         : toPosix(argv.src),
-            outDir                          : toPosix(argv.types),
-            declarationDir                  : toPosix(argv.types),
+            ...tsconfigCompilerOptions,
+            target                      : 'esnext',
+            module                      : 'esnext',
+            moduleResolution            : 'node',
+            allowJs                     : true,
+            declaration                 : true,
+            emitDeclarationOnly         : true,
+            esModuleInterop             : true,
+            resolveJsonModule           : true,
+            emitDecoratorMetadata       : true,
+            experimentalDecorators      : true,
+            allowSyntheticDefaultImports: true,
+            // forceConsistentCasingInFileNames: true,
+            // rootDir                     : toPosix(argv.src),
+            // baseUrl                     : toPosix(argv.src),
+            outDir                      : toPosix(argv.types),
+            // declarationDir              : toPosix(argv.types),
           }
         }
 
@@ -246,6 +259,8 @@ const argv = minimist(process.argv.slice(2), {
           tsc,
           [
             ...['--build', tsconfigPath],
+
+            // '--force',
 
             ...argv.watch ? ['--watch'] : [],
               
@@ -338,14 +353,15 @@ const argv = minimist(process.argv.slice(2), {
           exports       : 'named',
           format        : extension === '.js' ? 'commonjs' : 'esm',
           dir           : argv.out,
-          chunkFileNames: '_includes/[name]-[hash]' + extension,
+          chunkFileNames: '_includes/[name]' + extension, // -[hash]
           generatedCode,
         },
         external: function(id, importree) {
+          if (id.startsWith('node:')) return true
           if (importree) {
             // not package
             if (/^\.?[/\\]|\\/.test(id)) return void 0
-            else return externals.some((v) => v.test(id))
+            else return externals.length ? externals.some((v) => v.test(id)) : false
           }
         },
         plugins: [
@@ -359,11 +375,12 @@ const argv = minimist(process.argv.slice(2), {
                   this.addWatchFile(pkgjson)
                 }
                 for (let i = chunks.length; i-- > 0;) {
+                  // if (!k) console.log(chunks[i])
                   this.emitFile({
-                    type             : 'chunk',
-                    id               : chunks[i].id,
-                    fileName         : chunks[i].fileName + extension,
-                    preserveSignature: 'strict',
+                    type    : 'chunk',
+                    id      : chunks[i].id,
+                    fileName: chunks[i].fileName + extension,
+                    // preserveSignature: 'strict',
                     generatedCode
                   })
                 }
@@ -371,16 +388,24 @@ const argv = minimist(process.argv.slice(2), {
             }
           })(),
           sucrase_custom(),
-          argv.ie && babel_custom(argv.ie),
+          ...argv.ie ? [babel_custom(argv.ie)] : [],
           resolve({ extensions: ['.mjs', '.js', '.jsx', '.mts', '.ts', '.tsx', '.json'] }),
           commonjs(),
           terser_custom(argv.min),
           {
             renderChunk(code, id) {
               if (!k) {
-                const { fileName, facadeModuleId } = id
-                // console.log(111, id)
-                _files[fileName] = facadeModuleId
+                const { fileName, facadeModuleId, exports } = id
+                // console.log(111, exports)
+                _files[fileName] = { facadeModuleId, exports }
+
+                try {
+                  if (facadeModuleId) {
+                    console.log(kleur.green('BUILD: ' + path_relative(argv.src, facadeModuleId) + ' => ' + path_relative(argv.dir, path_join(argv.out, fileName))))
+                  }
+                } catch (e) {
+                  console.error(e)
+                }
               }
   
               return '/* eslint-disable */\n' + code
@@ -422,11 +447,12 @@ const argv = minimist(process.argv.slice(2), {
 
           const exports = {}
 
+          const _exp = {}
           let src, type, input, dirname, isMain
           for (const fileName in files) {
             // console.log('\n\n')
             type = null
-            src = files[fileName]
+            src = files[fileName].facadeModuleId
 
             input = path_relative(argv.dir, path_join(argv.out, fileName))
             filesOBJ[input.split(/[\\/]/)[0]] = true
@@ -436,17 +462,17 @@ const argv = minimist(process.argv.slice(2), {
               if (isMain = input === 'index.mjs') {
                 pkg.main = 'index', pkg.module = 'index.mjs'
                 dirname = '.'
+                filesOBJ['index.js'] = filesOBJ['index.mjs'] = true
               }
               input = toPosix(input)
-              console.log(kleur.green('BUILD: ' + path_relative(argv.src, src) + ' => ' + input))
+              // console.log(kleur.green('BUILD: ' + path_relative(argv.src, src) + ' => ' + input))
 
               exports[dirname] = {
                 import : './' + input,
                 require: './' + input.slice(0, -3) + 'js'
               }
 
-              // console.log(dirname)
-              // console.log({ fileName, src })
+              _exp[dirname] = files[fileName].exports
 
               if (tsc) {
                 type = path_relative(argv.dir, path_join(argv.types, path_relative(argv.src, src)))
@@ -455,7 +481,10 @@ const argv = minimist(process.argv.slice(2), {
                 if (!/\.d\.[mc]?ts$/.test(type)) ERROR('type: ' + type)
                 // console.log(type)
 
-                if (isMain) pkg.types = type
+                if (isMain) {
+                  pkg.types = 'index.d.ts' // type
+                  filesOBJ['index.d.ts'] = true
+                }
 
                 exports[dirname].types = './' + type
               }
@@ -463,8 +492,30 @@ const argv = minimist(process.argv.slice(2), {
           }
 
           pkg.exports = { './package.json': './package.json' }
-          for (let a = Object.keys(exports).sort(), i = 0; i < a.length; i++) {
-            pkg.exports[a[i]] = exports[a[i]]
+          for (let fl, a = Object.keys(exports).sort(), i = 0; i < a.length; i++) {
+            fl = a[i]
+            pkg.exports[fl] = exports[fl]
+            if (tsc) {
+              let t = toPosix(path_relative(
+                path_resolve(argv.dir, path_dirname(exports[fl].import)),
+                path_resolve(argv.dir, exports[fl].types)
+              )).replace(/(\/index)?\.d\.\w+$/, '')
+              if (t[0] !== '.') t = './' + t
+              t = JSON.stringify(t)
+
+              const str = `export * from ${t};\n`
+              // for (const pname of _exp[fl]) {
+              //   if (pname !== 'default') {
+              //     str += `export { ${pname} } from ${t};\n`
+              //   } else {
+              //     str +=
+              //       `import { ${pname} as __dflt__ } from ${t};\nexport { __dflt__ as default };\n`
+              //   }
+              // }
+
+              // console.log(111, fl, exports[fl])
+              fs_writeFileSync(path_resolve(argv.dir, fl, 'index.d.ts'), str)
+            }
           }
 
           // console.log(pkg.exports)
@@ -479,7 +530,8 @@ const argv = minimist(process.argv.slice(2), {
             filesOBJ[typesDir = path_relative(argv.dir, argv.types).split(/[\\/]/)[0]] = true
           }
           for (let fileName in filesOBJ) {
-            if (typesDir && typesDir === fileName) pkg.files.push(fileName + '/**/*')
+            if (tsc && fileName === 'index.d.ts') pkg.files.push(fileName)
+            else if (tsc && typesDir && typesDir === fileName) pkg.files.push(fileName + '/**/*')
             else if (fs_existsSync(filePath = path_join(argv.dir, fileName))) {
               //! FIX FOR NPM
               if (fs_lstatSync(filePath).isDirectory()) fileName += '/**/*'
@@ -503,67 +555,3 @@ const argv = minimist(process.argv.slice(2), {
        */
   }
 })()
-
-// function compile({
-//   rootDir = '',
-//   inputDir = 'src',
-//   outputDir = 'dist',
-//   typesDir = 'types',
-//   packageJson = 'package.json',
-//   watch = true
-// } = {}) {
-//   rootDir = path_resolve(rootDir)
-//   inputDir = path_resolve(rootDir, inputDir)
-//   outputDir = path_resolve(rootDir, outputDir)
-//   typesDir = path_resolve(rootDir, typesDir)
-//   packageJson = path_resolve(rootDir, packageJson)
-
-//   let chunks
-//   let packageMainTmp
-  
-//   watcher
-//     .on('change', function(id, data) {
-//       if (id === packageJson) {
-//         externals = getExternals(packageJson)
-//       }
-//       if (data.event !== 'update') {
-//         chunks = null
-//         console.log(data.event + ': ' + id)
-//       }
-//     })
-//     .on('event', function(data) {
-//       if (data.code === 'END') {
-//         if (!watch) watcher.close()
-//         chunks || (chunks = getChunks(inputDir, typesDir))
-//         // console.log(333, chunks)
-
-//         const packageMain = {}
-//         const packageFiles = chunks.map((v) => v.dir)
-//         const packageExports = { './package.json': './package.json' }
-//         for (const item of chunks) {
-//           if (item.fileName === 'index') {
-//             packageMain.main = 'index'
-//             packageMain.module = 'index.mjs'
-//             packageMain.types = 'index.d.ts'
-  
-//             packageFiles.push('index.d.ts', 'index.mjs', 'index.js')
-//           }
-//           packageExports[item.exports] = item.exportsData
-//         }
-//         packageMain.files = unique(packageFiles)
-//         packageMain.exports = packageExports
-
-//         if (packageMainTmp !== (packageMainTmp = JSON.stringify(packageMain))) {
-//           console.log(packageMain)
-
-//           // const json = JSON.parse(fs_readFileSync(packageJson, 'utf8'))
-//         }
-//       }
-//     })
-// }
-
-// compile({
-//   inputDir   : '../test/src',
-//   outputDir  : '../test/dist',
-//   packageJson: '../package.json'
-// })

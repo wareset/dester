@@ -1,28 +1,28 @@
 /* eslint-disable */
-const e = require("kleur"), s = require("path"), t = require("fs"), n = require("module"), o = require("child_process"), r = require("rollup"), i = require("@rollup/plugin-commonjs"), l = require("@rollup/plugin-node-resolve"), c = require("@babel/core"), a = require("terser"), p = require("sucrase"), d = require("minimist"), {red: u, cyan: m, bold: f} = e, g = m(f(`\n    ___       ${u("__")} _ ${u("_ _ _ /_,_")}  ${u("_______   ____")}\n   / _ \\_${u("(/(/(_(")}/ ${u("(-_)(-/_ _)")} ${u("/ ___/ /  /  _/")}\n  / _/ / -_/_ —/ __/ -_/ __/ ${u("/ /__/ /___/ /")}\n  \\___/\\__/___/\\__/\\__/_/    ${u("\\___/____/___/")}\n\n`)), b = [].concat([ "$schema", "name", "displayName", "version" ], [ "private", "publishConfig" ], [ "description", "categories", "keywords", "license", "qna" ], [ "homepage", "bugs", "repository", "funding" ], [ "author", "maintainers", "contributors", "publisher" ], "sideEffects", "type", [ "proxy", "homepage" ], [ "flat", "resolutions", "workspaces" ], "bolt", "jsdelivr", "unpkg", [ "source", "umd:main" ], "jsnext:main", "main", "module", [ "types", "typesVersions", "typings" ], "files", "assets", [ "imports", "exports", "bin", "man", "directories" ], [ "browser", "esnext", "es2015", "esm", "module-browser", "modules.root" ], [ "engines", "engineStrict", "languageName", "os", "cpu" ], "preferGlobal", "example", "examplestyle", [ "binary", "scripts", "betterScripts", "capabilities", "activationEvents", "contributes", "husky", "simple-git-hooks", "commitlint", "lint-staged", "config", "nodemonConfig" ], [ "applypatch-msg", "pre-applypatch", "post-applypatch", "pre-commit", "pre-merge-commit", "prepare-commit-msg", "commit-msg", "post-commit", "pre-rebase", "post-checkout", "post-merge", "pre-push", "pre-receive", "update", "proc-receive", "post-receive", "post-update", "reference-transaction", "push-to-checkout", "pre-auto-gc", "post-rewrite", "sendemail-validate", "fsmonitor-watchman", "p4-changelist", "p4-prepare-changelist", "p4-post-changelist", "p4-pre-submit", "post-index-change" ], [ "flow", "flow:main" ], [ "browserify", "browserify.transform" ], "browserslist", "babel", "style", "xo", "prettier", [ "eslintConfig", "eslintIgnore" ], "npmpkgjsonlint", "remarkConfig", "stylelint", "ava", "jest", "mocha", "nyc", "tap", [ "react-native" ], [ "@std", "@std/esm" ], [ "jspm", "ignore", "format", "registry", "shim", "map" ], "size-limit", "pwmetrics", [ "peerDependencies", "peerDependenciesMeta", "optionalDependencies", "optionalDependenciesMeta", "bundledDependencies", "bundledDependenciesMeta", "bundleDependencies", "bundleDependenciesMeta", "devDependencies", "devDependenciesMeta", "dependencies", "dependenciesMeta" ], [ "extensionPack", "extensionDependencies", "icon", "badges", "galleryBanner", "preview", "markdown" ]);
+const e = require("kleur"), t = require("path"), s = require("fs"), n = require("module"), r = require("child_process"), o = require("rollup"), i = require("@rollup/plugin-commonjs"), l = require("@rollup/plugin-node-resolve"), c = require("@babel/core"), a = require("terser"), d = require("sucrase"), p = require("minimist"), {red: u, cyan: m, bold: f} = e, g = m(f(`\n    ___       ${u("__")} _ ${u("_ _ _ /_,_")}  ${u("_______   ____")}\n   / _ \\_${u("(/(/(_(")}/ ${u("(-_)(-/_ _)")} ${u("/ ___/ /  /  _/")}\n  / _/ / -_/_ —/ __/ -_/ __/ ${u("/ /__/ /___/ /")}\n  \\___/\\__/___/\\__/\\__/_/    ${u("\\___/____/___/")}\n\n`)), b = [].concat([ "$schema", "name", "displayName", "version" ], [ "private", "publishConfig" ], [ "description", "categories", "keywords", "license", "qna" ], [ "homepage", "bugs", "repository", "funding" ], [ "author", "maintainers", "contributors", "publisher" ], "sideEffects", "type", [ "proxy", "homepage" ], [ "flat", "resolutions", "workspaces" ], "bolt", "jsdelivr", "unpkg", [ "source", "umd:main" ], "jsnext:main", "main", "module", [ "types", "typesVersions", "typings" ], "files", "assets", [ "imports", "exports", "bin", "man", "directories" ], [ "browser", "esnext", "es2015", "esm", "module-browser", "modules.root" ], [ "engines", "engineStrict", "languageName", "os", "cpu" ], "preferGlobal", "example", "examplestyle", [ "binary", "scripts", "betterScripts", "capabilities", "activationEvents", "contributes", "husky", "simple-git-hooks", "commitlint", "lint-staged", "config", "nodemonConfig" ], [ "applypatch-msg", "pre-applypatch", "post-applypatch", "pre-commit", "pre-merge-commit", "prepare-commit-msg", "commit-msg", "post-commit", "pre-rebase", "post-checkout", "post-merge", "pre-push", "pre-receive", "update", "proc-receive", "post-receive", "post-update", "reference-transaction", "push-to-checkout", "pre-auto-gc", "post-rewrite", "sendemail-validate", "fsmonitor-watchman", "p4-changelist", "p4-prepare-changelist", "p4-post-changelist", "p4-pre-submit", "post-index-change" ], [ "flow", "flow:main" ], [ "browserify", "browserify.transform" ], "browserslist", "babel", "style", "xo", "prettier", [ "eslintConfig", "eslintIgnore" ], "npmpkgjsonlint", "remarkConfig", "stylelint", "ava", "jest", "mocha", "nyc", "tap", [ "react-native" ], [ "@std", "@std/esm" ], [ "jspm", "ignore", "format", "registry", "shim", "map" ], "size-limit", "pwmetrics", [ "peerDependencies", "peerDependenciesMeta", "optionalDependencies", "optionalDependenciesMeta", "bundledDependencies", "bundledDependenciesMeta", "bundleDependencies", "bundleDependenciesMeta", "devDependencies", "devDependenciesMeta", "dependencies", "dependenciesMeta" ], [ "extensionPack", "extensionDependencies", "icon", "badges", "galleryBanner", "preview", "markdown" ]);
 
 console.clear();
 
 const y = "undefined" != typeof require ? require : n.createRequire("undefined" == typeof document ? new (require("url").URL)("file:" + __filename).href : document.currentScript && document.currentScript.src || new URL("index.js", document.baseURI).href);
 
-function _(e) {
-    return e.replace(/\\+/, "/");
+function h(e) {
+    return e.replace(/[/\\]+/, "/");
 }
 
-function h(e) {
-    const n = [], o = t.readdirSync(e, {
+function _(e) {
+    const n = [], r = s.readdirSync(e, {
         withFileTypes: !0
     });
-    for (let t, r, i = o.length; i-- > 0; ) t = o[i], /^[^._]/.test(t.name) && !/\.tests?($|\.)/i.test(t.name) && (r = s.join(e, t.name), 
-    t.isDirectory() ? n.push(...h(r)) : /\.[mc]?[jt]s$/.test(t.name) && n.push(r));
+    for (let s, o, i = r.length; i-- > 0; ) s = r[i], /^[^._]/.test(s.name) && !/\.tests?($|\.)/i.test(s.name) && (o = t.join(e, s.name), 
+    s.isDirectory() ? n.push(..._(o)) : /\.[mc]?[jt]s$/.test(s.name) && n.push(o));
     return n;
 }
 
-function v(s) {
-    throw console.log(e.bgRed(e.black("ERROR: " + s))), process.kill(0), s;
+function v(t) {
+    throw console.log(e.bgRed(e.black("ERROR: " + t))), process.kill(0), t;
 }
 
-const k = d(process.argv.slice(2), {
+const x = p(process.argv.slice(2), {
     default: {
         help: !1,
         dir: "",
@@ -46,41 +46,48 @@ const k = d(process.argv.slice(2), {
 });
 
 !function() {
-    if (console.log(g), k.help) console.log("help"); else {
-        if (console.log("rollup: v" + r.VERSION), console.log("babel:  v" + c.version), 
-        console.log(""), k.dir = s.resolve(k.dir), k.src = s.resolve(k.dir, k.src), k.out = s.resolve(k.dir, k.out), 
-        console.log(e.bgGreen(e.black(e.bold("dir: ") + k.dir))), console.log(e.bgGreen(e.black(e.bold("src: ") + k.src))), 
-        console.log(e.bgGreen(e.black(e.bold("out: ") + k.out))), console.log(""), !k.out.startsWith(k.dir)) return v("dir OUT must be in dir DIR");
-        const u = s.resolve(k.dir, "package.json");
-        if (!t.existsSync(u)) return v("package.json not found in " + k.dir);
+    if (console.log(g), x.help) console.log("help"); else {
+        if (console.log("rollup: v" + o.VERSION), console.log("babel:  v" + c.version), 
+        console.log(""), x.dir = t.resolve(x.dir), x.src = t.resolve(x.dir, x.src), x.out = t.resolve(x.dir, x.out), 
+        console.log(e.bgGreen(e.black(e.bold("dir: ") + x.dir))), console.log(e.bgGreen(e.black(e.bold("src: ") + x.src))), 
+        console.log(e.bgGreen(e.black(e.bold("out: ") + x.out))), console.log(""), !x.out.startsWith(x.dir)) return v("dir OUT must be in dir DIR");
+        const u = t.resolve(x.dir, "package.json");
+        if (!s.existsSync(u)) return v("package.json not found in " + x.dir);
         let m, f, j;
         function n() {
-            const e = JSON.parse(t.readFileSync(u, "utf8")), s = e.dependencies || {}, n = e.peerDependencies || {};
-            var o;
-            m = (o = [ ...Object.keys(s), ...Object.keys(n) ], o.filter(((e, s, t) => e && t.indexOf(e) === s)).sort()).map((e => new RegExp(`^${e}($|/|\\\\)`)));
+            const e = JSON.parse(s.readFileSync(u, "utf8")), t = e.dependencies || {}, n = e.peerDependencies || {};
+            var r;
+            m = (r = [ ...Object.keys(process.binding("natives")), ...Object.keys(t), ...Object.keys(n) ], 
+            r.filter(((e, t, s) => e && s.indexOf(e) === t)).sort()).map((e => new RegExp(`^${e}($|/|\\\\)`)));
         }
         if (console.log(e.bgMagenta(e.black(e.bold("package.json: ") + u))), console.log(""), 
-        n(), k.types) {
-            if ("string" != typeof k.types && (k.types = "types"), k.types = s.resolve(k.dir, k.types), 
-            console.log(e.bgGreen(e.black(e.bold("types: ") + k.types))), !k.types.startsWith(k.dir)) return console.log(e.bgRed(e.black("ERROR:"))), 
+        n(), x.types) {
+            if ("string" != typeof x.types && (x.types = "types"), x.types = t.resolve(x.dir, x.types), 
+            console.log(e.bgGreen(e.black(e.bold("types: ") + x.types))), !x.types.startsWith(x.dir)) return console.log(e.bgRed(e.black("ERROR:"))), 
             v("dir TYPES must be in dir DIR");
             if (f = function() {
-                let s;
-                const t = e.bgBlue(e.black(e.bold("tsc: ")));
+                let t;
+                const s = e.bgBlue(e.black(e.bold("tsc: ")));
                 try {
-                    s = y.resolve(".bin/tsc"), console.log(t + e.bgBlue(e.black(s))), o.spawnSync(s, [ "-v" ], {
+                    t = y.resolve(".bin/tsc"), console.log(s + e.bgBlue(e.black(t))), r.spawnSync(t, [ "-v" ], {
                         stdio: [ "ignore", "inherit", "inherit" ],
                         shell: !0
                     });
                 } catch {
-                    console.warn(t + e.bgRed(e.black("not found")));
+                    console.warn(s + e.bgRed(e.black("not found")));
                 }
-                return s;
+                return t;
             }()) {
-                const R = s.resolve(k.dir, ".dester.tsconfig.json"), q = {
-                    include: [ _(s.resolve(k.src, "**/*")) ],
-                    exclude: [ _(s.resolve(k.src, "**/node_modules")), _(s.resolve(k.src, "**/_*")), _(s.resolve(k.src, "**/*.test.*")), _(s.resolve(k.src, "**/*.tests.*")) ],
+                const O = t.resolve(x.dir, ".dester.tsconfig.json");
+                let R = {};
+                if (s.existsSync(O)) try {
+                    R = JSON.parse(s.readFileSync(O)).compilerOptions || {};
+                } catch {}
+                const N = {
+                    include: [ h(t.resolve(x.src, "**/*")) ],
+                    exclude: [ h(t.resolve(x.src, "**/node_modules")), h(t.resolve(x.src, "**/_*")), h(t.resolve(x.src, "**/*.test.*")), h(t.resolve(x.src, "**/*.tests.*")) ],
                     compilerOptions: {
+                        ...R,
                         target: "esnext",
                         module: "esnext",
                         moduleResolution: "node",
@@ -92,45 +99,41 @@ const k = d(process.argv.slice(2), {
                         emitDecoratorMetadata: !0,
                         experimentalDecorators: !0,
                         allowSyntheticDefaultImports: !0,
-                        forceConsistentCasingInFileNames: !0,
-                        rootDir: _(k.src),
-                        baseUrl: _(k.src),
-                        outDir: _(k.types),
-                        declarationDir: _(k.types)
+                        outDir: h(x.types)
                     }
                 };
-                t.writeFileSync(R, JSON.stringify(q, null, 2));
-                const N = o.spawn(f, [ "--build", R, ...k.watch ? [ "--watch" ] : [] ], {
-                    cwd: k.src,
+                s.writeFileSync(O, JSON.stringify(N, null, 2));
+                const $ = r.spawn(f, [ "--build", O, ...x.watch ? [ "--watch" ] : [] ], {
+                    cwd: x.src,
                     shell: !0
                 });
-                N.stdout.on("data", (function(s) {
-                    s = s.toString().trim(), console.log("\n" + e.bgBlue(e.black("tsc: "))), console.dir(s);
-                })), N.stderr.on("data", (function(s) {
-                    s = s.toString().trim(), console.log("\n" + e.bgRed(e.black("tsc: "))), console.dir(s);
+                $.stdout.on("data", (function(t) {
+                    t = t.toString().trim(), console.log("\n" + e.bgBlue(e.black("tsc: "))), console.dir(t);
+                })), $.stderr.on("data", (function(t) {
+                    t = t.toString().trim(), console.log("\n" + e.bgRed(e.black("tsc: "))), console.dir(t);
                 }));
-                const O = function() {
-                    N.kill(0);
+                const q = function() {
+                    $.kill(0);
                 };
-                process.on("SIGTERM", O), process.on("exit", O);
+                process.on("SIGTERM", q), process.on("exit", q);
             }
         }
-        function d() {
+        function p() {
             if (!j) {
-                const e = h(k.src).map((function(e) {
-                    const {dir: t, name: n} = s.parse(s.relative(k.src, e));
+                const e = _(x.src).map((function(e) {
+                    const {dir: s, name: n} = t.parse(t.relative(x.src, e));
                     return {
                         id: e,
-                        fileName: s.join(t, "index" === n ? n : s.join(n, "index"))
+                        fileName: t.join(s, "index" === n ? n : t.join(n, "index"))
                     };
                 }));
-                j = e.sort((function(e, s) {
-                    return e.fileName.localeCompare(s.fileName);
+                j = e.sort((function(e, t) {
+                    return e.fileName.localeCompare(t.fileName);
                 }));
             }
         }
         console.log("");
-        const w = {
+        const k = {
             preset: "es5",
             arrowFunctions: !1,
             constBindings: !0,
@@ -138,123 +141,163 @@ const k = d(process.argv.slice(2), {
             reservedNamesAsProps: !0,
             symbols: !1
         };
-        let x, S = {};
-        const D = r.watch([ ".mjs", ".js" ].map((function(e, s) {
+        let w, S = {};
+        const D = o.watch([ ".mjs", ".js" ].map((function(s, n) {
             return {
                 output: {
                     exports: "named",
-                    format: ".js" === e ? "commonjs" : "esm",
-                    dir: k.out,
-                    chunkFileNames: "_includes/[name]-[hash]" + e,
-                    generatedCode: w
+                    format: ".js" === s ? "commonjs" : "esm",
+                    dir: x.out,
+                    chunkFileNames: "_includes/[name]" + s,
+                    generatedCode: k
                 },
-                external: function(e, s) {
-                    if (s) return /^\.?[/\\]|\\/.test(e) ? void 0 : m.some((s => s.test(e)));
+                external: function(e, t) {
+                    return !!e.startsWith("node:") || (t ? /^\.?[/\\]|\\/.test(e) ? void 0 : !!m.length && m.some((t => t.test(e))) : void 0);
                 },
                 plugins: [ {
                     name: "chunks",
                     buildStart() {
-                        j || d(), s || (this.addWatchFile(k.src), this.addWatchFile(u));
-                        for (let s = j.length; s-- > 0; ) this.emitFile({
+                        j || p(), n || (this.addWatchFile(x.src), this.addWatchFile(u));
+                        for (let e = j.length; e-- > 0; ) this.emitFile({
                             type: "chunk",
-                            id: j[s].id,
-                            fileName: j[s].fileName + e,
-                            preserveSignature: "strict",
-                            generatedCode: w
+                            id: j[e].id,
+                            fileName: j[e].fileName + s,
+                            generatedCode: k
                         });
                     }
                 }, {
                     name: "sucrase-custom",
-                    transform: (e, s) => /\.tsx?$/.test(s) ? p.transform(e, {
-                        transforms: [ "typescript" ]
-                    }).code : null
-                }, k.ie && (n = k.ie, {
-                    name: "babel-custom",
-                    transform: async e => ({
-                        code: (await c.transformAsync(e, {
-                            presets: [ [ "@babel/preset-env", {
-                                corejs: 3,
-                                loose: !0,
-                                bugfixes: !0,
-                                modules: !1,
-                                useBuiltIns: "entry",
-                                targets: "> 1%, not dead" + (n ? ", ie " + Math.max(9, +n || 11) : "")
-                            } ] ],
-                            plugins: [ "@babel/plugin-transform-runtime" ]
-                        })).code
-                    })
-                }), l({
-                    extensions: [ ".mjs", ".js", ".jsx", ".mts", ".ts", ".tsx", ".json" ]
-                }), i(), (t = k.min, {
-                    name: "terser-custom",
-                    renderChunk: async e => ({
-                        code: e = (await a.minify(e, {
-                            safari10: !0,
-                            mangle: !0,
-                            module: !0,
-                            toplevel: !0,
-                            compress: !0,
-                            ...t ? {
-                                keep_classnames: !1
-                            } : {
-                                keep_classnames: !0,
-                                format: {
-                                    beautify: !0
-                                }
+                    transform(e, t) {
+                        if (/\.[mc]?tsx?$/.test(t)) {
+                            try {
+                                e = d.transform(e, {
+                                    transforms: [ "typescript" ]
+                                }).code;
+                            } catch (s) {
+                                console.error("sucrase-custom"), console.error(s);
                             }
-                        })).code
-                    })
-                }), {
-                    renderChunk(e, t) {
-                        if (!s) {
-                            const {fileName: e, facadeModuleId: s} = t;
-                            S[e] = s;
+                            return {
+                                code: e
+                            };
                         }
-                        return "/* eslint-disable */\n" + e;
+                        return null;
+                    }
+                }, ...x.ie ? [ (o = x.ie, {
+                    name: "babel-custom",
+                    async transform(e) {
+                        try {
+                            e = (await c.transformAsync(e, {
+                                presets: [ [ "@babel/preset-env", {
+                                    corejs: 3,
+                                    loose: !0,
+                                    bugfixes: !0,
+                                    modules: !1,
+                                    useBuiltIns: "entry",
+                                    targets: "> 1%, not dead" + (o ? ", ie " + Math.max(9, +o || 11) : "")
+                                } ] ],
+                                plugins: [ "@babel/plugin-transform-runtime" ]
+                            })).code;
+                        } catch (t) {
+                            console.error("babel-custom"), console.error(t);
+                        }
+                        return {
+                            code: e
+                        };
+                    }
+                }) ] : [], l({
+                    extensions: [ ".mjs", ".js", ".jsx", ".mts", ".ts", ".tsx", ".json" ]
+                }), i(), (r = x.min, {
+                    name: "terser-custom",
+                    async renderChunk(e) {
+                        try {
+                            e = (await a.minify(e, {
+                                safari10: !0,
+                                mangle: !0,
+                                module: !0,
+                                toplevel: !0,
+                                compress: !0,
+                                ...r ? {
+                                    keep_classnames: !1
+                                } : {
+                                    keep_classnames: !0,
+                                    format: {
+                                        beautify: !0
+                                    }
+                                }
+                            })).code;
+                        } catch (t) {
+                            console.error("terser-custom"), console.error(t);
+                        }
+                        return {
+                            code: e
+                        };
+                    }
+                }), {
+                    renderChunk(s, r) {
+                        if (!n) {
+                            const {fileName: s, facadeModuleId: n, exports: i} = r;
+                            S[s] = {
+                                facadeModuleId: n,
+                                exports: i
+                            };
+                            try {
+                                n && console.log(e.green("BUILD: " + t.relative(x.src, n) + " => " + t.relative(x.dir, t.join(x.out, s))));
+                            } catch (o) {
+                                console.error(o);
+                            }
+                        }
+                        return "/* eslint-disable */\n" + s;
                     }
                 } ]
             };
-            var t, n;
-        }))).on("change", (function(e, s) {
-            e === u && n(), "update" !== s.event && (j = null, console.log(s.event + ": " + e));
-        })).on("event", (function(n) {
-            if ("END" === n.code) {
-                k.watch ? console.log("\n...WATCH...\n") : D.close(), console.log("");
-                const n = S;
-                if (S = {}, x === (x = JSON.stringify(n))) return;
-                const o = JSON.parse(t.readFileSync(u, "utf8"));
-                delete o.main, delete o.module, delete o.types;
+            var r, o;
+        }))).on("change", (function(e, t) {
+            e === u && n(), "update" !== t.event && (j = null, console.log(t.event + ": " + e));
+        })).on("event", (function(e) {
+            if ("END" === e.code) {
+                x.watch ? console.log("\n...WATCH...\n") : D.close(), console.log("");
+                const e = S;
+                if (S = {}, w === (w = JSON.stringify(e))) return;
+                const n = JSON.parse(s.readFileSync(u, "utf8"));
+                delete n.main, delete n.module, delete n.types;
                 const r = {};
-                if (o.files) for (let e of o.files) e = s.relative(k.dir, s.join(k.dir, e)), /^\.?[\\/]/.test(e) && v(e), 
-                e = e.split(/[\\/]/)[0], r[e] = !0;
-                const i = {};
-                let l, c, a, p, d, m, g;
-                for (const t in n) c = null, l = n[t], a = s.relative(k.dir, s.join(k.out, t)), 
-                r[a.split(/[\\/]/)[0]] = !0, l && (p = "./" + _(s.dirname(a)), (d = "index.mjs" === a) && (o.main = "index", 
-                o.module = "index.mjs", p = "."), a = _(a), console.log(e.green("BUILD: " + s.relative(k.src, l) + " => " + a)), 
-                i[p] = {
-                    import: "./" + a,
-                    require: "./" + a.slice(0, -3) + "js"
-                }, f && (c = s.relative(k.dir, s.join(k.types, s.relative(k.src, l))), c = _(c.replace(/\.([mc]?)[tj]s$/, ".d.$1ts")), 
-                /\.d\.[mc]?ts$/.test(c) || v("type: " + c), d && (o.types = c), i[p].types = "./" + c));
-                o.exports = {
+                if (n.files) for (let s of n.files) s = t.relative(x.dir, t.join(x.dir, s)), /^\.?[\\/]/.test(s) && v(s), 
+                s = s.split(/[\\/]/)[0], r[s] = !0;
+                const o = {};
+                let i, l, c, a, d, p, m;
+                for (const s in e) l = null, i = e[s].facadeModuleId, c = t.relative(x.dir, t.join(x.out, s)), 
+                r[c.split(/[\\/]/)[0]] = !0, i && (a = "./" + h(t.dirname(c)), (d = "index.mjs" === c) && (n.main = "index", 
+                n.module = "index.mjs", a = ".", r["index.js"] = r["index.mjs"] = !0), c = h(c), 
+                o[a] = {
+                    import: "./" + c,
+                    require: "./" + c.slice(0, -3) + "js"
+                }, e[s].exports, f && (l = t.relative(x.dir, t.join(x.types, t.relative(x.src, i))), 
+                l = h(l.replace(/\.([mc]?)[tj]s$/, ".d.$1ts")), /\.d\.[mc]?ts$/.test(l) || v("type: " + l), 
+                d && (n.types = "index.d.ts", r["index.d.ts"] = !0), o[a].types = "./" + l));
+                n.exports = {
                     "./package.json": "./package.json"
                 };
-                for (let e = Object.keys(i).sort(), s = 0; s < e.length; s++) o.exports[e[s]] = i[e[s]];
-                o.files = [], f && (r[g = s.relative(k.dir, k.types).split(/[\\/]/)[0]] = !0);
-                for (let e in r) g && g === e ? o.files.push(e + "/**/*") : t.existsSync(m = s.join(k.dir, e)) && (
+                for (let u, b = Object.keys(o).sort(), y = 0; y < b.length; y++) if (u = b[y], n.exports[u] = o[u], 
+                f) {
+                    let e = h(t.relative(t.resolve(x.dir, t.dirname(o[u].import)), t.resolve(x.dir, o[u].types))).replace(/(\/index)?\.d\.\w+$/, "");
+                    "." !== e[0] && (e = "./" + e), e = JSON.stringify(e);
+                    const n = `export * from ${e};\n`;
+                    s.writeFileSync(t.resolve(x.dir, u, "index.d.ts"), n);
+                }
+                n.files = [], f && (r[m = t.relative(x.dir, x.types).split(/[\\/]/)[0]] = !0);
+                for (let u in r) f && "index.d.ts" === u ? n.files.push(u) : f && m && m === u ? n.files.push(u + "/**/*") : s.existsSync(p = t.join(x.dir, u)) && (
                 //! FIX FOR NPM
-                t.lstatSync(m).isDirectory() && (e += "/**/*"), o.files.push(e));
-                o.files.sort();
-                const y = function(e) {
-                    const s = {}, t = Object.keys(e).sort();
-                    return [ ...b, ...t ].filter((function(e, s, n) {
-                        return t.indexOf(e) > -1 && s === n.indexOf(e);
-                    })).forEach((function(t) {
-                        s[t] = e[t];
-                    })), s;
-                }(o);
-                t.writeFileSync(u, JSON.stringify(y, null, 2));
+                s.lstatSync(p).isDirectory() && (u += "/**/*"), n.files.push(u));
+                n.files.sort();
+                const g = function(e) {
+                    const t = {}, s = Object.keys(e).sort();
+                    return [ ...b, ...s ].filter((function(e, t, n) {
+                        return s.indexOf(e) > -1 && t === n.indexOf(e);
+                    })).forEach((function(s) {
+                        t[s] = e[s];
+                    })), t;
+                }(n);
+                s.writeFileSync(u, JSON.stringify(g, null, 2));
             }
         }));
     }

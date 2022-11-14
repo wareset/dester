@@ -20,10 +20,6 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
-    "rootDir": "/home/rease/data/dev/packages/dester/src",
-    "baseUrl": "/home/rease/data/dev/packages/dester/src",
-    "outDir": "/home/rease/data/dev/packages/dester/types",
-    "declarationDir": "/home/rease/data/dev/packages/dester/types"
+    "outDir": "/home/rease/data/dev/packages/dester/types"
   }
 }
