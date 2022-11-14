@@ -29,20 +29,20 @@ console.clear();
 
 const N = "undefined" != typeof require ? require : d(import.meta.url);
 
-function S(e) {
+function R(e) {
     return e.replace(/[/\\]+/, "/");
 }
 
-function M(e) {
+function S(e) {
     const t = [], s = p(e, {
         withFileTypes: !0
     });
     for (let n, r, i = s.length; i-- > 0; ) n = s[i], /^[^._]/.test(n.name) && !/\.tests?($|\.)/i.test(n.name) && (r = o(e, n.name), 
-    n.isDirectory() ? t.push(...M(r)) : /\.[mc]?[jt]s$/.test(n.name) && t.push(r));
+    n.isDirectory() ? t.push(...S(r)) : /\.[mc]?[jt]s$/.test(n.name) && t.push(r));
     return t;
 }
 
-function R(t) {
+function M(t) {
     throw console.log(e.bgRed(e.black("ERROR: " + t))), process.kill(0), t;
 }
 
@@ -74,9 +74,9 @@ const I = j(process.argv.slice(2), {
         if (console.log("rollup: v" + f), console.log("babel:  v" + y), console.log(""), 
         I.dir = t(I.dir), I.src = t(I.dir, I.src), I.out = t(I.dir, I.out), console.log(e.bgGreen(e.black(e.bold("dir: ") + I.dir))), 
         console.log(e.bgGreen(e.black(e.bold("src: ") + I.src))), console.log(e.bgGreen(e.black(e.bold("out: ") + I.out))), 
-        console.log(""), !I.out.startsWith(I.dir)) return R("dir OUT must be in dir DIR");
+        console.log(""), !I.out.startsWith(I.dir)) return M("dir OUT must be in dir DIR");
         const j = t(I.dir, "package.json");
-        if (!i(j)) return R("package.json not found in " + I.dir);
+        if (!i(j)) return M("package.json not found in " + I.dir);
         let v, w, D;
         function p() {
             const e = JSON.parse(c(j, "utf8")), t = e.dependencies || {}, s = e.peerDependencies || {};
@@ -88,7 +88,7 @@ const I = j(process.argv.slice(2), {
         p(), I.types) {
             if ("string" != typeof I.types && (I.types = "types"), I.types = t(I.dir, I.types), 
             console.log(e.bgGreen(e.black(e.bold("types: ") + I.types))), !I.types.startsWith(I.dir)) return console.log(e.bgRed(e.black("ERROR:"))), 
-            R("dir TYPES must be in dir DIR");
+            M("dir TYPES must be in dir DIR");
             if (w = function() {
                 let t;
                 const s = e.bgBlue(e.black(e.bold("tsc: ")));
@@ -108,8 +108,8 @@ const I = j(process.argv.slice(2), {
                     G = JSON.parse(c(F)).compilerOptions || {};
                 } catch {}
                 const W = {
-                    include: [ S(t(I.src, "**/*")) ],
-                    exclude: [ S(t(I.src, "**/node_modules")), S(t(I.src, "**/_*")), S(t(I.src, "**/*.test.*")), S(t(I.src, "**/*.tests.*")) ],
+                    include: [ R(t(I.src, "**/*")) ],
+                    exclude: [ R(t(I.src, "**/node_modules")), R(t(I.src, "**/_*")), R(t(I.src, "**/*.test.*")), R(t(I.src, "**/*.tests.*")) ],
                     compilerOptions: {
                         ...G,
                         target: "esnext",
@@ -123,7 +123,7 @@ const I = j(process.argv.slice(2), {
                         emitDecoratorMetadata: !0,
                         experimentalDecorators: !0,
                         allowSyntheticDefaultImports: !0,
-                        outDir: S(I.types)
+                        outDir: R(I.types)
                     }
                 };
                 l(F, JSON.stringify(W, null, 2));
@@ -144,7 +144,7 @@ const I = j(process.argv.slice(2), {
         }
         function d() {
             if (!D) {
-                const e = M(I.src).map((function(e) {
+                const e = S(I.src).map((function(e) {
                     const {dir: t, name: n} = r(s(I.src, e));
                     return {
                         id: e,
@@ -278,32 +278,32 @@ const I = j(process.argv.slice(2), {
         }))).on("change", (function(e, t) {
             e === j && p(), "update" !== t.event && (D = null, console.log(t.event + ": " + e));
         })).on("event", (function(e) {
-            if ("END" === e.code) {
+            if ("ERROR" === e.code) console.error(e); else if ("END" === e.code) {
                 I.watch ? console.log("\n...WATCH...\n") : B.close(), console.log("");
                 const e = J;
                 if (J = {}, E === (E = JSON.stringify(e))) return;
                 const r = JSON.parse(c(j, "utf8"));
                 delete r.main, delete r.module, delete r.types;
                 const p = {};
-                if (r.files) for (let t of r.files) t = s(I.dir, o(I.dir, t)), /^\.?[\\/]/.test(t) && R(t), 
+                if (r.files) for (let t of r.files) t = s(I.dir, o(I.dir, t)), /^\.?[\\/]/.test(t) && M(t), 
                 t = t.split(/[\\/]/)[0], p[t] = !0;
                 const d = {};
                 let m, u, f, g, b, h, _;
                 for (const t in e) u = null, m = e[t].facadeModuleId, f = s(I.dir, o(I.out, t)), 
-                p[f.split(/[\\/]/)[0]] = !0, m && (g = "./" + S(n(f)), (b = "index.mjs" === f) && (r.main = "index", 
-                r.module = "index.mjs", g = ".", p["index.js"] = p["index.mjs"] = !0), f = S(f), 
+                p[f.split(/[\\/]/)[0]] = !0, m && (g = "./" + R(n(f)), (b = "index.mjs" === f) && (r.main = "index", 
+                r.module = "index.mjs", g = ".", p["index.js"] = p["index.mjs"] = !0), f = R(f), 
                 d[g] = {
                     import: "./" + f,
                     require: "./" + f.slice(0, -3) + "js"
-                }, e[t].exports, w && (u = s(I.dir, o(I.types, s(I.src, m))), u = S(u.replace(/\.([mc]?)[tj]s$/, ".d.$1ts")), 
-                /\.d\.[mc]?ts$/.test(u) || R("type: " + u), b && (r.types = "index.d.ts", p["index.d.ts"] = !0), 
+                }, e[t].exports, w && (u = s(I.dir, o(I.types, s(I.src, m))), u = R(u.replace(/\.([mc]?)[tj]s$/, ".d.$1ts")), 
+                /\.d\.[mc]?ts$/.test(u) || M("type: " + u), b && (r.types = "index.d.ts", p["index.d.ts"] = !0), 
                 d[g].types = "./" + u));
                 r.exports = {
                     "./package.json": "./package.json"
                 };
                 for (let o, i = Object.keys(d).sort(), c = 0; c < i.length; c++) if (o = i[c], r.exports[o] = d[o], 
                 w) {
-                    let e = S(s(t(I.dir, n(d[o].import)), t(I.dir, d[o].types))).replace(/(\/index)?\.d\.\w+$/, "");
+                    let e = R(s(t(I.dir, n(d[o].import)), t(I.dir, d[o].types))).replace(/(\/index)?\.d\.\w+$/, "");
                     "." !== e[0] && (e = "./" + e), e = JSON.stringify(e);
                     const r = `export * from ${e};\n`;
                     l(t(I.dir, o, "index.d.ts"), r);

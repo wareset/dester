@@ -254,7 +254,7 @@ const x = p(process.argv.slice(2), {
         }))).on("change", (function(e, t) {
             e === u && n(), "update" !== t.event && (j = null, console.log(t.event + ": " + e));
         })).on("event", (function(e) {
-            if ("END" === e.code) {
+            if ("ERROR" === e.code) console.error(e); else if ("END" === e.code) {
                 x.watch ? console.log("\n...WATCH...\n") : D.close(), console.log("");
                 const e = S;
                 if (S = {}, w === (w = JSON.stringify(e))) return;

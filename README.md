@@ -1,5 +1,5 @@
 # dester
-A simple CLI js/ts lib-builder that uses Rollup, Babel and TypeScript/Sucrase
+wip: CLI js/ts lib-builder that uses Rollup, Babel and TypeScript/Sucrase
 
 // TODO
 

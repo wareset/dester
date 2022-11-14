@@ -423,7 +423,9 @@ const argv = minimist(process.argv.slice(2), {
         }
       })
       .on('event', function(data) {
-        if (data.code === 'END') {
+        if (data.code === 'ERROR') {
+          console.error(data)
+        } else if (data.code === 'END') {
           if (!argv.watch) watcher.close()
           else console.log('\n...WATCH...\n')
           console.log('')
