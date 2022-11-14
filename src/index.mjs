@@ -12,7 +12,7 @@ import {
   parse as path_parse,
   dirname as path_dirname,
   resolve as path_resolve,
-  relative as path_relative
+  relative as path_relative,
 } from 'path'
 
 import {
@@ -20,9 +20,9 @@ import {
   existsSync as fs_existsSync,
   readdirSync as fs_readdirSync,
   readFileSync as fs_readFileSync,
-  writeFileSync as fs_writeFileSync
+  writeFileSync as fs_writeFileSync,
 } from 'fs'
-import os from 'os'
+// import os from 'os'
 import { createRequire } from 'module'
 import {
   spawn as child_process_spawn,
@@ -35,7 +35,7 @@ const REQUIRE = typeof require !== 'undefined'
   ? require
   : createRequire(import.meta.url)
 
-export function getTSC() {
+function getTSC() {
   let tsc
   const title = kleur.bgBlue(kleur.black(kleur.bold('tsc: ')))
 
@@ -55,6 +55,15 @@ export function getTSC() {
   }
   return tsc
 }
+
+// function getTSconfigFileName() {
+//   let dir
+//   try {
+//     dir = REQUIRE.resolve('dester')
+//   } catch {
+//     dir = os.tmpdir()
+//   }
+// }
 
 import { watch as rollup_watch, VERSION as ROLLUP_VERSION } from 'rollup'
 import commonjs from '@rollup/plugin-commonjs'
@@ -201,15 +210,15 @@ const argv = minimist(process.argv.slice(2), {
       }
   
       if (tsc = getTSC()) {
-        const tsconfigPath = path_resolve(os.tmpdir(), 'dester-tsconfig.json')
+        const tsconfigPath = path_resolve(argv.dir, '.dester.tsconfig.json')
 
         const tsconfig = {
           include: [toPosix(path_resolve(argv.src, '**/*'))],
           exclude: [
-            '**/node_modules',
-            '**/_*',
-            '**/*.test.*',
-            '**/*.tests.*'
+            toPosix(path_resolve(argv.src, '**/node_modules')),
+            toPosix(path_resolve(argv.src, '**/_*')),
+            toPosix(path_resolve(argv.src, '**/*.test.*')),
+            toPosix(path_resolve(argv.src, '**/*.tests.*'))
           ],
           compilerOptions: {
             target                          : 'esnext',
@@ -231,7 +240,7 @@ const argv = minimist(process.argv.slice(2), {
           }
         }
 
-        fs_writeFileSync(tsconfigPath, JSON.stringify(tsconfig))
+        fs_writeFileSync(tsconfigPath, JSON.stringify(tsconfig, null, 2))
       
         const tscProcess = child_process_spawn(
           tsc,

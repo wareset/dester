@@ -1,1 +1,1 @@
-export function getTSC(): any;
+export {};
