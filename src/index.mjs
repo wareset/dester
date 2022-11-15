@@ -2,8 +2,6 @@
 /* eslint-disable no-useless-return */
 // setTimeout(function() {}, 1000 * 60 * 60 * 24)
 
-console.clear()
-
 import { LOGO } from './_logo.mjs'
 import { sort_pkg_json } from './_sort_pkg_json.mjs'
 
@@ -71,6 +69,7 @@ import resolve from '@rollup/plugin-node-resolve'
 
 import { version as BABEL_VERSION } from '@babel/core'
 
+import fake_inject from './_rollup-plugins/fake_inject.mjs'
 import babel_custom from './_rollup-plugins/babel_custom.mjs'
 import terser_custom from './_rollup-plugins/terser_custom.mjs'
 import sucrase_custom from './_rollup-plugins/sucrase_custom.mjs'
@@ -146,6 +145,7 @@ const argv = minimist(process.argv.slice(2), {
     // TODO help
     console.log('help')
   } else {
+    if (argv.watch) console.clear()
     console.log('rollup: v' + ROLLUP_VERSION)
     console.log('babel:  v' + BABEL_VERSION)
     console.log('')
@@ -364,6 +364,16 @@ const argv = minimist(process.argv.slice(2), {
             else return externals.length ? externals.some((v) => v.test(id)) : false
           }
         },
+        
+        // preserveEntrySignatures: 'strict',
+
+        // treeshake: {
+        //   preset                  : 'smallest',
+        //   moduleSideEffects       : false,
+        //   propertyReadSideEffects : false,
+        //   unknownGlobalSideEffects: false
+        // },
+
         plugins: [
           (function() {
             return {
@@ -389,6 +399,7 @@ const argv = minimist(process.argv.slice(2), {
           })(),
           sucrase_custom(),
           ...argv.ie ? [babel_custom(argv.ie)] : [],
+          ...fake_inject(),
           resolve({ extensions: ['.mjs', '.js', '.jsx', '.mts', '.ts', '.tsx', '.json'] }),
           commonjs(),
           terser_custom(argv.min),
