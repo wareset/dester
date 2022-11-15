@@ -5,16 +5,16 @@ console.clear();
 
 const y = "undefined" != typeof require ? require : n.createRequire("undefined" == typeof document ? new (require("url").URL)("file:" + __filename).href : document.currentScript && document.currentScript.src || new URL("index.js", document.baseURI).href);
 
-function h(e) {
+function _(e) {
     return e.replace(/[/\\]+/, "/");
 }
 
-function _(e) {
+function h(e) {
     const n = [], r = s.readdirSync(e, {
         withFileTypes: !0
     });
     for (let s, o, i = r.length; i-- > 0; ) s = r[i], /^[^._]/.test(s.name) && !/\.tests?($|\.)/i.test(s.name) && (o = t.join(e, s.name), 
-    s.isDirectory() ? n.push(..._(o)) : /\.[mc]?[jt]s$/.test(s.name) && n.push(o));
+    s.isDirectory() ? n.push(...h(o)) : /\.[mc]?[jt]s$/.test(s.name) && n.push(o));
     return n;
 }
 
@@ -83,9 +83,9 @@ const x = p(process.argv.slice(2), {
                 if (s.existsSync(O)) try {
                     R = JSON.parse(s.readFileSync(O)).compilerOptions || {};
                 } catch {}
-                const N = {
-                    include: [ h(t.resolve(x.src, "**/*")) ],
-                    exclude: [ h(t.resolve(x.src, "**/node_modules")), h(t.resolve(x.src, "**/_*")), h(t.resolve(x.src, "**/*.test.*")), h(t.resolve(x.src, "**/*.tests.*")) ],
+                const $ = {
+                    include: [ _(t.resolve(x.src, "**/*")) ],
+                    exclude: [ _(t.resolve(x.src, "**/node_modules")), _(t.resolve(x.src, "**/_*")), _(t.resolve(x.src, "**/*.test.*")), _(t.resolve(x.src, "**/*.tests.*")) ],
                     compilerOptions: {
                         ...R,
                         target: "esnext",
@@ -99,28 +99,28 @@ const x = p(process.argv.slice(2), {
                         emitDecoratorMetadata: !0,
                         experimentalDecorators: !0,
                         allowSyntheticDefaultImports: !0,
-                        outDir: h(x.types)
+                        outDir: _(x.types)
                     }
                 };
-                s.writeFileSync(O, JSON.stringify(N, null, 2));
-                const $ = r.spawn(f, [ "--build", O, ...x.watch ? [ "--watch" ] : [] ], {
+                s.writeFileSync(O, JSON.stringify($, null, 2));
+                const N = r.spawn(f, [ "--build", O, ...x.watch ? [ "--watch" ] : [] ], {
                     cwd: x.src,
                     shell: !0
                 });
-                $.stdout.on("data", (function(t) {
+                N.stdout.on("data", (function(t) {
                     t = t.toString().trim(), console.log("\n" + e.bgBlue(e.black("tsc: "))), console.dir(t);
-                })), $.stderr.on("data", (function(t) {
+                })), N.stderr.on("data", (function(t) {
                     t = t.toString().trim(), console.log("\n" + e.bgRed(e.black("tsc: "))), console.dir(t);
                 }));
                 const q = function() {
-                    $.kill(0);
+                    N.kill(0);
                 };
                 process.on("SIGTERM", q), process.on("exit", q);
             }
         }
         function p() {
             if (!j) {
-                const e = _(x.src).map((function(e) {
+                const e = h(x.src).map((function(e) {
                     const {dir: s, name: n} = t.parse(t.relative(x.src, e));
                     return {
                         id: e,
@@ -263,33 +263,34 @@ const x = p(process.argv.slice(2), {
                 const r = {};
                 if (n.files) for (let s of n.files) s = t.relative(x.dir, t.join(x.dir, s)), /^\.?[\\/]/.test(s) && v(s), 
                 s = s.split(/[\\/]/)[0], r[s] = !0;
-                const o = {};
-                let i, l, c, a, d, p, m;
-                for (const s in e) l = null, i = e[s].facadeModuleId, c = t.relative(x.dir, t.join(x.out, s)), 
-                r[c.split(/[\\/]/)[0]] = !0, i && (a = "./" + h(t.dirname(c)), (d = "index.mjs" === c) && (n.main = "index", 
-                n.module = "index.mjs", a = ".", r["index.js"] = r["index.mjs"] = !0), c = h(c), 
-                o[a] = {
-                    import: "./" + c,
-                    require: "./" + c.slice(0, -3) + "js"
-                }, e[s].exports, f && (l = t.relative(x.dir, t.join(x.types, t.relative(x.src, i))), 
-                l = h(l.replace(/\.([mc]?)[tj]s$/, ".d.$1ts")), /\.d\.[mc]?ts$/.test(l) || v("type: " + l), 
-                d && (n.types = "index.d.ts", r["index.d.ts"] = !0), o[a].types = "./" + l));
+                const o = {}, i = {};
+                let l, c, a, d, p, m, g;
+                for (const s in e) c = null, l = e[s].facadeModuleId, a = t.relative(x.dir, t.join(x.out, s)), 
+                r[a.split(/[\\/]/)[0]] = !0, l && (d = "./" + _(t.dirname(a)), (p = "index.mjs" === a) && (n.main = "index", 
+                n.module = "index.mjs", d = ".", r["index.js"] = r["index.mjs"] = !0), a = _(a), 
+                o[d] = {
+                    import: "./" + a,
+                    require: "./" + a.slice(0, -3) + "js"
+                }, i[d] = e[s].exports, f && (c = t.relative(x.dir, t.join(x.types, t.relative(x.src, l))), 
+                c = _(c.replace(/\.([mc]?)[tj]s$/, ".d.$1ts")), /\.d\.[mc]?ts$/.test(c) || v("type: " + c), 
+                p && (n.types = c, r["index.d.ts"] = !0), o[d].types = "./" + c));
                 n.exports = {
                     "./package.json": "./package.json"
                 };
-                for (let u, b = Object.keys(o).sort(), y = 0; y < b.length; y++) if (u = b[y], n.exports[u] = o[u], 
+                for (let u, b = Object.keys(o).sort(), h = 0; h < b.length; h++) if (u = b[h], n.exports[u] = o[u], 
                 f) {
-                    let e = h(t.relative(t.resolve(x.dir, t.dirname(o[u].import)), t.resolve(x.dir, o[u].types))).replace(/(\/index)?\.d\.\w+$/, "");
+                    let e = _(t.relative(t.resolve(x.dir, t.dirname(o[u].import)), t.resolve(x.dir, o[u].types))).replace(/(\/index)?\.d\.\w+$/, "");
                     "." !== e[0] && (e = "./" + e), e = JSON.stringify(e);
-                    const n = `export * from ${e};\n`;
+                    let n = `export * from ${e};\n`;
+                    for (const t of i[u]) "default" === t ? n += `import { ${t} as __default__ } from ${e};\nexport { __default__ as default };\n` : "*" !== t[0] && (n += `export { ${t} } from ${e};\n`);
                     s.writeFileSync(t.resolve(x.dir, u, "index.d.ts"), n);
                 }
-                n.files = [], f && (r[m = t.relative(x.dir, x.types).split(/[\\/]/)[0]] = !0);
-                for (let u in r) f && "index.d.ts" === u ? n.files.push(u) : f && m && m === u ? n.files.push(u + "/**/*") : s.existsSync(p = t.join(x.dir, u)) && (
+                n.files = [], f && (r[g = t.relative(x.dir, x.types).split(/[\\/]/)[0]] = !0);
+                for (let u in r) f && "index.d.ts" === u ? n.files.push(u) : f && g && g === u ? n.files.push(u + "/**/*") : s.existsSync(m = t.join(x.dir, u)) && (
                 //! FIX FOR NPM
-                s.lstatSync(p).isDirectory() && (u += "/**/*"), n.files.push(u));
+                s.lstatSync(m).isDirectory() && (u += "/**/*"), n.files.push(u));
                 n.files.sort();
-                const g = function(e) {
+                const y = function(e) {
                     const t = {}, s = Object.keys(e).sort();
                     return [ ...b, ...s ].filter((function(e, t, n) {
                         return s.indexOf(e) > -1 && t === n.indexOf(e);
@@ -297,7 +298,7 @@ const x = p(process.argv.slice(2), {
                         t[s] = e[s];
                     })), t;
                 }(n);
-                s.writeFileSync(u, JSON.stringify(g, null, 2));
+                s.writeFileSync(u, JSON.stringify(y, null, 2));
             }
         }));
     }

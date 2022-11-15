@@ -484,7 +484,7 @@ const argv = minimist(process.argv.slice(2), {
                 // console.log(type)
 
                 if (isMain) {
-                  pkg.types = 'index.d.ts' // type
+                  pkg.types = type // 'index.d.ts' // type
                   filesOBJ['index.d.ts'] = true
                 }
 
@@ -505,15 +505,15 @@ const argv = minimist(process.argv.slice(2), {
               if (t[0] !== '.') t = './' + t
               t = JSON.stringify(t)
 
-              const str = `export * from ${t};\n`
-              // for (const pname of _exp[fl]) {
-              //   if (pname !== 'default') {
-              //     str += `export { ${pname} } from ${t};\n`
-              //   } else {
-              //     str +=
-              //       `import { ${pname} as __dflt__ } from ${t};\nexport { __dflt__ as default };\n`
-              //   }
-              // }
+              let str = `export * from ${t};\n`
+              for (const pname of _exp[fl]) {
+                if (pname === 'default') {
+                  str +=
+                  `import { ${pname} as __default__ } from ${t};\nexport { __default__ as default };\n`
+                } else if (pname[0] !== '*') {
+                  str += `export { ${pname} } from ${t};\n`
+                }
+              }
 
               // console.log(111, fl, exports[fl])
               fs_writeFileSync(path_resolve(argv.dir, fl, 'index.d.ts'), str)
