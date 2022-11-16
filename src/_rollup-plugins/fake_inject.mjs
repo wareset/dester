@@ -2,26 +2,25 @@ import rollupInject from '@rollup/plugin-inject'
 // TODO
 const NAME = 'dester-inject-'
 
-const injectObject = (function(listFns, listOther) {
-  const obj = {}
-
+const injectMethods = {}
+const injectObjects = {}
+;(function(listFns, listOther) {
   for (let a = Object.getOwnPropertyNames(Object.prototype),
     i = a.length; i-- > 0;) {
-    obj['Object.prototype.' + a[i]] = NAME + 'Object.prototype.' + a[i]
+    injectMethods['Object.prototype.' + a[i]] = NAME + 'Object.prototype.' + a[i]
   }
 
   for (let v, i = listFns.length; i-- > 0;) {
     v = listFns[i]
     for (let a = ['prototype'].concat(Object.getOwnPropertyNames(v[1])),
       i = a.length; i-- > 0;) {
-      obj[v[0] + '.' + a[i]] = NAME + v[0] + '.' + a[i]
+      injectMethods[v[0] + '.' + a[i]] = NAME + v[0] + '.' + a[i]
     }
 
-    obj[v[0]] = NAME + v[0]
+    injectObjects[v[0]] = NAME + v[0]
   }
 
-  for (let v, i = listOther.length; i-- > 0;) obj[v = listOther[i]] = NAME + v
-  return obj
+  for (let v, i = listOther.length; i-- > 0;) injectObjects[v = listOther[i]] = NAME + v
 })(
   [
     ['Object', Object],
@@ -72,7 +71,8 @@ export default function fake_inject() {
   // console.log(injectObject)
 
   return [
-    rollupInject(injectObject),
+    rollupInject(injectMethods),
+    rollupInject(injectObjects),
     {
       name: NAME,
       resolveId(id) {
