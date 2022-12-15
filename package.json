@@ -1,6 +1,6 @@
 {
   "name": "dester",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "wip: CLI js/ts lib-builder that uses Rollup, Babel and TypeScript/Sucrase",
   "keywords": [
     "dester"
@@ -38,7 +38,7 @@
     "clear": "rm -rf -- bin/* && rm -rf -- types/*"
   },
   "peerDependencies": {
-    "typescript": "^4.8.4"
+    "typescript": "^4.9.4"
   },
   "peerDependenciesMeta": {
     "typescript": {
@@ -46,18 +46,18 @@
     }
   },
   "dependencies": {
-    "@babel/core": "^7.20.2",
+    "@babel/core": "^7.20.5",
     "@babel/plugin-transform-runtime": "^7.19.6",
     "@babel/preset-env": "^7.20.2",
-    "@babel/runtime": "^7.20.1",
-    "@rollup/plugin-commonjs": "^23.0.2",
+    "@babel/runtime": "^7.20.6",
+    "@rollup/plugin-commonjs": "^23.0.5",
     "@rollup/plugin-inject": "^5.0.2",
-    "@rollup/plugin-json": "^5.0.1",
+    "@rollup/plugin-json": "^5.0.2",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "kleur": "^4.1.5",
     "minimist": "^1.2.7",
-    "rollup": "3.3.0",
+    "rollup": "3.7.4",
     "sucrase": "^3.29.0",
-    "terser": "^5.15.1"
+    "terser": "^5.16.1"
   }
 }
