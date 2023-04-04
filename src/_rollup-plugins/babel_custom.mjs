@@ -16,7 +16,7 @@ export default function babelPlugin(ie) {
                 bugfixes   : true,
                 modules    : false,
                 useBuiltIns: 'entry', // 'entry', 'usage'
-                targets    : '> 1%, not dead' + (ie ? ', ie ' + Math.max(9, +ie || 11) : ''),
+                targets    : '> 1%, not dead' + (ie ? ', ie ' + (+ie > 8 ? +ie : 11) : ''),
               }
             ]
           ],
