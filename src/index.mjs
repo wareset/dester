@@ -104,7 +104,7 @@ function getInputValidFiles(dir) {
   return res
 }
 
-function ERROR(text) {
+function printError(text) {
   console.log(kleur.bgRed(kleur.black('ERROR: ' + text)))
   process.kill(0)
   throw text
@@ -125,10 +125,12 @@ const argv = minimist(process.argv.slice(2), {
     min: false,
 
     ie: false,
+    
+    takeout: false,
   },
   number : ['ie'],
   string : ['dir', 'src', 'out', 'types'],
-  boolean: ['help', 'watch', 'min'],
+  boolean: ['help', 'watch', 'min', 'takeout'],
   alias  : {
     h: 'help',
     d: 'dir',
@@ -162,7 +164,7 @@ const argv = minimist(process.argv.slice(2), {
     console.log('')
   
     if (!argv.out.startsWith(argv.dir)) {
-      return ERROR('dir OUT must be in dir DIR')
+      return printError('dir OUT must be in dir DIR')
     }
     /**
      * /GET_FOLDERS
@@ -173,7 +175,7 @@ const argv = minimist(process.argv.slice(2), {
      */
     const pkgjson = path_resolve(argv.dir, 'package.json')
     if (!fs_existsSync(pkgjson)) {
-      return ERROR('package.json not found in ' + argv.dir)
+      return printError('package.json not found in ' + argv.dir)
     }
     console.log(kleur.bgMagenta(kleur.black(kleur.bold('package.json: ') + pkgjson)))
     console.log('')
@@ -210,7 +212,7 @@ const argv = minimist(process.argv.slice(2), {
   
       if (!argv.types.startsWith(argv.dir)) {
         console.log(kleur.bgRed(kleur.black('ERROR:')))
-        return ERROR('dir TYPES must be in dir DIR')
+        return printError('dir TYPES must be in dir DIR')
       }
   
       if (tsc = getTSC()) {
@@ -398,8 +400,8 @@ const argv = minimist(process.argv.slice(2), {
             }
           })(),
           sucrase_custom(),
-          ...argv.ie ? [babel_custom(argv.ie)] : [],
-          ...fake_inject(),
+          babel_custom(argv.ie), // ...argv.ie ? [babel_custom(argv.ie)] : [],
+          ...argv.takeout ? fake_inject() : [],
           resolve({ extensions: ['.mjs', '.js', '.jsx', '.mts', '.ts', '.tsx', '.json'] }),
           commonjs(),
           terser_custom(argv.min),
@@ -452,7 +454,7 @@ const argv = minimist(process.argv.slice(2), {
           if (pkg.files) {
             for (let fileName of pkg.files) {
               fileName = path_relative(argv.dir, path_join(argv.dir, fileName))
-              if (/^\.?[\\/]/.test(fileName)) ERROR(fileName)
+              if (/^\.?[\\/]/.test(fileName)) printError(fileName)
               fileName = fileName.split(/[\\/]/)[0]
               filesOBJ[fileName] = true
             }
@@ -491,7 +493,7 @@ const argv = minimist(process.argv.slice(2), {
                 type = path_relative(argv.dir, path_join(argv.types, path_relative(argv.src, src)))
                 type = toPosix(type.replace(/\.([mc]?)[tj]s$/, '.d.$1ts'))
   
-                if (!/\.d\.[mc]?ts$/.test(type)) ERROR('type: ' + type)
+                if (!/\.d\.[mc]?ts$/.test(type)) printError('type: ' + type)
                 // console.log(type)
 
                 if (isMain) {

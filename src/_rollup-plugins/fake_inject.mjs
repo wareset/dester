@@ -4,7 +4,7 @@ const NAME = 'dester-inject-'
 
 const injectMethods = {}
 const injectObjects = {}
-;(function(listFns, listOther) {
+;(function (listFns, listOther) {
   for (let a = Object.getOwnPropertyNames(Object.prototype),
     i = a.length; i-- > 0;) {
     injectMethods['Object.prototype.' + a[i]] = NAME + 'Object.prototype.' + a[i]
@@ -33,7 +33,9 @@ const injectObjects = {}
   ],
 
   `
-Function Boolean
+Function
+Boolean
+
 Date
 RegExp
 Error

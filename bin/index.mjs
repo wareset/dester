@@ -1,9 +1,9 @@
 /* eslint-disable */
 import e from "kleur";
 
-import { resolve as t, relative as o, join as n, dirname as s, parse as r } from "path";
+import { resolve as t, relative as r, join as o, dirname as n, parse as s } from "path";
 
-import { existsSync as i, readFileSync as l, writeFileSync as c, lstatSync as a, readdirSync as p } from "fs";
+import { existsSync as i, readFileSync as a, writeFileSync as l, lstatSync as c, readdirSync as p } from "fs";
 
 import { createRequire as d } from "module";
 
@@ -17,50 +17,49 @@ import h from "@rollup/plugin-node-resolve";
 
 import { transformAsync as _, version as y } from "@babel/core";
 
-import x from "@rollup/plugin-inject";
+import v from "@rollup/plugin-inject";
 
-import { minify as k } from "terser";
+import { minify as x } from "terser";
 
-import { transform as R } from "sucrase";
+import { transform as k } from "sucrase";
 
-import v from "minimist";
+import j from "minimist";
 
-const j = RegExp, w = JSON, D = w.parse, $ = Object, O = $.keys, I = w.stringify, {red: E, cyan: N, bold: P} = e, M = N(P(`\n    ___       ${E("__")} _ ${E("_ _ _ /_,_")}  ${E("_______   ____")}\n   / _ \\_${E("(/(/(_(")}/ ${E("(-_)(-/_ _)")} ${E("/ ___/ /  /  _/")}\n  / _/ / -_/_ —/ __/ -_/ __/ ${E("/ /__/ /___/ /")}\n  \\___/\\__/___/\\__/\\__/_/    ${E("\\___/____/___/")}\n\n`)), C = [].concat([ "$schema", "name", "displayName", "version" ], [ "private", "publishConfig" ], [ "description", "categories", "keywords", "license", "qna" ], [ "homepage", "bugs", "repository", "funding" ], [ "author", "maintainers", "contributors", "publisher" ], "sideEffects", "type", [ "proxy", "homepage" ], [ "flat", "resolutions", "workspaces" ], "bolt", "jsdelivr", "unpkg", [ "source", "umd:main" ], "jsnext:main", "main", "module", [ "types", "typesVersions", "typings" ], "files", "assets", [ "imports", "exports", "bin", "man", "directories" ], [ "browser", "esnext", "es2015", "esm", "module-browser", "modules.root" ], [ "engines", "engineStrict", "languageName", "os", "cpu" ], "preferGlobal", "example", "examplestyle", [ "binary", "scripts", "betterScripts", "capabilities", "activationEvents", "contributes", "husky", "simple-git-hooks", "commitlint", "lint-staged", "config", "nodemonConfig" ], [ "applypatch-msg", "pre-applypatch", "post-applypatch", "pre-commit", "pre-merge-commit", "prepare-commit-msg", "commit-msg", "post-commit", "pre-rebase", "post-checkout", "post-merge", "pre-push", "pre-receive", "update", "proc-receive", "post-receive", "post-update", "reference-transaction", "push-to-checkout", "pre-auto-gc", "post-rewrite", "sendemail-validate", "fsmonitor-watchman", "p4-changelist", "p4-prepare-changelist", "p4-post-changelist", "p4-pre-submit", "post-index-change" ], [ "flow", "flow:main" ], [ "browserify", "browserify.transform" ], "browserslist", "babel", "style", "xo", "prettier", [ "eslintConfig", "eslintIgnore" ], "npmpkgjsonlint", "remarkConfig", "stylelint", "ava", "jest", "mocha", "nyc", "tap", [ "react-native" ], [ "@std", "@std/esm" ], [ "jspm", "ignore", "format", "registry", "shim", "map" ], "size-limit", "pwmetrics", [ "peerDependencies", "peerDependenciesMeta", "optionalDependencies", "optionalDependenciesMeta", "bundledDependencies", "bundledDependenciesMeta", "bundleDependencies", "bundleDependenciesMeta", "devDependencies", "devDependenciesMeta", "dependencies", "dependenciesMeta" ], [ "extensionPack", "extensionDependencies", "icon", "badges", "galleryBanner", "preview", "markdown" ]);
+var {red: w, cyan: O, bold: N} = e, D = O(N(`\n    ___       ${w("__")} _ ${w("_ _ _ /_,_")}  ${w("_______   ____")}\n   / _ \\_${w("(/(/(_(")}/ ${w("(-_)(-/_ _)")} ${w("/ ___/ /  /  _/")}\n  / _/ / -_/_ —/ __/ -_/ __/ ${w("/ /__/ /___/ /")}\n  \\___/\\__/___/\\__/\\__/_/    ${w("\\___/____/___/")}\n\n`)), R = [].concat([ "$schema", "name", "displayName", "version" ], [ "private", "publishConfig" ], [ "description", "categories", "keywords", "license", "qna" ], [ "homepage", "bugs", "repository", "funding" ], [ "author", "maintainers", "contributors", "publisher" ], "sideEffects", "type", [ "proxy", "homepage" ], [ "flat", "resolutions", "workspaces" ], "bolt", "jsdelivr", "unpkg", [ "source", "umd:main" ], "jsnext:main", "main", "module", [ "types", "typesVersions", "typings" ], "files", "assets", [ "imports", "exports", "bin", "man", "directories" ], [ "browser", "esnext", "es2015", "esm", "module-browser", "modules.root" ], [ "engines", "engineStrict", "languageName", "os", "cpu" ], "preferGlobal", "example", "examplestyle", [ "binary", "scripts", "betterScripts", "capabilities", "activationEvents", "contributes", "husky", "simple-git-hooks", "commitlint", "lint-staged", "config", "nodemonConfig" ], [ "applypatch-msg", "pre-applypatch", "post-applypatch", "pre-commit", "pre-merge-commit", "prepare-commit-msg", "commit-msg", "post-commit", "pre-rebase", "post-checkout", "post-merge", "pre-push", "pre-receive", "update", "proc-receive", "post-receive", "post-update", "reference-transaction", "push-to-checkout", "pre-auto-gc", "post-rewrite", "sendemail-validate", "fsmonitor-watchman", "p4-changelist", "p4-prepare-changelist", "p4-post-changelist", "p4-pre-submit", "post-index-change" ], [ "flow", "flow:main" ], [ "browserify", "browserify.transform" ], "browserslist", "babel", "style", "xo", "prettier", [ "eslintConfig", "eslintIgnore" ], "npmpkgjsonlint", "remarkConfig", "stylelint", "ava", "jest", "mocha", "nyc", "tap", [ "react-native" ], [ "@std", "@std/esm" ], [ "jspm", "ignore", "format", "registry", "shim", "map" ], "size-limit", "pwmetrics", [ "peerDependencies", "peerDependenciesMeta", "optionalDependencies", "optionalDependenciesMeta", "bundledDependencies", "bundledDependenciesMeta", "bundleDependencies", "bundleDependenciesMeta", "devDependencies", "devDependenciesMeta", "dependencies", "dependenciesMeta" ], [ "extensionPack", "extensionDependencies", "icon", "badges", "galleryBanner", "preview", "markdown" ]);
 
-const S = Number, F = Math, W = String, B = Array, T = Promise, G = $.getOwnPropertyNames, U = $.prototype, q = "dester-inject-", A = {}, J = {};
+var $ = "dester-inject-", I = {}, E = {};
 
 !function(e, t) {
-    for (let o = G(U), n = o.length; n-- > 0; ) A["Object.prototype." + o[n]] = q + "Object.prototype." + o[n];
-    for (let o, n = e.length; n-- > 0; ) {
-        o = e[n];
-        for (let e = [ "prototype" ].concat(G(o[1])), t = e.length; t-- > 0; ) A[o[0] + "." + e[t]] = q + o[0] + "." + e[t];
-        J[o[0]] = q + o[0];
+    for (var r = Object.getOwnPropertyNames(Object.prototype), o = r.length; o-- > 0; ) I["Object.prototype." + r[o]] = $ + "Object.prototype." + r[o];
+    for (var n, s = e.length; s-- > 0; ) {
+        n = e[s];
+        for (var i = [ "prototype" ].concat(Object.getOwnPropertyNames(n[1])), a = i.length; a-- > 0; ) I[n[0] + "." + i[a]] = $ + n[0] + "." + i[a];
+        E[n[0]] = $ + n[0];
     }
-    for (let o, n = t.length; n-- > 0; ) J[o = t[n]] = q + o;
-}([ [ "Object", $ ], [ "Number", S ], [ "Math", F ], [ "String", W ], [ "Array", B ], [ "JSON", w ], [ "Promise", T ] ], "\nFunction Boolean\nDate\nRegExp\nError\n\nsetTimeout\nclearTimeout\nsetInterval\nclearInterval\n\neval\nisFinite\nisNaN\nparseFloat\nparseInt\ndecodeURI\ndecodeURIComponent\nencodeURI\nencodeURIComponent\n".trim().split(/\W+/));
+    for (var l, c = t.length; c-- > 0; ) E[l = t[c]] = $ + l;
+}([ [ "Object", Object ], [ "Number", Number ], [ "Math", Math ], [ "String", String ], [ "Array", Array ], [ "JSON", JSON ], [ "Promise", Promise ] ], "\nFunction\nBoolean\n\nDate\nRegExp\nError\n\nsetTimeout\nclearTimeout\nsetInterval\nclearInterval\n\neval\nisFinite\nisNaN\nparseFloat\nparseInt\ndecodeURI\ndecodeURIComponent\nencodeURI\nencodeURIComponent\n".trim().split(/\W+/));
 
-const V = /^[A-Z][^]*[a-z]/;
+var S = /^[A-Z][^]*[a-z]/;
 
-const z = "undefined" != typeof require ? require : d(import.meta.url);
+var P = "undefined" != typeof require ? require : d(import.meta.url);
 
 function toPosix(e) {
     return e.replace(/[/\\]+/, "/");
 }
 
 function getInputValidFiles(e) {
-    const t = [], o = p(e, {
+    for (var t, r, n = [], s = p(e, {
         withFileTypes: !0
-    });
-    for (let s, r, i = o.length; i-- > 0; ) s = o[i], /^[^._]/.test(s.name) && !/\.tests?($|\.)/i.test(s.name) && (r = n(e, s.name), 
-    s.isDirectory() ? t.push(...getInputValidFiles(r)) : /\.[mc]?[jt]s$/.test(s.name) && t.push(r));
-    return t;
+    }), i = s.length; i-- > 0; ) t = s[i], /^[^._]/.test(t.name) && !/\.tests?($|\.)/i.test(t.name) && (r = o(e, t.name), 
+    t.isDirectory() ? n.push(...getInputValidFiles(r)) : /\.[mc]?[jt]s$/.test(t.name) && n.push(r));
+    return n;
 }
 
-function ERROR(t) {
+function printError(t) {
     throw console.log(e.bgRed(e.black("ERROR: " + t))), process.kill(0), t;
 }
 
-const H = v(process.argv.slice(2), {
+var C = j(process.argv.slice(2), {
     default: {
         help: !1,
         dir: "",
@@ -69,11 +68,12 @@ const H = v(process.argv.slice(2), {
         types: "types",
         watch: !1,
         min: !1,
-        ie: !1
+        ie: !1,
+        takeout: !1
     },
     number: [ "ie" ],
     string: [ "dir", "src", "out", "types" ],
-    boolean: [ "help", "watch", "min" ],
+    boolean: [ "help", "watch", "min", "takeout" ],
     alias: {
         h: "help",
         d: "dir",
@@ -84,48 +84,45 @@ const H = v(process.argv.slice(2), {
 });
 
 !function() {
-    if (console.log(M), H.help) console.log("help"); else {
-        if (H.watch && console.clear(), console.log("rollup: v" + f), console.log("babel:  v" + y), 
-        console.log(""), H.dir = t(H.dir), H.src = t(H.dir, H.src), H.out = t(H.dir, H.out), 
-        console.log(e.bgGreen(e.black(e.bold("dir: ") + H.dir))), console.log(e.bgGreen(e.black(e.bold("src: ") + H.src))), 
-        console.log(e.bgGreen(e.black(e.bold("out: ") + H.out))), console.log(""), !H.out.startsWith(H.dir)) return ERROR("dir OUT must be in dir DIR");
-        const p = t(H.dir, "package.json");
-        if (!i(p)) return ERROR("package.json not found in " + H.dir);
-        let d, v, w;
+    if (console.log(D), C.help) console.log("help"); else {
+        if (C.watch && console.clear(), console.log("rollup: v" + f), console.log("babel:  v" + y), 
+        console.log(""), C.dir = t(C.dir), C.src = t(C.dir, C.src), C.out = t(C.dir, C.out), 
+        console.log(e.bgGreen(e.black(e.bold("dir: ") + C.dir))), console.log(e.bgGreen(e.black(e.bold("src: ") + C.src))), 
+        console.log(e.bgGreen(e.black(e.bold("out: ") + C.out))), console.log(""), !C.out.startsWith(C.dir)) return printError("dir OUT must be in dir DIR");
+        var p, d, j, w = t(C.dir, "package.json");
+        if (!i(w)) return printError("package.json not found in " + C.dir);
         function getExternals() {
-            const e = D(l(p, "utf8")), t = e.dependencies || {}, o = e.peerDependencies || {};
-            d = function unique(e) {
-                return e.filter(((e, t, o) => e && o.indexOf(e) === t)).sort();
-            }([ ...O(process.binding("natives")), ...O(t), ...O(o) ]).map((e => new j(`^${e}($|/|\\\\)`)));
+            var e = JSON.parse(a(w, "utf8")), t = e.dependencies || {}, r = e.peerDependencies || {};
+            p = function unique(e) {
+                return e.filter(((e, t, r) => e && r.indexOf(e) === t)).sort();
+            }([ ...Object.keys(process.binding("natives")), ...Object.keys(t), ...Object.keys(r) ]).map((e => new RegExp(`^${e}($|/|\\\\)`)));
         }
-        if (console.log(e.bgMagenta(e.black(e.bold("package.json: ") + p))), console.log(""), 
-        getExternals(), H.types) {
-            if ("string" != typeof H.types && (H.types = "types"), H.types = t(H.dir, H.types), 
-            console.log(e.bgGreen(e.black(e.bold("types: ") + H.types))), !H.types.startsWith(H.dir)) return console.log(e.bgRed(e.black("ERROR:"))), 
-            ERROR("dir TYPES must be in dir DIR");
-            if (v = function getTSC() {
-                let t;
-                const o = e.bgBlue(e.black(e.bold("tsc: ")));
+        if (console.log(e.bgMagenta(e.black(e.bold("package.json: ") + w))), console.log(""), 
+        getExternals(), C.types) {
+            if ("string" != typeof C.types && (C.types = "types"), C.types = t(C.dir, C.types), 
+            console.log(e.bgGreen(e.black(e.bold("types: ") + C.types))), !C.types.startsWith(C.dir)) return console.log(e.bgRed(e.black("ERROR:"))), 
+            printError("dir TYPES must be in dir DIR");
+            if (d = function getTSC() {
+                var t, r = e.bgBlue(e.black(e.bold("tsc: ")));
                 try {
-                    t = z.resolve(".bin/tsc"), console.log(o + e.bgBlue(e.black(t))), u(t, [ "-v" ], {
+                    t = P.resolve(".bin/tsc"), console.log(r + e.bgBlue(e.black(t))), u(t, [ "-v" ], {
                         stdio: [ "ignore", "inherit", "inherit" ],
                         shell: !0
                     });
                 } catch {
-                    console.warn(o + e.bgRed(e.black("not found")));
+                    console.warn(r + e.bgRed(e.black("not found")));
                 }
                 return t;
             }()) {
-                const S = t(H.dir, ".dester.tsconfig.json");
-                let F = {};
-                if (i(S)) try {
-                    F = D(l(S)).compilerOptions || {};
+                var O = t(C.dir, ".dester.tsconfig.json"), N = {};
+                if (i(O)) try {
+                    N = JSON.parse(a(O)).compilerOptions || {};
                 } catch {}
-                const W = {
-                    include: [ toPosix(t(H.src, "**/*")) ],
-                    exclude: [ toPosix(t(H.src, "**/node_modules")), toPosix(t(H.src, "**/_*")), toPosix(t(H.src, "**/*.test.*")), toPosix(t(H.src, "**/*.tests.*")) ],
+                var M = {
+                    include: [ toPosix(t(C.src, "**/*")) ],
+                    exclude: [ toPosix(t(C.src, "**/node_modules")), toPosix(t(C.src, "**/_*")), toPosix(t(C.src, "**/*.test.*")), toPosix(t(C.src, "**/*.tests.*")) ],
                     compilerOptions: {
-                        ...F,
+                        ...N,
                         target: "esnext",
                         module: "esnext",
                         moduleResolution: "node",
@@ -137,70 +134,68 @@ const H = v(process.argv.slice(2), {
                         emitDecoratorMetadata: !0,
                         experimentalDecorators: !0,
                         allowSyntheticDefaultImports: !0,
-                        outDir: toPosix(H.types)
+                        outDir: toPosix(C.types)
                     }
                 };
-                c(S, I(W, null, 2));
-                const B = m(v, [ "--build", S, ...H.watch ? [ "--watch" ] : [] ], {
-                    cwd: H.src,
+                l(O, JSON.stringify(M, null, 2));
+                var F = m(d, [ "--build", O, ...C.watch ? [ "--watch" ] : [] ], {
+                    cwd: C.src,
                     shell: !0
                 });
-                B.stdout.on("data", (function(t) {
+                F.stdout.on("data", (function(t) {
                     t = t.toString().trim(), console.log("\n" + e.bgBlue(e.black("tsc: "))), console.dir(t);
-                })), B.stderr.on("data", (function(t) {
+                })), F.stderr.on("data", (function(t) {
                     t = t.toString().trim(), console.log("\n" + e.bgRed(e.black("tsc: "))), console.dir(t);
                 }));
-                const tscExit = function() {
-                    B.kill(0);
+                var tscExit = function() {
+                    F.kill(0);
                 };
                 process.on("SIGTERM", tscExit), process.on("exit", tscExit);
             }
         }
         function getChunks() {
-            if (!w) {
-                const e = getInputValidFiles(H.src).map((function(e) {
-                    const {dir: t, name: s} = r(o(H.src, e));
+            if (!j) {
+                var e = getInputValidFiles(C.src).map((function(e) {
+                    var {dir: t, name: n} = s(r(C.src, e));
                     return {
                         id: e,
-                        fileName: n(t, "index" === s ? s : n(s, "index"))
+                        fileName: o(t, "index" === n ? n : o(n, "index"))
                     };
                 }));
-                w = e.sort((function(e, t) {
+                j = e.sort((function(e, t) {
                     return e.fileName.localeCompare(t.fileName);
                 }));
             }
         }
         console.log("");
-        const $ = {
+        var J, W = {
             preset: "es5",
             arrowFunctions: !1,
             constBindings: !0,
             objectShorthand: !1,
             reservedNamesAsProps: !0,
             symbols: !1
-        };
-        let E, N = {};
-        const P = g([ ".mjs", ".js" ].map((function(t, s) {
+        }, B = {}, T = g([ ".mjs", ".js" ].map((function(t, n) {
             return {
                 output: {
                     exports: "named",
                     format: ".js" === t ? "commonjs" : "esm",
-                    dir: H.out,
+                    dir: C.out,
                     chunkFileNames: "_includes/[name]" + t,
-                    generatedCode: $
+                    generatedCode: W
                 },
                 external: function(e, t) {
-                    return !!e.startsWith("node:") || (t ? /^\.?[/\\]|\\/.test(e) ? void 0 : !!d.length && d.some((t => t.test(e))) : void 0);
+                    return !!e.startsWith("node:") || (t ? /^\.?[/\\]|\\/.test(e) ? void 0 : !!p.length && p.some((t => t.test(e))) : void 0);
                 },
                 plugins: [ {
                     name: "chunks",
                     buildStart() {
-                        w || getChunks(), s || (this.addWatchFile(H.src), this.addWatchFile(p));
-                        for (let e = w.length; e-- > 0; ) this.emitFile({
+                        j || getChunks(), n || (this.addWatchFile(C.src), this.addWatchFile(w));
+                        for (var e = j.length; e-- > 0; ) this.emitFile({
                             type: "chunk",
-                            id: w[e].id,
-                            fileName: w[e].fileName + t,
-                            generatedCode: $
+                            id: j[e].id,
+                            fileName: j[e].fileName + t,
+                            generatedCode: W
                         });
                     }
                 }, {
@@ -208,11 +203,11 @@ const H = v(process.argv.slice(2), {
                     transform(e, t) {
                         if (/\.[mc]?tsx?$/.test(t)) {
                             try {
-                                e = R(e, {
+                                e = k(e, {
                                     transforms: [ "typescript" ]
                                 }).code;
-                            } catch (o) {
-                                console.error("sucrase-custom"), console.error(o);
+                            } catch (r) {
+                                console.error("sucrase-custom"), console.error(r);
                             }
                             return {
                                 code: e
@@ -220,7 +215,7 @@ const H = v(process.argv.slice(2), {
                         }
                         return null;
                     }
-                }, ...H.ie ? [ (i = H.ie, {
+                }, (i = C.ie, {
                     name: "babel-custom",
                     async transform(e) {
                         try {
@@ -233,7 +228,9 @@ const H = v(process.argv.slice(2), {
                                     useBuiltIns: "entry",
                                     targets: "> 1%, not dead" + (i ? ", ie " + (+i > 8 ? +i : 11) : "")
                                 } ] ],
-                                plugins: [ "@babel/plugin-transform-runtime" ]
+                                plugins: [ "@babel/plugin-transform-runtime", [ "@babel/plugin-transform-block-scoping", {
+                                    throwIfClosureRequired: !0
+                                } ] ]
                             })).code;
                         } catch (t) {
                             console.error("babel-custom"), console.error(t);
@@ -242,28 +239,28 @@ const H = v(process.argv.slice(2), {
                             code: e
                         };
                     }
-                }) ] : [], x(A), x(J), {
-                    name: q,
-                    resolveId: e => e.startsWith(q) ? {
+                }), ...C.takeout ? [ v(I), v(E), {
+                    name: $,
+                    resolveId: e => e.startsWith($) ? {
                         id: e,
                         external: !1
                     } : null,
-                    load: e => e.startsWith(q) ? `const v = ${e.slice(q.length)}; export default v` : null
-                }, h({
+                    load: e => e.startsWith($) ? `const v = ${e.slice(14)}; export default v` : null
+                } ] : [], h({
                     extensions: [ ".mjs", ".js", ".jsx", ".mts", ".ts", ".tsx", ".json" ]
-                }), b(), (r = H.min, {
+                }), b(), (s = C.min, {
                     name: "terser-custom",
                     async renderChunk(e) {
                         try {
-                            e = (await k(e, {
+                            e = (await x(e, {
                                 safari10: !0,
                                 mangle: !0,
                                 module: !0,
                                 toplevel: !0,
                                 compress: !0,
-                                ...r ? {
-                                    keep_classnames: V,
-                                    keep_fnames: V
+                                ...s ? {
+                                    keep_classnames: S,
+                                    keep_fnames: S
                                 } : {
                                     keep_classnames: !0,
                                     keep_fnames: !0,
@@ -280,72 +277,70 @@ const H = v(process.argv.slice(2), {
                         };
                     }
                 }), {
-                    renderChunk(t, r) {
-                        if (!s) {
-                            const {fileName: t, facadeModuleId: s, exports: l} = r;
-                            N[t] = {
-                                facadeModuleId: s,
+                    renderChunk(t, s) {
+                        if (!n) {
+                            var {fileName: i, facadeModuleId: a, exports: l} = s;
+                            B[i] = {
+                                facadeModuleId: a,
                                 exports: l
                             };
                             try {
-                                s && console.log(e.green("BUILD: " + o(H.src, s) + " => " + o(H.dir, n(H.out, t))));
-                            } catch (i) {
-                                console.error(i);
+                                a && console.log(e.green("BUILD: " + r(C.src, a) + " => " + r(C.dir, o(C.out, i))));
+                            } catch (c) {
+                                console.error(c);
                             }
                         }
                         return "/* eslint-disable */\n" + t;
                     }
                 } ]
             };
-            var r, i;
+            var s, i;
         }))).on("change", (function(e, t) {
-            e === p && getExternals(), "update" !== t.event && (w = null, console.log(t.event + ": " + e));
+            e === w && getExternals(), "update" !== t.event && (j = null, console.log(t.event + ": " + e));
         })).on("event", (function(e) {
             if ("ERROR" === e.code) console.error(e); else if ("END" === e.code) {
-                H.watch ? console.log("\n...WATCH...\n") : P.close(), console.log("");
-                const e = N;
-                if (N = {}, E === (E = I(e))) return;
-                const r = D(l(p, "utf8"));
-                delete r.main, delete r.module, delete r.types;
-                const d = {};
-                if (r.files) for (let t of r.files) t = o(H.dir, n(H.dir, t)), /^\.?[\\/]/.test(t) && ERROR(t), 
-                t = t.split(/[\\/]/)[0], d[t] = !0;
-                const m = {}, u = {};
-                let f, g, b, h, _, y, x;
-                for (const t in e) g = null, f = e[t].facadeModuleId, b = o(H.dir, n(H.out, t)), 
-                d[b.split(/[\\/]/)[0]] = !0, f && (h = "./" + toPosix(s(b)), (_ = "index.mjs" === b) && (r.main = "index", 
-                r.module = "index.mjs", h = ".", d["index.js"] = d["index.mjs"] = !0), b = toPosix(b), 
-                m[h] = {
+                C.watch ? console.log("\n...WATCH...\n") : T.close(), console.log("");
+                var s = B;
+                if (B = {}, J === (J = JSON.stringify(s))) return;
+                var p = JSON.parse(a(w, "utf8"));
+                delete p.main, delete p.module, delete p.types;
+                var m = {};
+                if (p.files) for (var u of p.files) u = r(C.dir, o(C.dir, u)), /^\.?[\\/]/.test(u) && printError(u), 
+                m[u = u.split(/[\\/]/)[0]] = !0;
+                var f, g, b, h, _, y, v, x = {}, k = {};
+                for (var j in s) g = null, f = s[j].facadeModuleId, m[(b = r(C.dir, o(C.out, j))).split(/[\\/]/)[0]] = !0, 
+                f && (h = "./" + toPosix(n(b)), (_ = "index.mjs" === b) && (p.main = "index", p.module = "index.mjs", 
+                h = ".", m["index.js"] = m["index.mjs"] = !0), b = toPosix(b), x[h] = {
                     import: "./" + b,
                     require: "./" + b.slice(0, -3) + "js"
-                }, u[h] = e[t].exports, v && (g = o(H.dir, n(H.types, o(H.src, f))), g = toPosix(g.replace(/\.([mc]?)[tj]s$/, ".d.$1ts")), 
-                /\.d\.[mc]?ts$/.test(g) || ERROR("type: " + g), _ && (r.types = g, d["index.d.ts"] = !0), 
-                m[h].types = "./" + g));
-                r.exports = {
+                }, k[h] = s[j].exports, d && (g = toPosix((g = r(C.dir, o(C.types, r(C.src, f)))).replace(/\.([mc]?)[tj]s$/, ".d.$1ts")), 
+                /\.d\.[mc]?ts$/.test(g) || printError("type: " + g), _ && (p.types = g, m["index.d.ts"] = !0), 
+                x[h].types = "./" + g));
+                p.exports = {
                     "./package.json": "./package.json"
                 };
-                for (let n, i = O(m).sort(), l = 0; l < i.length; l++) if (n = i[l], r.exports[n] = m[n], 
-                v) {
-                    let e = toPosix(o(t(H.dir, s(m[n].import)), t(H.dir, m[n].types))).replace(/(\/index)?\.d\.\w+$/, "");
-                    "." !== e[0] && (e = "./" + e), e = I(e);
-                    let r = `export * from ${e};\n`;
-                    for (const t of u[n]) "default" === t ? r += `import { ${t} as __default__ } from ${e};\nexport { __default__ as default };\n` : "*" !== t[0] && (r += `export { ${t} } from ${e};\n`);
-                    c(t(H.dir, n, "index.d.ts"), r);
+                for (var O, N = Object.keys(x).sort(), D = 0; D < N.length; D++) if (O = N[D], p.exports[O] = x[O], 
+                d) {
+                    var $ = toPosix(r(t(C.dir, n(x[O].import)), t(C.dir, x[O].types))).replace(/(\/index)?\.d\.\w+$/, "");
+                    "." !== $[0] && ($ = "./" + $);
+                    var I = `export * from ${$ = JSON.stringify($)};\n`;
+                    for (var E of k[O]) "default" === E ? I += `import { ${E} as __default__ } from ${$};\nexport { __default__ as default };\n` : "*" !== E[0] && (I += `export { ${E} } from ${$};\n`);
+                    l(t(C.dir, O, "index.d.ts"), I);
                 }
-                r.files = [], v && (d[x = o(H.dir, H.types).split(/[\\/]/)[0]] = !0);
-                for (let t in d) v && "index.d.ts" === t ? r.files.push(t) : v && x && x === t ? r.files.push(t + "/**/*") : i(y = n(H.dir, t)) && (
+                for (var S in p.files = [], d && (m[v = r(C.dir, C.types).split(/[\\/]/)[0]] = !0), 
+                m) d && "index.d.ts" === S ? p.files.push(S) : d && v && v === S ? p.files.push(S + "/**/*") : i(y = o(C.dir, S)) && (
                 //! FIX FOR NPM
-                a(y).isDirectory() && (t += "/**/*"), r.files.push(t));
-                r.files.sort();
-                const k = function sort_pkg_json(e) {
-                    const t = {}, o = O(e).sort();
-                    return [ ...C, ...o ].filter((function(e, t, n) {
-                        return o.indexOf(e) > -1 && t === n.indexOf(e);
-                    })).forEach((function(o) {
-                        t[o] = e[o];
+                c(y).isDirectory() && (S += "/**/*"), p.files.push(S));
+                p.files.sort();
+                var P = function sort_pkg_json(e) {
+                    var t = {}, r = Object.keys(e).sort();
+                    return [ ...R, ...r ].filter((function(e, t, o) {
+                        return r.indexOf(e) > -1 && t === o.indexOf(e);
+                    })).forEach((function(r) {
+                        t[r] = e[r];
                     })), t;
-                }(r);
-                c(p, I(k, null, 2));
+                }(p);
+                l(w, JSON.stringify(P, null, 2));
             }
         }));
     }

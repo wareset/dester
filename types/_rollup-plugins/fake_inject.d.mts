@@ -1,4 +1,4 @@
-export default function fake_inject(): (import("rollup").Plugin | {
+export default function fake_inject(): (import("rollup").Plugin<any> | {
     name: string;
     resolveId(id: any): {
         id: any;
