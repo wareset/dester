@@ -28,7 +28,8 @@ export default function babelPlugin(ie) {
                 {
                   throwIfClosureRequired: true
                 }
-              ]
+              ],
+              ['@babel/plugin-transform-destructuring']
             ]
           })
         ).code

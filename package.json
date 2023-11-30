@@ -1,6 +1,6 @@
 {
   "name": "dester",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "wip: CLI js/ts lib-builder that uses Rollup, Babel and TypeScript/Sucrase",
   "keywords": [
     "dester"
@@ -49,6 +49,7 @@
     "@babel/core": "^7.23.3",
     "@babel/plugin-transform-runtime": "^7.23.3",
     "@babel/plugin-transform-block-scoping": "^7.23.3",
+    "@babel/plugin-transform-destructuring": "^7.23.3",
     "@babel/preset-env": "^7.23.3",
     "@babel/runtime": "^7.23.2",
     "@rollup/plugin-commonjs": "^25.0.4",

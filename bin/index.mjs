@@ -25,23 +25,23 @@ import { transform as k } from "sucrase";
 
 import j from "minimist";
 
-var {red: w, cyan: O, bold: N} = e, D = O(N(`\n    ___       ${w("__")} _ ${w("_ _ _ /_,_")}  ${w("_______   ____")}\n   / _ \\_${w("(/(/(_(")}/ ${w("(-_)(-/_ _)")} ${w("/ ___/ /  /  _/")}\n  / _/ / -_/_ —/ __/ -_/ __/ ${w("/ /__/ /___/ /")}\n  \\___/\\__/___/\\__/\\__/_/    ${w("\\___/____/___/")}\n\n`)), R = [].concat([ "$schema", "name", "displayName", "version" ], [ "private", "publishConfig" ], [ "description", "categories", "keywords", "license", "qna" ], [ "homepage", "bugs", "repository", "funding" ], [ "author", "maintainers", "contributors", "publisher" ], "sideEffects", "type", [ "proxy", "homepage" ], [ "flat", "resolutions", "workspaces" ], "bolt", "jsdelivr", "unpkg", [ "source", "umd:main" ], "jsnext:main", "main", "module", [ "types", "typesVersions", "typings" ], "files", "assets", [ "imports", "exports", "bin", "man", "directories" ], [ "browser", "esnext", "es2015", "esm", "module-browser", "modules.root" ], [ "engines", "engineStrict", "languageName", "os", "cpu" ], "preferGlobal", "example", "examplestyle", [ "binary", "scripts", "betterScripts", "capabilities", "activationEvents", "contributes", "husky", "simple-git-hooks", "commitlint", "lint-staged", "config", "nodemonConfig" ], [ "applypatch-msg", "pre-applypatch", "post-applypatch", "pre-commit", "pre-merge-commit", "prepare-commit-msg", "commit-msg", "post-commit", "pre-rebase", "post-checkout", "post-merge", "pre-push", "pre-receive", "update", "proc-receive", "post-receive", "post-update", "reference-transaction", "push-to-checkout", "pre-auto-gc", "post-rewrite", "sendemail-validate", "fsmonitor-watchman", "p4-changelist", "p4-prepare-changelist", "p4-post-changelist", "p4-pre-submit", "post-index-change" ], [ "flow", "flow:main" ], [ "browserify", "browserify.transform" ], "browserslist", "babel", "style", "xo", "prettier", [ "eslintConfig", "eslintIgnore" ], "npmpkgjsonlint", "remarkConfig", "stylelint", "ava", "jest", "mocha", "nyc", "tap", [ "react-native" ], [ "@std", "@std/esm" ], [ "jspm", "ignore", "format", "registry", "shim", "map" ], "size-limit", "pwmetrics", [ "peerDependencies", "peerDependenciesMeta", "optionalDependencies", "optionalDependenciesMeta", "bundledDependencies", "bundledDependenciesMeta", "bundleDependencies", "bundleDependenciesMeta", "devDependencies", "devDependenciesMeta", "dependencies", "dependenciesMeta" ], [ "extensionPack", "extensionDependencies", "icon", "badges", "galleryBanner", "preview", "markdown" ]);
+var w = e.red, O = (0, e.cyan)((0, e.bold)(`\n    ___       ${w("__")} _ ${w("_ _ _ /_,_")}  ${w("_______   ____")}\n   / _ \\_${w("(/(/(_(")}/ ${w("(-_)(-/_ _)")} ${w("/ ___/ /  /  _/")}\n  / _/ / -_/_ —/ __/ -_/ __/ ${w("/ /__/ /___/ /")}\n  \\___/\\__/___/\\__/\\__/_/    ${w("\\___/____/___/")}\n\n`)), N = [].concat([ "$schema", "name", "displayName", "version" ], [ "private", "publishConfig" ], [ "description", "categories", "keywords", "license", "qna" ], [ "homepage", "bugs", "repository", "funding" ], [ "author", "maintainers", "contributors", "publisher" ], "sideEffects", "type", [ "proxy", "homepage" ], [ "flat", "resolutions", "workspaces" ], "bolt", "jsdelivr", "unpkg", [ "source", "umd:main" ], "jsnext:main", "main", "module", [ "types", "typesVersions", "typings" ], "files", "assets", [ "imports", "exports", "bin", "man", "directories" ], [ "browser", "esnext", "es2015", "esm", "module-browser", "modules.root" ], [ "engines", "engineStrict", "languageName", "os", "cpu" ], "preferGlobal", "example", "examplestyle", [ "binary", "scripts", "betterScripts", "capabilities", "activationEvents", "contributes", "husky", "simple-git-hooks", "commitlint", "lint-staged", "config", "nodemonConfig" ], [ "applypatch-msg", "pre-applypatch", "post-applypatch", "pre-commit", "pre-merge-commit", "prepare-commit-msg", "commit-msg", "post-commit", "pre-rebase", "post-checkout", "post-merge", "pre-push", "pre-receive", "update", "proc-receive", "post-receive", "post-update", "reference-transaction", "push-to-checkout", "pre-auto-gc", "post-rewrite", "sendemail-validate", "fsmonitor-watchman", "p4-changelist", "p4-prepare-changelist", "p4-post-changelist", "p4-pre-submit", "post-index-change" ], [ "flow", "flow:main" ], [ "browserify", "browserify.transform" ], "browserslist", "babel", "style", "xo", "prettier", [ "eslintConfig", "eslintIgnore" ], "npmpkgjsonlint", "remarkConfig", "stylelint", "ava", "jest", "mocha", "nyc", "tap", [ "react-native" ], [ "@std", "@std/esm" ], [ "jspm", "ignore", "format", "registry", "shim", "map" ], "size-limit", "pwmetrics", [ "peerDependencies", "peerDependenciesMeta", "optionalDependencies", "optionalDependenciesMeta", "bundledDependencies", "bundledDependenciesMeta", "bundleDependencies", "bundleDependenciesMeta", "devDependencies", "devDependenciesMeta", "dependencies", "dependenciesMeta" ], [ "extensionPack", "extensionDependencies", "icon", "badges", "galleryBanner", "preview", "markdown" ]);
 
-var $ = "dester-inject-", I = {}, E = {};
+var D = "dester-inject-", R = {}, $ = {};
 
 !function(e, t) {
-    for (var r = Object.getOwnPropertyNames(Object.prototype), o = r.length; o-- > 0; ) I["Object.prototype." + r[o]] = $ + "Object.prototype." + r[o];
+    for (var r = Object.getOwnPropertyNames(Object.prototype), o = r.length; o-- > 0; ) R["Object.prototype." + r[o]] = D + "Object.prototype." + r[o];
     for (var n, s = e.length; s-- > 0; ) {
         n = e[s];
-        for (var i = [ "prototype" ].concat(Object.getOwnPropertyNames(n[1])), a = i.length; a-- > 0; ) I[n[0] + "." + i[a]] = $ + n[0] + "." + i[a];
-        E[n[0]] = $ + n[0];
+        for (var i = [ "prototype" ].concat(Object.getOwnPropertyNames(n[1])), a = i.length; a-- > 0; ) R[n[0] + "." + i[a]] = D + n[0] + "." + i[a];
+        $[n[0]] = D + n[0];
     }
-    for (var l, c = t.length; c-- > 0; ) E[l = t[c]] = $ + l;
+    for (var l, c = t.length; c-- > 0; ) $[l = t[c]] = D + l;
 }([ [ "Object", Object ], [ "Number", Number ], [ "Math", Math ], [ "String", String ], [ "Array", Array ], [ "JSON", JSON ], [ "Promise", Promise ] ], "\nFunction\nBoolean\n\nDate\nRegExp\nError\n\nsetTimeout\nclearTimeout\nsetInterval\nclearInterval\n\neval\nisFinite\nisNaN\nparseFloat\nparseInt\ndecodeURI\ndecodeURIComponent\nencodeURI\nencodeURIComponent\n".trim().split(/\W+/));
 
-var S = /^[A-Z][^]*[a-z]/;
+var I = /^[A-Z][^]*[a-z]/;
 
-var P = "undefined" != typeof require ? require : d(import.meta.url);
+var E = "undefined" != typeof require ? require : d(import.meta.url);
 
 function toPosix(e) {
     return e.replace(/[/\\]+/, "/");
@@ -59,7 +59,7 @@ function printError(t) {
     throw console.log(e.bgRed(e.black("ERROR: " + t))), process.kill(0), t;
 }
 
-var C = j(process.argv.slice(2), {
+var S = j(process.argv.slice(2), {
     default: {
         help: !1,
         dir: "",
@@ -84,13 +84,13 @@ var C = j(process.argv.slice(2), {
 });
 
 !function() {
-    if (console.log(D), C.help) console.log("help"); else {
-        if (C.watch && console.clear(), console.log("rollup: v" + f), console.log("babel:  v" + y), 
-        console.log(""), C.dir = t(C.dir), C.src = t(C.dir, C.src), C.out = t(C.dir, C.out), 
-        console.log(e.bgGreen(e.black(e.bold("dir: ") + C.dir))), console.log(e.bgGreen(e.black(e.bold("src: ") + C.src))), 
-        console.log(e.bgGreen(e.black(e.bold("out: ") + C.out))), console.log(""), !C.out.startsWith(C.dir)) return printError("dir OUT must be in dir DIR");
-        var p, d, j, w = t(C.dir, "package.json");
-        if (!i(w)) return printError("package.json not found in " + C.dir);
+    if (console.log(O), S.help) console.log("help"); else {
+        if (S.watch && console.clear(), console.log("rollup: v" + f), console.log("babel:  v" + y), 
+        console.log(""), S.dir = t(S.dir), S.src = t(S.dir, S.src), S.out = t(S.dir, S.out), 
+        console.log(e.bgGreen(e.black(e.bold("dir: ") + S.dir))), console.log(e.bgGreen(e.black(e.bold("src: ") + S.src))), 
+        console.log(e.bgGreen(e.black(e.bold("out: ") + S.out))), console.log(""), !S.out.startsWith(S.dir)) return printError("dir OUT must be in dir DIR");
+        var p, d, j, w = t(S.dir, "package.json");
+        if (!i(w)) return printError("package.json not found in " + S.dir);
         function getExternals() {
             var e = JSON.parse(a(w, "utf8")), t = e.dependencies || {}, r = e.peerDependencies || {};
             p = function unique(e) {
@@ -98,14 +98,14 @@ var C = j(process.argv.slice(2), {
             }([ ...Object.keys(process.binding("natives")), ...Object.keys(t), ...Object.keys(r) ]).map((e => new RegExp(`^${e}($|/|\\\\)`)));
         }
         if (console.log(e.bgMagenta(e.black(e.bold("package.json: ") + w))), console.log(""), 
-        getExternals(), C.types) {
-            if ("string" != typeof C.types && (C.types = "types"), C.types = t(C.dir, C.types), 
-            console.log(e.bgGreen(e.black(e.bold("types: ") + C.types))), !C.types.startsWith(C.dir)) return console.log(e.bgRed(e.black("ERROR:"))), 
+        getExternals(), S.types) {
+            if ("string" != typeof S.types && (S.types = "types"), S.types = t(S.dir, S.types), 
+            console.log(e.bgGreen(e.black(e.bold("types: ") + S.types))), !S.types.startsWith(S.dir)) return console.log(e.bgRed(e.black("ERROR:"))), 
             printError("dir TYPES must be in dir DIR");
             if (d = function getTSC() {
                 var t, r = e.bgBlue(e.black(e.bold("tsc: ")));
                 try {
-                    t = P.resolve(".bin/tsc"), console.log(r + e.bgBlue(e.black(t))), u(t, [ "-v" ], {
+                    t = E.resolve(".bin/tsc"), console.log(r + e.bgBlue(e.black(t))), u(t, [ "-v" ], {
                         stdio: [ "ignore", "inherit", "inherit" ],
                         shell: !0
                     });
@@ -114,15 +114,15 @@ var C = j(process.argv.slice(2), {
                 }
                 return t;
             }()) {
-                var O = t(C.dir, ".dester.tsconfig.json"), N = {};
-                if (i(O)) try {
-                    N = JSON.parse(a(O)).compilerOptions || {};
+                var P = t(S.dir, ".dester.tsconfig.json"), C = {};
+                if (i(P)) try {
+                    C = JSON.parse(a(P)).compilerOptions || {};
                 } catch {}
                 var M = {
-                    include: [ toPosix(t(C.src, "**/*")) ],
-                    exclude: [ toPosix(t(C.src, "**/node_modules")), toPosix(t(C.src, "**/_*")), toPosix(t(C.src, "**/*.test.*")), toPosix(t(C.src, "**/*.tests.*")) ],
+                    include: [ toPosix(t(S.src, "**/*")) ],
+                    exclude: [ toPosix(t(S.src, "**/node_modules")), toPosix(t(S.src, "**/_*")), toPosix(t(S.src, "**/*.test.*")), toPosix(t(S.src, "**/*.tests.*")) ],
                     compilerOptions: {
-                        ...N,
+                        ...C,
                         target: "esnext",
                         module: "esnext",
                         moduleResolution: "node",
@@ -134,12 +134,12 @@ var C = j(process.argv.slice(2), {
                         emitDecoratorMetadata: !0,
                         experimentalDecorators: !0,
                         allowSyntheticDefaultImports: !0,
-                        outDir: toPosix(C.types)
+                        outDir: toPosix(S.types)
                     }
                 };
-                l(O, JSON.stringify(M, null, 2));
-                var F = m(d, [ "--build", O, ...C.watch ? [ "--watch" ] : [] ], {
-                    cwd: C.src,
+                l(P, JSON.stringify(M, null, 2));
+                var F = m(d, [ "--build", P, ...S.watch ? [ "--watch" ] : [] ], {
+                    cwd: S.src,
                     shell: !0
                 });
                 F.stdout.on("data", (function(t) {
@@ -155,11 +155,11 @@ var C = j(process.argv.slice(2), {
         }
         function getChunks() {
             if (!j) {
-                var e = getInputValidFiles(C.src).map((function(e) {
-                    var {dir: t, name: n} = s(r(C.src, e));
+                var e = getInputValidFiles(S.src).map((function(e) {
+                    var t = s(r(S.src, e)), n = t.dir, i = t.name;
                     return {
                         id: e,
-                        fileName: o(t, "index" === n ? n : o(n, "index"))
+                        fileName: o(n, "index" === i ? i : o(i, "index"))
                     };
                 }));
                 j = e.sort((function(e, t) {
@@ -180,7 +180,7 @@ var C = j(process.argv.slice(2), {
                 output: {
                     exports: "named",
                     format: ".js" === t ? "commonjs" : "esm",
-                    dir: C.out,
+                    dir: S.out,
                     chunkFileNames: "_includes/[name]" + t,
                     generatedCode: W
                 },
@@ -190,7 +190,7 @@ var C = j(process.argv.slice(2), {
                 plugins: [ {
                     name: "chunks",
                     buildStart() {
-                        j || getChunks(), n || (this.addWatchFile(C.src), this.addWatchFile(w));
+                        j || getChunks(), n || (this.addWatchFile(S.src), this.addWatchFile(w));
                         for (var e = j.length; e-- > 0; ) this.emitFile({
                             type: "chunk",
                             id: j[e].id,
@@ -215,7 +215,7 @@ var C = j(process.argv.slice(2), {
                         }
                         return null;
                     }
-                }, (i = C.ie, {
+                }, (i = S.ie, {
                     name: "babel-custom",
                     async transform(e) {
                         try {
@@ -230,7 +230,7 @@ var C = j(process.argv.slice(2), {
                                 } ] ],
                                 plugins: [ "@babel/plugin-transform-runtime", [ "@babel/plugin-transform-block-scoping", {
                                     throwIfClosureRequired: !0
-                                } ] ]
+                                } ], [ "@babel/plugin-transform-destructuring" ] ]
                             })).code;
                         } catch (t) {
                             console.error("babel-custom"), console.error(t);
@@ -239,16 +239,16 @@ var C = j(process.argv.slice(2), {
                             code: e
                         };
                     }
-                }), ...C.takeout ? [ v(I), v(E), {
-                    name: $,
-                    resolveId: e => e.startsWith($) ? {
+                }), ...S.takeout ? [ v(R), v($), {
+                    name: D,
+                    resolveId: e => e.startsWith(D) ? {
                         id: e,
                         external: !1
                     } : null,
-                    load: e => e.startsWith($) ? `const v = ${e.slice(14)}; export default v` : null
+                    load: e => e.startsWith(D) ? `const v = ${e.slice(14)}; export default v` : null
                 } ] : [], h({
                     extensions: [ ".mjs", ".js", ".jsx", ".mts", ".ts", ".tsx", ".json" ]
-                }), b(), (s = C.min, {
+                }), b(), (s = S.min, {
                     name: "terser-custom",
                     async renderChunk(e) {
                         try {
@@ -259,8 +259,8 @@ var C = j(process.argv.slice(2), {
                                 toplevel: !0,
                                 compress: !0,
                                 ...s ? {
-                                    keep_classnames: S,
-                                    keep_fnames: S
+                                    keep_classnames: I,
+                                    keep_fnames: I
                                 } : {
                                     keep_classnames: !0,
                                     keep_fnames: !0,
@@ -279,13 +279,13 @@ var C = j(process.argv.slice(2), {
                 }), {
                     renderChunk(t, s) {
                         if (!n) {
-                            var {fileName: i, facadeModuleId: a, exports: l} = s;
+                            var i = s.fileName, a = s.facadeModuleId, l = s.exports;
                             B[i] = {
                                 facadeModuleId: a,
                                 exports: l
                             };
                             try {
-                                a && console.log(e.green("BUILD: " + r(C.src, a) + " => " + r(C.dir, o(C.out, i))));
+                                a && console.log(e.green("BUILD: " + r(S.src, a) + " => " + r(S.dir, o(S.out, i))));
                             } catch (c) {
                                 console.error(c);
                             }
@@ -299,48 +299,48 @@ var C = j(process.argv.slice(2), {
             e === w && getExternals(), "update" !== t.event && (j = null, console.log(t.event + ": " + e));
         })).on("event", (function(e) {
             if ("ERROR" === e.code) console.error(e); else if ("END" === e.code) {
-                C.watch ? console.log("\n...WATCH...\n") : T.close(), console.log("");
+                S.watch ? console.log("\n...WATCH...\n") : T.close(), console.log("");
                 var s = B;
                 if (B = {}, J === (J = JSON.stringify(s))) return;
                 var p = JSON.parse(a(w, "utf8"));
                 delete p.main, delete p.module, delete p.types;
                 var m = {};
-                if (p.files) for (var u of p.files) u = r(C.dir, o(C.dir, u)), /^\.?[\\/]/.test(u) && printError(u), 
+                if (p.files) for (var u of p.files) u = r(S.dir, o(S.dir, u)), /^\.?[\\/]/.test(u) && printError(u), 
                 m[u = u.split(/[\\/]/)[0]] = !0;
                 var f, g, b, h, _, y, v, x = {}, k = {};
-                for (var j in s) g = null, f = s[j].facadeModuleId, m[(b = r(C.dir, o(C.out, j))).split(/[\\/]/)[0]] = !0, 
+                for (var j in s) g = null, f = s[j].facadeModuleId, m[(b = r(S.dir, o(S.out, j))).split(/[\\/]/)[0]] = !0, 
                 f && (h = "./" + toPosix(n(b)), (_ = "index.mjs" === b) && (p.main = "index", p.module = "index.mjs", 
                 h = ".", m["index.js"] = m["index.mjs"] = !0), b = toPosix(b), x[h] = {
                     import: "./" + b,
                     require: "./" + b.slice(0, -3) + "js"
-                }, k[h] = s[j].exports, d && (g = toPosix((g = r(C.dir, o(C.types, r(C.src, f)))).replace(/\.([mc]?)[tj]s$/, ".d.$1ts")), 
+                }, k[h] = s[j].exports, d && (g = toPosix((g = r(S.dir, o(S.types, r(S.src, f)))).replace(/\.([mc]?)[tj]s$/, ".d.$1ts")), 
                 /\.d\.[mc]?ts$/.test(g) || printError("type: " + g), _ && (p.types = g, m["index.d.ts"] = !0), 
                 x[h].types = "./" + g));
                 p.exports = {
                     "./package.json": "./package.json"
                 };
-                for (var O, N = Object.keys(x).sort(), D = 0; D < N.length; D++) if (O = N[D], p.exports[O] = x[O], 
+                for (var O, D = Object.keys(x).sort(), R = 0; R < D.length; R++) if (O = D[R], p.exports[O] = x[O], 
                 d) {
-                    var $ = toPosix(r(t(C.dir, n(x[O].import)), t(C.dir, x[O].types))).replace(/(\/index)?\.d\.\w+$/, "");
+                    var $ = toPosix(r(t(S.dir, n(x[O].import)), t(S.dir, x[O].types))).replace(/(\/index)?\.d\.\w+$/, "");
                     "." !== $[0] && ($ = "./" + $);
                     var I = `export * from ${$ = JSON.stringify($)};\n`;
                     for (var E of k[O]) "default" === E ? I += `import { ${E} as __default__ } from ${$};\nexport { __default__ as default };\n` : "*" !== E[0] && (I += `export { ${E} } from ${$};\n`);
-                    l(t(C.dir, O, "index.d.ts"), I);
+                    l(t(S.dir, O, "index.d.ts"), I);
                 }
-                for (var S in p.files = [], d && (m[v = r(C.dir, C.types).split(/[\\/]/)[0]] = !0), 
-                m) d && "index.d.ts" === S ? p.files.push(S) : d && v && v === S ? p.files.push(S + "/**/*") : i(y = o(C.dir, S)) && (
+                for (var P in p.files = [], d && (m[v = r(S.dir, S.types).split(/[\\/]/)[0]] = !0), 
+                m) d && "index.d.ts" === P ? p.files.push(P) : d && v && v === P ? p.files.push(P + "/**/*") : i(y = o(S.dir, P)) && (
                 //! FIX FOR NPM
-                c(y).isDirectory() && (S += "/**/*"), p.files.push(S));
+                c(y).isDirectory() && (P += "/**/*"), p.files.push(P));
                 p.files.sort();
-                var P = function sort_pkg_json(e) {
+                var C = function sort_pkg_json(e) {
                     var t = {}, r = Object.keys(e).sort();
-                    return [ ...R, ...r ].filter((function(e, t, o) {
+                    return [ ...N, ...r ].filter((function(e, t, o) {
                         return r.indexOf(e) > -1 && t === o.indexOf(e);
                     })).forEach((function(r) {
                         t[r] = e[r];
                     })), t;
                 }(p);
-                l(w, JSON.stringify(P, null, 2));
+                l(w, JSON.stringify(C, null, 2));
             }
         }));
     }
