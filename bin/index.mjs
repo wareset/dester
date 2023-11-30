@@ -68,10 +68,8 @@ var S = j(process.argv.slice(2), {
         types: "types",
         watch: !1,
         min: !1,
-        ie: !1,
         takeout: !1
     },
-    number: [ "ie" ],
     string: [ "dir", "src", "out", "types" ],
     boolean: [ "help", "watch", "min", "takeout" ],
     alias: {
@@ -175,7 +173,7 @@ var S = j(process.argv.slice(2), {
             objectShorthand: !1,
             reservedNamesAsProps: !0,
             symbols: !1
-        }, B = {}, T = g([ ".mjs", ".js" ].map((function(t, n) {
+        }, T = {}, B = g([ ".mjs", ".js" ].map((function(t, n) {
             return {
                 output: {
                     exports: "named",
@@ -215,19 +213,11 @@ var S = j(process.argv.slice(2), {
                         }
                         return null;
                     }
-                }, (i = S.ie, {
+                }, (S.ie, {
                     name: "babel-custom",
                     async transform(e) {
                         try {
                             e = (await _(e, {
-                                presets: [ [ "@babel/preset-env", {
-                                    corejs: 3,
-                                    loose: !0,
-                                    bugfixes: !0,
-                                    modules: !1,
-                                    useBuiltIns: "entry",
-                                    targets: "> 1%, not dead" + (i ? ", ie " + (+i > 8 ? +i : 11) : "")
-                                } ] ],
                                 plugins: [ "@babel/plugin-transform-runtime", [ "@babel/plugin-transform-block-scoping", {
                                     throwIfClosureRequired: !0
                                 } ], [ "@babel/plugin-transform-destructuring" ] ]
@@ -280,7 +270,7 @@ var S = j(process.argv.slice(2), {
                     renderChunk(t, s) {
                         if (!n) {
                             var i = s.fileName, a = s.facadeModuleId, l = s.exports;
-                            B[i] = {
+                            T[i] = {
                                 facadeModuleId: a,
                                 exports: l
                             };
@@ -294,14 +284,14 @@ var S = j(process.argv.slice(2), {
                     }
                 } ]
             };
-            var s, i;
+            var s;
         }))).on("change", (function(e, t) {
             e === w && getExternals(), "update" !== t.event && (j = null, console.log(t.event + ": " + e));
         })).on("event", (function(e) {
             if ("ERROR" === e.code) console.error(e); else if ("END" === e.code) {
-                S.watch ? console.log("\n...WATCH...\n") : T.close(), console.log("");
-                var s = B;
-                if (B = {}, J === (J = JSON.stringify(s))) return;
+                S.watch ? console.log("\n...WATCH...\n") : B.close(), console.log("");
+                var s = T;
+                if (T = {}, J === (J = JSON.stringify(s))) return;
                 var p = JSON.parse(a(w, "utf8"));
                 delete p.main, delete p.module, delete p.types;
                 var m = {};

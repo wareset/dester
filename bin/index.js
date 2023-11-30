@@ -45,10 +45,8 @@ var j = u(process.argv.slice(2), {
         types: "types",
         watch: !1,
         min: !1,
-        ie: !1,
         takeout: !1
     },
-    number: [ "ie" ],
     string: [ "dir", "src", "out", "types" ],
     boolean: [ "help", "watch", "min", "takeout" ],
     alias: {
@@ -152,7 +150,7 @@ var j = u(process.argv.slice(2), {
             objectShorthand: !1,
             reservedNamesAsProps: !0,
             symbols: !1
-        }, I = {}, D = s.watch([ ".mjs", ".js" ].map((function(t, o) {
+        }, D = {}, I = s.watch([ ".mjs", ".js" ].map((function(t, o) {
             return {
                 output: {
                     exports: "named",
@@ -192,19 +190,11 @@ var j = u(process.argv.slice(2), {
                         }
                         return null;
                     }
-                }, (u = j.ie, {
+                }, (j.ie, {
                     name: "babel-custom",
                     async transform(e) {
                         try {
                             e = (await l.transformAsync(e, {
-                                presets: [ [ "@babel/preset-env", {
-                                    corejs: 3,
-                                    loose: !0,
-                                    bugfixes: !0,
-                                    modules: !1,
-                                    useBuiltIns: "entry",
-                                    targets: "> 1%, not dead" + (u ? ", ie " + (+u > 8 ? +u : 11) : "")
-                                } ] ],
                                 plugins: [ "@babel/plugin-transform-runtime", [ "@babel/plugin-transform-block-scoping", {
                                     throwIfClosureRequired: !0
                                 } ], [ "@babel/plugin-transform-destructuring" ] ]
@@ -257,7 +247,7 @@ var j = u(process.argv.slice(2), {
                     renderChunk(t, n) {
                         if (!o) {
                             var s = n.fileName, i = n.facadeModuleId, a = n.exports;
-                            I[s] = {
+                            D[s] = {
                                 facadeModuleId: i,
                                 exports: a
                             };
@@ -271,14 +261,14 @@ var j = u(process.argv.slice(2), {
                     }
                 } ]
             };
-            var s, u;
+            var s;
         }))).on("change", (function(e, r) {
             e === f && getExternals(), "update" !== r.event && (m = null, console.log(r.event + ": " + e));
         })).on("event", (function(e) {
             if ("ERROR" === e.code) console.error(e); else if ("END" === e.code) {
-                j.watch ? console.log("\n...WATCH...\n") : D.close(), console.log("");
-                var n = I;
-                if (I = {}, R === (R = JSON.stringify(n))) return;
+                j.watch ? console.log("\n...WATCH...\n") : I.close(), console.log("");
+                var n = D;
+                if (D = {}, R === (R = JSON.stringify(n))) return;
                 var o = JSON.parse(t.readFileSync(f, "utf8"));
                 delete o.main, delete o.module, delete o.types;
                 var s = {};

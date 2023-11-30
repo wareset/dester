@@ -50,7 +50,6 @@
     "@babel/plugin-transform-runtime": "^7.23.3",
     "@babel/plugin-transform-block-scoping": "^7.23.3",
     "@babel/plugin-transform-destructuring": "^7.23.3",
-    "@babel/preset-env": "^7.23.3",
     "@babel/runtime": "^7.23.2",
     "@rollup/plugin-commonjs": "^25.0.4",
     "@rollup/plugin-inject": "^5.0.3",

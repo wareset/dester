@@ -124,11 +124,11 @@ const argv = minimist(process.argv.slice(2), {
 
     min: false,
 
-    ie: false,
+    // ie: false,
     
     takeout: false,
   },
-  number : ['ie'],
+  // number : ['ie'],
   string : ['dir', 'src', 'out', 'types'],
   boolean: ['help', 'watch', 'min', 'takeout'],
   alias  : {
