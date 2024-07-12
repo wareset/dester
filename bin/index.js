@@ -36,7 +36,7 @@ function printError(r) {
     throw console.log(e.bgRed(e.black("ERROR: " + r))), process.kill(0), r;
 }
 
-var j = u(process.argv.slice(2), {
+var k = u(process.argv.slice(2), {
     default: {
         help: !1,
         dir: "",
@@ -59,13 +59,13 @@ var j = u(process.argv.slice(2), {
 });
 
 !function() {
-    if (console.log(g), j.help) console.log("help"); else {
-        if (j.watch && console.clear(), console.log("rollup: v" + s.VERSION), console.log("babel:  v" + l.version), 
-        console.log(""), j.dir = r.resolve(j.dir), j.src = r.resolve(j.dir, j.src), j.out = r.resolve(j.dir, j.out), 
-        console.log(e.bgGreen(e.black(e.bold("dir: ") + j.dir))), console.log(e.bgGreen(e.black(e.bold("src: ") + j.src))), 
-        console.log(e.bgGreen(e.black(e.bold("out: ") + j.out))), console.log(""), !j.out.startsWith(j.dir)) return printError("dir OUT must be in dir DIR");
-        var n, u, m, f = r.resolve(j.dir, "package.json");
-        if (!t.existsSync(f)) return printError("package.json not found in " + j.dir);
+    if (console.log(g), k.help) console.log("help"); else {
+        if (k.watch && console.clear(), console.log("rollup: v" + s.VERSION), console.log("babel:  v" + l.version), 
+        console.log(""), k.dir = r.resolve(k.dir), k.src = r.resolve(k.dir, k.src), k.out = r.resolve(k.dir, k.out), 
+        console.log(e.bgGreen(e.black(e.bold("dir: ") + k.dir))), console.log(e.bgGreen(e.black(e.bold("src: ") + k.src))), 
+        console.log(e.bgGreen(e.black(e.bold("out: ") + k.out))), console.log(""), !k.out.startsWith(k.dir)) return printError("dir OUT must be in dir DIR");
+        var n, u, m, f = r.resolve(k.dir, "package.json");
+        if (!t.existsSync(f)) return printError("package.json not found in " + k.dir);
         function getExternals() {
             var e = JSON.parse(t.readFileSync(f, "utf8")), r = e.dependencies || {}, o = e.peerDependencies || {};
             n = function unique(e) {
@@ -73,9 +73,9 @@ var j = u(process.argv.slice(2), {
             }([ ...Object.keys(process.binding("natives")), ...Object.keys(r), ...Object.keys(o) ]).map((e => new RegExp(`^${e}($|/|\\\\)`)));
         }
         if (console.log(e.bgMagenta(e.black(e.bold("package.json: ") + f))), console.log(""), 
-        getExternals(), j.types) {
-            if ("string" != typeof j.types && (j.types = "types"), j.types = r.resolve(j.dir, j.types), 
-            console.log(e.bgGreen(e.black(e.bold("types: ") + j.types))), !j.types.startsWith(j.dir)) return console.log(e.bgRed(e.black("ERROR:"))), 
+        getExternals(), k.types) {
+            if ("string" != typeof k.types && (k.types = "types"), k.types = r.resolve(k.dir, k.types), 
+            console.log(e.bgGreen(e.black(e.bold("types: ") + k.types))), !k.types.startsWith(k.dir)) return console.log(e.bgRed(e.black("ERROR:"))), 
             printError("dir TYPES must be in dir DIR");
             if (u = function getTSC() {
                 var r, t = e.bgBlue(e.black(e.bold("tsc: ")));
@@ -89,13 +89,13 @@ var j = u(process.argv.slice(2), {
                 }
                 return r;
             }()) {
-                var k = r.resolve(j.dir, ".dester.tsconfig.json"), w = {};
-                if (t.existsSync(k)) try {
-                    w = JSON.parse(t.readFileSync(k)).compilerOptions || {};
+                var j = r.resolve(k.dir, ".dester.tsconfig.json"), w = {};
+                if (t.existsSync(j)) try {
+                    w = JSON.parse(t.readFileSync(j)).compilerOptions || {};
                 } catch {}
                 var S = {
-                    include: [ toPosix(r.resolve(j.src, "**/*")) ],
-                    exclude: [ toPosix(r.resolve(j.src, "**/node_modules")), toPosix(r.resolve(j.src, "**/_*")), toPosix(r.resolve(j.src, "**/*.test.*")), toPosix(r.resolve(j.src, "**/*.tests.*")) ],
+                    include: [ toPosix(r.resolve(k.src, "**/*")) ],
+                    exclude: [ toPosix(r.resolve(k.src, "**/node_modules")), toPosix(r.resolve(k.src, "**/_*")), toPosix(r.resolve(k.src, "**/*.test.*")), toPosix(r.resolve(k.src, "**/*.tests.*")) ],
                     compilerOptions: {
                         ...w,
                         target: "esnext",
@@ -109,12 +109,14 @@ var j = u(process.argv.slice(2), {
                         emitDecoratorMetadata: !0,
                         experimentalDecorators: !0,
                         allowSyntheticDefaultImports: !0,
-                        outDir: toPosix(j.types)
+                        outDir: toPosix(k.types),
+                        skipDefaultLibCheck: !0,
+                        skipLibCheck: !0
                     }
                 };
-                t.writeFileSync(k, JSON.stringify(S, null, 2));
-                var O = o.spawn(u, [ "--build", k, ...j.watch ? [ "--watch" ] : [] ], {
-                    cwd: j.src,
+                t.writeFileSync(j, JSON.stringify(S, null, 2));
+                var O = o.spawn(u, [ "--build", j, ...k.watch ? [ "--watch" ] : [] ], {
+                    cwd: k.src,
                     shell: !0
                 });
                 O.stdout.on("data", (function(r) {
@@ -130,8 +132,8 @@ var j = u(process.argv.slice(2), {
         }
         function getChunks() {
             if (!m) {
-                var e = getInputValidFiles(j.src).map((function(e) {
-                    var t = r.parse(r.relative(j.src, e)), n = t.dir, o = t.name;
+                var e = getInputValidFiles(k.src).map((function(e) {
+                    var t = r.parse(r.relative(k.src, e)), n = t.dir, o = t.name;
                     return {
                         id: e,
                         fileName: r.join(n, "index" === o ? o : r.join(o, "index"))
@@ -155,7 +157,7 @@ var j = u(process.argv.slice(2), {
                 output: {
                     exports: "named",
                     format: ".js" === t ? "commonjs" : "esm",
-                    dir: j.out,
+                    dir: k.out,
                     chunkFileNames: "_includes/[name]" + t,
                     generatedCode: N
                 },
@@ -165,7 +167,7 @@ var j = u(process.argv.slice(2), {
                 plugins: [ {
                     name: "chunks",
                     buildStart() {
-                        m || getChunks(), o || (this.addWatchFile(j.src), this.addWatchFile(f));
+                        m || getChunks(), o || (this.addWatchFile(k.src), this.addWatchFile(f));
                         for (var e = m.length; e-- > 0; ) this.emitFile({
                             type: "chunk",
                             id: m[e].id,
@@ -190,7 +192,7 @@ var j = u(process.argv.slice(2), {
                         }
                         return null;
                     }
-                }, (j.ie, {
+                }, (k.ie, {
                     name: "babel-custom",
                     async transform(e) {
                         try {
@@ -206,7 +208,7 @@ var j = u(process.argv.slice(2), {
                             code: e
                         };
                     }
-                }), ...j.takeout ? [ c(y), c(h), {
+                }), ...k.takeout ? [ c(y), c(h), {
                     name: v,
                     resolveId: e => e.startsWith(v) ? {
                         id: e,
@@ -215,7 +217,7 @@ var j = u(process.argv.slice(2), {
                     load: e => e.startsWith(v) ? `const v = ${e.slice(14)}; export default v` : null
                 } ] : [], a({
                     extensions: [ ".mjs", ".js", ".jsx", ".mts", ".ts", ".tsx", ".json" ]
-                }), i(), (s = j.min, {
+                }), i(), (s = k.min, {
                     name: "terser-custom",
                     async renderChunk(e) {
                         try {
@@ -224,7 +226,9 @@ var j = u(process.argv.slice(2), {
                                 mangle: !0,
                                 module: !0,
                                 toplevel: !0,
-                                compress: !0,
+                                compress: {
+                                    drop_debugger: !1
+                                },
                                 ...s ? {
                                     keep_classnames: _,
                                     keep_fnames: _
@@ -252,7 +256,7 @@ var j = u(process.argv.slice(2), {
                                 exports: a
                             };
                             try {
-                                i && console.log(e.green("BUILD: " + r.relative(j.src, i) + " => " + r.relative(j.dir, r.join(j.out, s))));
+                                i && console.log(e.green("BUILD: " + r.relative(k.src, i) + " => " + r.relative(k.dir, r.join(k.out, s))));
                             } catch (l) {
                                 console.error(l);
                             }
@@ -266,37 +270,37 @@ var j = u(process.argv.slice(2), {
             e === f && getExternals(), "update" !== r.event && (m = null, console.log(r.event + ": " + e));
         })).on("event", (function(e) {
             if ("ERROR" === e.code) console.error(e); else if ("END" === e.code) {
-                j.watch ? console.log("\n...WATCH...\n") : I.close(), console.log("");
+                k.watch ? console.log("\n...WATCH...\n") : I.close(), console.log("");
                 var n = D;
                 if (D = {}, R === (R = JSON.stringify(n))) return;
                 var o = JSON.parse(t.readFileSync(f, "utf8"));
                 delete o.main, delete o.module, delete o.types;
                 var s = {};
-                if (o.files) for (var i of o.files) i = r.relative(j.dir, r.join(j.dir, i)), /^\.?[\\/]/.test(i) && printError(i), 
+                if (o.files) for (var i of o.files) i = r.relative(k.dir, r.join(k.dir, i)), /^\.?[\\/]/.test(i) && printError(i), 
                 s[i = i.split(/[\\/]/)[0]] = !0;
                 var a, l, c, p, d, m, g, v = {}, y = {};
-                for (var h in n) l = null, a = n[h].facadeModuleId, s[(c = r.relative(j.dir, r.join(j.out, h))).split(/[\\/]/)[0]] = !0, 
+                for (var h in n) l = null, a = n[h].facadeModuleId, s[(c = r.relative(k.dir, r.join(k.out, h))).split(/[\\/]/)[0]] = !0, 
                 a && (p = "./" + toPosix(r.dirname(c)), (d = "index.mjs" === c) && (o.main = "index", 
                 o.module = "index.mjs", p = ".", s["index.js"] = s["index.mjs"] = !0), c = toPosix(c), 
                 v[p] = {
                     import: "./" + c,
                     require: "./" + c.slice(0, -3) + "js"
-                }, y[p] = n[h].exports, u && (l = toPosix((l = r.relative(j.dir, r.join(j.types, r.relative(j.src, a)))).replace(/\.([mc]?)[tj]s$/, ".d.$1ts")), 
+                }, y[p] = n[h].exports, u && (l = toPosix((l = r.relative(k.dir, r.join(k.types, r.relative(k.src, a)))).replace(/\.([mc]?)[tj]s$/, ".d.$1ts")), 
                 /\.d\.[mc]?ts$/.test(l) || printError("type: " + l), d && (o.types = l, s["index.d.ts"] = !0), 
                 v[p].types = "./" + l));
                 o.exports = {
                     "./package.json": "./package.json"
                 };
-                for (var _, x = Object.keys(v).sort(), k = 0; k < x.length; k++) if (_ = x[k], o.exports[_] = v[_], 
+                for (var _, x = Object.keys(v).sort(), j = 0; j < x.length; j++) if (_ = x[j], o.exports[_] = v[_], 
                 u) {
-                    var w = toPosix(r.relative(r.resolve(j.dir, r.dirname(v[_].import)), r.resolve(j.dir, v[_].types))).replace(/(\/index)?\.d\.\w+$/, "");
+                    var w = toPosix(r.relative(r.resolve(k.dir, r.dirname(v[_].import)), r.resolve(k.dir, v[_].types))).replace(/(\/index)?\.d\.\w+$/, "");
                     "." !== w[0] && (w = "./" + w);
                     var S = `export * from ${w = JSON.stringify(w)};\n`;
                     for (var O of y[_]) "default" === O ? S += `import { ${O} as __default__ } from ${w};\nexport { __default__ as default };\n` : "*" !== O[0] && (S += `export { ${O} } from ${w};\n`);
-                    t.writeFileSync(r.resolve(j.dir, _, "index.d.ts"), S);
+                    t.writeFileSync(r.resolve(k.dir, _, "index.d.ts"), S);
                 }
-                for (var N in o.files = [], u && (s[g = r.relative(j.dir, j.types).split(/[\\/]/)[0]] = !0), 
-                s) u && "index.d.ts" === N ? o.files.push(N) : u && g && g === N ? o.files.push(N + "/**/*") : t.existsSync(m = r.join(j.dir, N)) && (
+                for (var N in o.files = [], u && (s[g = r.relative(k.dir, k.types).split(/[\\/]/)[0]] = !0), 
+                s) u && "index.d.ts" === N ? o.files.push(N) : u && g && g === N ? o.files.push(N + "/**/*") : t.existsSync(m = r.join(k.dir, N)) && (
                 //! FIX FOR NPM
                 t.lstatSync(m).isDirectory() && (N += "/**/*"), o.files.push(N));
                 o.files.sort();

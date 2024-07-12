@@ -251,6 +251,8 @@ const argv = minimist(process.argv.slice(2), {
             // rootDir                     : toPosix(argv.src),
             // baseUrl                     : toPosix(argv.src),
             outDir                      : toPosix(argv.types),
+            skipDefaultLibCheck         : true,
+            skipLibCheck                : true
             // declarationDir              : toPosix(argv.types),
           }
         }

@@ -8,23 +8,25 @@ export default function terserPlugin(minify) {
     name: 'terser-custom',
     async renderChunk(code) {
       try {
-        code = (await terser(code, {
-          safari10: true,
-          mangle  : true,
-          module  : true,
-          toplevel: true,
-          compress: true,
-          ...minify
-            ? {
-              keep_classnames: KEEP_FNAMES,
-              keep_fnames    : KEEP_FNAMES,
-            }
-            : {
-              keep_classnames: true,
-              keep_fnames    : true,
-              format         : { beautify: true },
-            }
-        })).code
+        code = (
+          await terser(code, {
+            safari10: true,
+            mangle: true,
+            module: true,
+            toplevel: true,
+            compress: { drop_debugger: false },
+            ...(minify
+              ? {
+                  keep_classnames: KEEP_FNAMES,
+                  keep_fnames: KEEP_FNAMES
+                }
+              : {
+                  keep_classnames: true,
+                  keep_fnames: true,
+                  format: { beautify: true }
+                })
+          })
+        ).code
       } catch (e) {
         console.error('terser-custom')
         console.error(e)

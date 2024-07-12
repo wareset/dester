@@ -112,15 +112,15 @@ var S = j(process.argv.slice(2), {
                 }
                 return t;
             }()) {
-                var P = t(S.dir, ".dester.tsconfig.json"), C = {};
-                if (i(P)) try {
-                    C = JSON.parse(a(P)).compilerOptions || {};
+                var C = t(S.dir, ".dester.tsconfig.json"), P = {};
+                if (i(C)) try {
+                    P = JSON.parse(a(C)).compilerOptions || {};
                 } catch {}
                 var M = {
                     include: [ toPosix(t(S.src, "**/*")) ],
                     exclude: [ toPosix(t(S.src, "**/node_modules")), toPosix(t(S.src, "**/_*")), toPosix(t(S.src, "**/*.test.*")), toPosix(t(S.src, "**/*.tests.*")) ],
                     compilerOptions: {
-                        ...C,
+                        ...P,
                         target: "esnext",
                         module: "esnext",
                         moduleResolution: "node",
@@ -132,11 +132,13 @@ var S = j(process.argv.slice(2), {
                         emitDecoratorMetadata: !0,
                         experimentalDecorators: !0,
                         allowSyntheticDefaultImports: !0,
-                        outDir: toPosix(S.types)
+                        outDir: toPosix(S.types),
+                        skipDefaultLibCheck: !0,
+                        skipLibCheck: !0
                     }
                 };
-                l(P, JSON.stringify(M, null, 2));
-                var F = m(d, [ "--build", P, ...S.watch ? [ "--watch" ] : [] ], {
+                l(C, JSON.stringify(M, null, 2));
+                var F = m(d, [ "--build", C, ...S.watch ? [ "--watch" ] : [] ], {
                     cwd: S.src,
                     shell: !0
                 });
@@ -247,7 +249,9 @@ var S = j(process.argv.slice(2), {
                                 mangle: !0,
                                 module: !0,
                                 toplevel: !0,
-                                compress: !0,
+                                compress: {
+                                    drop_debugger: !1
+                                },
                                 ...s ? {
                                     keep_classnames: I,
                                     keep_fnames: I
@@ -317,12 +321,12 @@ var S = j(process.argv.slice(2), {
                     for (var E of k[O]) "default" === E ? I += `import { ${E} as __default__ } from ${$};\nexport { __default__ as default };\n` : "*" !== E[0] && (I += `export { ${E} } from ${$};\n`);
                     l(t(S.dir, O, "index.d.ts"), I);
                 }
-                for (var P in p.files = [], d && (m[v = r(S.dir, S.types).split(/[\\/]/)[0]] = !0), 
-                m) d && "index.d.ts" === P ? p.files.push(P) : d && v && v === P ? p.files.push(P + "/**/*") : i(y = o(S.dir, P)) && (
+                for (var C in p.files = [], d && (m[v = r(S.dir, S.types).split(/[\\/]/)[0]] = !0), 
+                m) d && "index.d.ts" === C ? p.files.push(C) : d && v && v === C ? p.files.push(C + "/**/*") : i(y = o(S.dir, C)) && (
                 //! FIX FOR NPM
-                c(y).isDirectory() && (P += "/**/*"), p.files.push(P));
+                c(y).isDirectory() && (C += "/**/*"), p.files.push(C));
                 p.files.sort();
-                var C = function sort_pkg_json(e) {
+                var P = function sort_pkg_json(e) {
                     var t = {}, r = Object.keys(e).sort();
                     return [ ...N, ...r ].filter((function(e, t, o) {
                         return r.indexOf(e) > -1 && t === o.indexOf(e);
@@ -330,7 +334,7 @@ var S = j(process.argv.slice(2), {
                         t[r] = e[r];
                     })), t;
                 }(p);
-                l(w, JSON.stringify(C, null, 2));
+                l(w, JSON.stringify(P, null, 2));
             }
         }));
     }
