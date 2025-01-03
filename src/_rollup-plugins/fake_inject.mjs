@@ -2,8 +2,8 @@ import rollupInject from '@rollup/plugin-inject'
 // TODO
 const NAME = 'dester-inject-'
 
-const injectMethods = {}
-const injectObjects = {}
+const injectMethods = { sourceMap: false }
+const injectObjects = { sourceMap: false }
 ;(function (listFns, listOther) {
   for (let a = Object.getOwnPropertyNames(Object.prototype),
     i = a.length; i-- > 0;) {

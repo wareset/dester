@@ -1,6 +1,6 @@
 {
   "name": "dester",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "wip: CLI js/ts lib-builder that uses Rollup, Babel and TypeScript/Sucrase",
   "keywords": [
     "dester"
@@ -15,6 +15,9 @@
     "url": "git+https://github.com/wareset/dester.git"
   },
   "author": "rease <cftcview@gmail.com>",
+  "main": "bin/index",
+  "module": "bin/index.mjs",
+  "types": "types/index.d.mts",
   "files": [
     "README.md",
     "bin/**/*",
@@ -23,7 +26,7 @@
   ],
   "exports": {
     "./package.json": "./package.json",
-    "./bin": {
+    ".": {
       "import": "./bin/index.mjs",
       "require": "./bin/index.js",
       "types": "./types/index.d.mts"
@@ -38,7 +41,7 @@
     "clear": "rm -rf -- bin/* && rm -rf -- types/*"
   },
   "peerDependencies": {
-    "typescript": "^5.2.2"
+    "typescript": "5.7.2"
   },
   "peerDependenciesMeta": {
     "typescript": {
@@ -51,14 +54,14 @@
     "@babel/plugin-transform-destructuring": "^7.23.3",
     "@babel/plugin-transform-runtime": "^7.23.6",
     "@babel/runtime": "^7.23.6",
-    "@rollup/plugin-commonjs": "^25.0.4",
-    "@rollup/plugin-inject": "^5.0.3",
-    "@rollup/plugin-json": "^6.0.0",
-    "@rollup/plugin-node-resolve": "^15.2.1",
+    "@rollup/plugin-commonjs": "^28.0.2",
+    "@rollup/plugin-inject": "^5.0.5",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^16.0.0",
     "kleur": "^4.1.5",
     "minimist": "^1.2.8",
     "rollup": "3.29.4",
-    "sucrase": "^3.34.0",
-    "terser": "^5.19.4"
+    "sucrase": "^3.35.0",
+    "terser": "^5.37.0"
   }
 }

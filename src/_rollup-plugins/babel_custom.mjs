@@ -8,6 +8,7 @@ export default function babelPlugin(ie) {
       try {
         code = (
           await babel(code, {
+            sourceMaps: false,
             // presets: [
             //   [
             //     '@babel/preset-env',

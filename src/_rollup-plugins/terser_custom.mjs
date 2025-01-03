@@ -10,6 +10,7 @@ export default function terserPlugin(minify) {
       try {
         code = (
           await terser(code, {
+            sourceMap: false,
             safari10: true,
             mangle: true,
             module: true,

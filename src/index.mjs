@@ -24,14 +24,12 @@ import {
 import { createRequire } from 'module'
 import {
   spawn as child_process_spawn,
-  spawnSync as child_process_spawnSync
+  spawnSync as child_process_spawnSync,
 } from 'child_process'
 
 import kleur from 'kleur'
 
-const REQUIRE = typeof require !== 'undefined'
-  ? require
-  : createRequire(import.meta.url)
+const REQUIRE = typeof require !== 'undefined' ? require : createRequire(import.meta.url)
 
 function getTSC() {
   let tsc
@@ -46,7 +44,7 @@ function getTSC() {
 
     child_process_spawnSync(tsc, ['-v'], {
       stdio: ['ignore', 'inherit', 'inherit'],
-      shell: true
+      shell: true,
     })
   } catch {
     console.warn(title + kleur.bgRed(kleur.black('not found')))
@@ -89,7 +87,7 @@ function getInputValidFiles(dir) {
 
   const a = fs_readdirSync(dir, { withFileTypes: true })
 
-  for (let dirent, file, i = a.length; i-- > 0;) {
+  for (let dirent, file, i = a.length; i-- > 0; ) {
     dirent = a[i]
     if (/^[^._]/.test(dirent.name) && !/\.tests?($|\.)/i.test(dirent.name)) {
       file = path_join(dir, dirent.name)
@@ -125,23 +123,23 @@ const argv = minimist(process.argv.slice(2), {
     min: false,
 
     // ie: false,
-    
+
     takeout: false,
   },
   // number : ['ie'],
-  string : ['dir', 'src', 'out', 'types'],
+  string: ['dir', 'src', 'out', 'types'],
   boolean: ['help', 'watch', 'min', 'takeout'],
-  alias  : {
+  alias: {
     h: 'help',
     d: 'dir',
     t: 'types',
     w: 'watch',
-    m: 'min'
-  }
+    m: 'min',
+  },
 })
 
 // console.log(argv)
-;(function() {
+;(function () {
   console.log(LOGO)
   if (argv.help) {
     // TODO help
@@ -157,19 +155,19 @@ const argv = minimist(process.argv.slice(2), {
     argv.dir = path_resolve(argv.dir)
     argv.src = path_resolve(argv.dir, argv.src)
     argv.out = path_resolve(argv.dir, argv.out)
-    
+
     console.log(kleur.bgGreen(kleur.black(kleur.bold('dir: ') + argv.dir)))
     console.log(kleur.bgGreen(kleur.black(kleur.bold('src: ') + argv.src)))
     console.log(kleur.bgGreen(kleur.black(kleur.bold('out: ') + argv.out)))
     console.log('')
-  
+
     if (!argv.out.startsWith(argv.dir)) {
       return printError('dir OUT must be in dir DIR')
     }
     /**
      * /GET_FOLDERS
      */
-  
+
     /**
      * <CHECK_PACKAGE_JSON
      */
@@ -184,22 +182,21 @@ const argv = minimist(process.argv.slice(2), {
     // eslint-disable-next-line no-inner-declarations
     function getExternals() {
       const json = JSON.parse(fs_readFileSync(pkgjson, 'utf8'))
-        
+
       const dependencies = json.dependencies || {}
       const peerDependencies = json.peerDependencies || {}
-  
+
       externals = unique([
         ...Object.keys(process.binding('natives')),
         ...Object.keys(dependencies),
-        ...Object.keys(peerDependencies)
-      ])
-        .map((v) => new RegExp(`^${v}($|/|\\\\)`))
+        ...Object.keys(peerDependencies),
+      ]).map((v) => new RegExp(`^${v}($|/|\\\\)`))
     }
     getExternals()
     /**
      * /CHECK_PACKAGE_JSON
      */
-  
+
     /**
      * <TYPESCRIPT_CREATE_TYPES
      */
@@ -209,13 +206,13 @@ const argv = minimist(process.argv.slice(2), {
       argv.types = path_resolve(argv.dir, argv.types)
 
       console.log(kleur.bgGreen(kleur.black(kleur.bold('types: ') + argv.types)))
-  
+
       if (!argv.types.startsWith(argv.dir)) {
         console.log(kleur.bgRed(kleur.black('ERROR:')))
         return printError('dir TYPES must be in dir DIR')
       }
-  
-      if (tsc = getTSC()) {
+
+      if ((tsc = getTSC())) {
         const tsconfigPath = path_resolve(argv.dir, '.dester.tsconfig.json')
 
         let tsconfigCompilerOptions = {}
@@ -232,33 +229,33 @@ const argv = minimist(process.argv.slice(2), {
             toPosix(path_resolve(argv.src, '**/node_modules')),
             toPosix(path_resolve(argv.src, '**/_*')),
             toPosix(path_resolve(argv.src, '**/*.test.*')),
-            toPosix(path_resolve(argv.src, '**/*.tests.*'))
+            toPosix(path_resolve(argv.src, '**/*.tests.*')),
           ],
           compilerOptions: {
             ...tsconfigCompilerOptions,
-            target                      : 'esnext',
-            module                      : 'esnext',
-            moduleResolution            : 'node',
-            allowJs                     : true,
-            declaration                 : true,
-            emitDeclarationOnly         : true,
-            esModuleInterop             : true,
-            resolveJsonModule           : true,
-            emitDecoratorMetadata       : true,
-            experimentalDecorators      : true,
+            target: 'esnext',
+            module: 'esnext',
+            moduleResolution: 'node',
+            allowJs: true,
+            declaration: true,
+            emitDeclarationOnly: true,
+            esModuleInterop: true,
+            resolveJsonModule: true,
+            emitDecoratorMetadata: true,
+            experimentalDecorators: true,
             allowSyntheticDefaultImports: true,
             // forceConsistentCasingInFileNames: true,
             // rootDir                     : toPosix(argv.src),
             // baseUrl                     : toPosix(argv.src),
-            outDir                      : toPosix(argv.types),
-            skipDefaultLibCheck         : true,
-            skipLibCheck                : true
+            outDir: toPosix(argv.types),
+            skipDefaultLibCheck: true,
+            skipLibCheck: true,
             // declarationDir              : toPosix(argv.types),
-          }
+          },
         }
 
         fs_writeFileSync(tsconfigPath, JSON.stringify(tsconfig, null, 2))
-      
+
         const tscProcess = child_process_spawn(
           tsc,
           [
@@ -266,48 +263,50 @@ const argv = minimist(process.argv.slice(2), {
 
             // '--force',
 
-            ...argv.watch ? ['--watch'] : [],
-              
+            ...(argv.watch ? ['--watch'] : []),
+
             // ...['--target', 'esnext'],
             // ...['--module', 'esnext'],
             // ...['--moduleResolution', 'node'],
-              
+
             // '--noEmit',
             // '--allowJs',
             // '--declaration',
             // '--emitDeclarationOnly',
-  
+
             // '--esModuleInterop',
             // '--resolveJsonModule',
             // '--emitDecoratorMetadata',
             // '--experimentalDecorators',
             // '--allowSyntheticDefaultImports',
-  
+
             // ...['--rootDir', argv.src],
             // ...['--baseUrl', argv.src],
             // ...['--outDir', argv.types],
             // ...['--declarationDir', argv.types],
           ],
           {
-            cwd  : argv.src,
+            cwd: argv.src,
             // stdio: ['ignore', 'inherit', 'inherit'],
-            shell: true
+            shell: true,
           }
         )
-  
-        tscProcess.stdout.on('data', function(data) {
+
+        tscProcess.stdout.on('data', function (data) {
           data = data.toString().trim()
           console.log('\n' + kleur.bgBlue(kleur.black('tsc: ')))
           console.dir(data)
         })
-        tscProcess.stderr.on('data', function(data) {
+        tscProcess.stderr.on('data', function (data) {
           data = data.toString().trim()
           console.log('\n' + kleur.bgRed(kleur.black('tsc: ')))
           console.dir(data)
         })
-  
+
         // eslint-disable-next-line func-style
-        const tscExit = function() { tscProcess.kill(0) }
+        const tscExit = function () {
+          tscProcess.kill(0)
+        }
         process.on('SIGTERM', tscExit)
         process.on('exit', tscExit)
       }
@@ -316,7 +315,7 @@ const argv = minimist(process.argv.slice(2), {
     /**
      * /TYPESCRIPT_CREATE_TYPES
      */
-  
+
     /**
      * <ROLLUP_WATCH
      */
@@ -324,120 +323,129 @@ const argv = minimist(process.argv.slice(2), {
     // eslint-disable-next-line no-inner-declarations
     function getChunks() {
       if (!chunks) {
-        const res = getInputValidFiles(argv.src)
-          .map(function(id) {
-            const { dir, name } = path_parse(path_relative(argv.src, id))
-            const fileName = path_join(dir, name === 'index' ? name : path_join(name, 'index'))
-            return { id, fileName }
-          })
-      
-        chunks = res.sort(function(a, b) {
+        const res = getInputValidFiles(argv.src).map(function (id) {
+          const { dir, name } = path_parse(path_relative(argv.src, id))
+          const fileName = path_join(dir, name === 'index' ? name : path_join(name, 'index'))
+          return { id, fileName }
+        })
+
+        chunks = res.sort(function (a, b) {
           return a.fileName.localeCompare(b.fileName)
         })
       }
     }
-  
+
     const generatedCode = {
-      preset              : 'es5',
-      arrowFunctions      : false,
-      constBindings       : true,
-      objectShorthand     : false,
+      preset: 'es5',
+      arrowFunctions: false,
+      constBindings: true,
+      objectShorthand: false,
       reservedNamesAsProps: true,
-      symbols             : false
+      symbols: false,
     }
-  
-    let _files = {}, _filesTmp
-    const watcher = rollup_watch([
-      '.mjs',
-      '.js'
-    ].map(function(extension, k) {
-      /** @type {import('rollup').RollupOptions[]} */
-      return {
-        output: {
-          exports       : 'named',
-          format        : extension === '.js' ? 'commonjs' : 'esm',
-          dir           : argv.out,
-          chunkFileNames: '_includes/[name]' + extension, // -[hash]
-          generatedCode,
-        },
-        external: function(id, importree) {
-          if (id.startsWith('node:')) return true
-          if (importree) {
-            // not package
-            if (/^\.?[/\\]|\\/.test(id)) return void 0
-            else return externals.length ? externals.some((v) => v.test(id)) : false
-          }
-        },
-        
-        // preserveEntrySignatures: 'strict',
 
-        // treeshake: {
-        //   preset                  : 'smallest',
-        //   moduleSideEffects       : false,
-        //   propertyReadSideEffects : false,
-        //   unknownGlobalSideEffects: false
-        // },
-
-        plugins: [
-          (function() {
-            return {
-              name: 'chunks',
-              buildStart() {
-                chunks || getChunks()
-                if (!k) {
-                  this.addWatchFile(argv.src)
-                  this.addWatchFile(pkgjson)
-                }
-                for (let i = chunks.length; i-- > 0;) {
-                  // if (!k) console.log(chunks[i])
-                  this.emitFile({
-                    type    : 'chunk',
-                    id      : chunks[i].id,
-                    fileName: chunks[i].fileName + extension,
-                    // preserveSignature: 'strict',
-                    generatedCode
-                  })
-                }
-              }
+    let _files = {},
+      _filesTmp
+    const watcher = rollup_watch(
+      ['.mjs', '.js'].map(function (extension, k) {
+        /** @type {import('rollup').RollupOptions[]} */
+        return {
+          output: {
+            exports: 'named',
+            format: extension === '.js' ? 'commonjs' : 'esm',
+            dir: argv.out,
+            chunkFileNames: '_includes/[name]' + extension, // -[hash]
+            generatedCode,
+          },
+          external: function (id, importree) {
+            if (id.startsWith('node:')) return true
+            if (importree) {
+              // not package
+              if (/^\.?[/\\]|\\/.test(id)) return void 0
+              else return externals.length ? externals.some((v) => v.test(id)) : false
             }
-          })(),
-          sucrase_custom(),
-          babel_custom(argv.ie), // ...argv.ie ? [babel_custom(argv.ie)] : [],
-          ...argv.takeout ? fake_inject() : [],
-          resolve({ extensions: ['.mjs', '.js', '.jsx', '.mts', '.ts', '.tsx', '.json'] }),
-          commonjs(),
-          terser_custom(argv.min),
-          {
-            renderChunk(code, id) {
-              if (!k) {
-                const { fileName, facadeModuleId, exports } = id
-                // console.log(111, exports)
-                _files[fileName] = { facadeModuleId, exports }
+          },
 
-                try {
-                  if (facadeModuleId) {
-                    console.log(kleur.green('BUILD: ' + path_relative(argv.src, facadeModuleId) + ' => ' + path_relative(argv.dir, path_join(argv.out, fileName))))
+          // preserveEntrySignatures: 'strict',
+
+          // treeshake: {
+          //   preset                  : 'smallest',
+          //   moduleSideEffects       : false,
+          //   propertyReadSideEffects : false,
+          //   unknownGlobalSideEffects: false
+          // },
+
+          plugins: [
+            (function () {
+              return {
+                name: 'chunks',
+                buildStart() {
+                  chunks || getChunks()
+                  if (!k) {
+                    this.addWatchFile(argv.src)
+                    this.addWatchFile(pkgjson)
                   }
-                } catch (e) {
-                  console.error(e)
-                }
+                  for (let i = chunks.length; i-- > 0; ) {
+                    // if (!k) console.log(chunks[i])
+                    this.emitFile({
+                      type: 'chunk',
+                      id: chunks[i].id,
+                      fileName: chunks[i].fileName + extension,
+                      // preserveSignature: 'strict',
+                      generatedCode,
+                    })
+                  }
+                },
               }
-  
-              return '/* eslint-disable */\n' + code
-            }
-          }
-        ],
-      }
-    }))
-      .on('change', function(id, data) {
+            })(),
+            sucrase_custom(),
+            babel_custom(argv.ie), // ...argv.ie ? [babel_custom(argv.ie)] : [],
+            ...(argv.takeout ? fake_inject() : []),
+            resolve({
+              preferBuiltins: false,
+              extensions: ['.mjs', '.js', '.jsx', '.mts', '.ts', '.tsx', '.json'],
+            }),
+            commonjs({ sourceMap: false }),
+            terser_custom(argv.min),
+            {
+              renderChunk(code, id) {
+                if (!k) {
+                  const { fileName, facadeModuleId, exports } = id
+                  // console.log(111, exports)
+                  _files[fileName] = { facadeModuleId, exports }
+
+                  try {
+                    if (facadeModuleId) {
+                      console.log(
+                        kleur.green(
+                          'BUILD: ' +
+                            path_relative(argv.src, facadeModuleId) +
+                            ' => ' +
+                            path_relative(argv.dir, path_join(argv.out, fileName))
+                        )
+                      )
+                    }
+                  } catch (e) {
+                    console.error(e)
+                  }
+                }
+
+                return '/* eslint-disable */\n' + code
+              },
+            },
+          ],
+        }
+      })
+    )
+      .on('change', function (id, data) {
         if (id === pkgjson) getExternals()
-          
+
         if (data.event !== 'update') {
           chunks = null
           console.log(data.event + ': ' + id)
         }
       })
-      .on('event', function(data) {
+      .on('event', function (data) {
         if (data.code === 'ERROR') {
           console.error(data)
         } else if (data.code === 'END') {
@@ -445,12 +453,15 @@ const argv = minimist(process.argv.slice(2), {
           else console.log('\n...WATCH...\n')
           console.log('')
 
-          const files = _files; _files = {}
+          const files = _files
+          _files = {}
 
           if (_filesTmp === (_filesTmp = JSON.stringify(files))) return
 
           const pkg = JSON.parse(fs_readFileSync(pkgjson, 'utf8'))
-          delete pkg.main; delete pkg.module; delete pkg.types
+          delete pkg.main
+          delete pkg.module
+          delete pkg.types
 
           const filesOBJ = {}
           if (pkg.files) {
@@ -475,32 +486,37 @@ const argv = minimist(process.argv.slice(2), {
             filesOBJ[input.split(/[\\/]/)[0]] = true
 
             if (src) {
-              dirname = './' + toPosix(path_dirname(input))
-              if (isMain = input === 'index.mjs') {
-                pkg.main = 'index', pkg.module = 'index.mjs'
+              // dirname = './' + toPosix(path_dirname(input))
+              dirname = './' + toPosix(path_dirname(path_relative(argv.dir, fileName)))
+              if ((isMain = dirname === './.')) {
                 dirname = '.'
-                filesOBJ['index.js'] = filesOBJ['index.mjs'] = true
+                ;(pkg.main = input.slice(0, -4)), (pkg.module = input)
+                if (input === 'index.mjs') filesOBJ['index.js'] = filesOBJ['index.mjs'] = true
               }
+
               input = toPosix(input)
               // console.log(kleur.green('BUILD: ' + path_relative(argv.src, src) + ' => ' + input))
 
               exports[dirname] = {
-                import : './' + input,
-                require: './' + input.slice(0, -3) + 'js'
+                import: './' + input,
+                require: './' + input.slice(0, -3) + 'js',
               }
 
               _exp[dirname] = files[fileName].exports
 
               if (tsc) {
-                type = path_relative(argv.dir, path_join(argv.types, path_relative(argv.src, src)))
+                type = path_relative(
+                  argv.dir,
+                  path_join(argv.types, path_relative(argv.src, src))
+                )
                 type = toPosix(type.replace(/\.([mc]?)[tj]s$/, '.d.$1ts'))
-  
+
                 if (!/\.d\.[mc]?ts$/.test(type)) printError('type: ' + type)
                 // console.log(type)
 
                 if (isMain) {
                   pkg.types = type // 'index.d.ts' // type
-                  filesOBJ['index.d.ts'] = true
+                  if (filesOBJ['index.mjs']) filesOBJ['index.d.ts'] = true
                 }
 
                 exports[dirname].types = './' + type
@@ -513,43 +529,46 @@ const argv = minimist(process.argv.slice(2), {
             fl = a[i]
             pkg.exports[fl] = exports[fl]
             if (tsc) {
-              let t = toPosix(path_relative(
-                path_resolve(argv.dir, path_dirname(exports[fl].import)),
-                path_resolve(argv.dir, exports[fl].types)
-              )).replace(/(\/index)?\.d\.\w+$/, '')
+              let t = toPosix(
+                path_relative(
+                  path_resolve(argv.dir, path_dirname(exports[fl].import)),
+                  path_resolve(argv.dir, exports[fl].types)
+                )
+              ).replace(/(\/index)?\.d\.\w+$/, '')
               if (t[0] !== '.') t = './' + t
               t = JSON.stringify(t)
 
               let str = `export * from ${t};\n`
               for (const pname of _exp[fl]) {
                 if (pname === 'default') {
-                  str +=
-                  `import { ${pname} as __default__ } from ${t};\nexport { __default__ as default };\n`
+                  str += `import { ${pname} as __default__ } from ${t};\nexport { __default__ as default };\n`
                 } else if (pname[0] !== '*') {
                   str += `export { ${pname} } from ${t};\n`
                 }
               }
 
               // console.log(111, fl, exports[fl])
-              fs_writeFileSync(path_resolve(argv.dir, fl, 'index.d.ts'), str)
+              // fs_writeFileSync(path_resolve(argv.dir, fl, 'index.d.ts'), str)
+              fs_writeFileSync(path_resolve(argv.out, fl, 'index.d.ts'), str)
             }
           }
 
           // console.log(pkg.exports)
 
           /**
-            * <CREATE_PACKAGE_JSON_FILES
-            */
+           * <CREATE_PACKAGE_JSON_FILES
+           */
           pkg.files = []
           let filePath
           let typesDir
           if (tsc) {
-            filesOBJ[typesDir = path_relative(argv.dir, argv.types).split(/[\\/]/)[0]] = true
+            filesOBJ[(typesDir = path_relative(argv.dir, argv.types).split(/[\\/]/)[0])] = true
           }
           for (let fileName in filesOBJ) {
             if (tsc && fileName === 'index.d.ts') pkg.files.push(fileName)
-            else if (tsc && typesDir && typesDir === fileName) pkg.files.push(fileName + '/**/*')
-            else if (fs_existsSync(filePath = path_join(argv.dir, fileName))) {
+            else if (tsc && typesDir && typesDir === fileName)
+              pkg.files.push(fileName + '/**/*')
+            else if (fs_existsSync((filePath = path_join(argv.dir, fileName)))) {
               //! FIX FOR NPM
               if (fs_lstatSync(filePath).isDirectory()) fileName += '/**/*'
               pkg.files.push(fileName)
@@ -558,8 +577,8 @@ const argv = minimist(process.argv.slice(2), {
           pkg.files.sort()
           // console.log(pkg.files)
           /**
-            * /CREATE_PACKAGE_JSON_FILES
-            */
+           * /CREATE_PACKAGE_JSON_FILES
+           */
 
           const pkgSorted = sort_pkg_json(pkg)
           // console.log(pkgSorted)
@@ -567,8 +586,8 @@ const argv = minimist(process.argv.slice(2), {
           fs_writeFileSync(pkgjson, JSON.stringify(pkgSorted, null, 2))
         }
       })
-      /**
-       * /ROLLUP_WATCH
-       */
+    /**
+     * /ROLLUP_WATCH
+     */
   }
 })()
