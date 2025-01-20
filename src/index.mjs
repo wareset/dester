@@ -93,7 +93,7 @@ function getInputValidFiles(dir) {
       file = path_join(dir, dirent.name)
       if (dirent.isDirectory()) {
         res.push(...getInputValidFiles(file))
-      } else if (/\.[mc]?[jt]s$/.test(dirent.name)) {
+      } else if (/\.[mc]?[jt]s$/.test(dirent.name) && !/\.d\.ts$/.test(dirent.name)) {
         res.push(file)
       }
     }

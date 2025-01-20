@@ -32,7 +32,7 @@ function getInputValidFiles(e) {
     for (var o, n, s = [], i = t.readdirSync(e, {
         withFileTypes: !0
     }), a = i.length; a-- > 0; ) o = i[a], /^[^._]/.test(o.name) && !/\.tests?($|\.)/i.test(o.name) && (n = r.join(e, o.name), 
-    o.isDirectory() ? s.push(...getInputValidFiles(n)) : /\.[mc]?[jt]s$/.test(o.name) && s.push(n));
+    o.isDirectory() ? s.push(...getInputValidFiles(n)) : /\.[mc]?[jt]s$/.test(o.name) && !/\.d\.ts$/.test(o.name) && s.push(n));
     return s;
 }
 
@@ -156,7 +156,7 @@ var k = u(process.argv.slice(2), {
             objectShorthand: !1,
             reservedNamesAsProps: !0,
             symbols: !1
-        }, D = {}, I = s.watch([ ".mjs", ".js" ].map((function(t, n) {
+        }, D = {}, $ = s.watch([ ".mjs", ".js" ].map((function(t, n) {
             return {
                 output: {
                     exports: "named",
@@ -279,7 +279,7 @@ var k = u(process.argv.slice(2), {
             e === f && getExternals(), "update" !== r.event && (m = null, console.log(r.event + ": " + e));
         })).on("event", (function(e) {
             if ("ERROR" === e.code) console.error(e); else if ("END" === e.code) {
-                k.watch ? console.log("\n...WATCH...\n") : I.close(), console.log("");
+                k.watch ? console.log("\n...WATCH...\n") : $.close(), console.log("");
                 var o = D;
                 if (D = {}, R === (R = JSON.stringify(o))) return;
                 var n = JSON.parse(t.readFileSync(f, "utf8"));
@@ -313,7 +313,7 @@ var k = u(process.argv.slice(2), {
                 //! FIX FOR NPM
                 t.lstatSync(m).isDirectory() && (N += "/**/*"), n.files.push(N));
                 n.files.sort();
-                var $ = function sort_pkg_json(e) {
+                var I = function sort_pkg_json(e) {
                     var r = {}, t = Object.keys(e).sort();
                     return [ ...b, ...t ].filter((function(e, r, o) {
                         return t.indexOf(e) > -1 && r === o.indexOf(e);
@@ -321,7 +321,7 @@ var k = u(process.argv.slice(2), {
                         r[t] = e[t];
                     })), r;
                 }(n);
-                t.writeFileSync(f, JSON.stringify($, null, 2));
+                t.writeFileSync(f, JSON.stringify(I, null, 2));
             }
         }));
     }
