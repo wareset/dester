@@ -15,17 +15,18 @@ export default function terserPlugin(minify) {
             mangle: true,
             module: true,
             toplevel: true,
+            format: { comments: /^[!@#]/ },
             compress: { drop_debugger: false },
             ...(minify
               ? {
                   keep_classnames: KEEP_FNAMES,
-                  keep_fnames: KEEP_FNAMES
+                  keep_fnames: KEEP_FNAMES,
                 }
               : {
                   keep_classnames: true,
                   keep_fnames: true,
-                  format: { beautify: true }
-                })
+                  format: { beautify: true },
+                }),
           })
         ).code
       } catch (e) {
@@ -33,6 +34,6 @@ export default function terserPlugin(minify) {
         console.error(e)
       }
       return { code }
-    }
+    },
   }
 }

@@ -258,6 +258,9 @@ var M = j(process.argv.slice(2), {
                                 mangle: !0,
                                 module: !0,
                                 toplevel: !0,
+                                format: {
+                                    comments: /^[!@#]/
+                                },
                                 compress: {
                                     drop_debugger: !1
                                 },
